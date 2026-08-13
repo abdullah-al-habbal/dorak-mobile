@@ -1,0 +1,12 @@
+name: dorak_mobile_workspace
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+workspace:
+  - apps/client_app
+  - apps/business_app
+  - apps/stylist_app
+  - packages/design_system
+  - packages/core
+  - packages/localization
+  - packages/feature_floor_plan
