@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:design_system/design_system.dart';
 
-import 'widgets/splash_background.widget.dart';
-import 'widgets/splash_logo.widget.dart';
+import 'package:client_app/src/features/splash/widgets/splash_background.widget.dart';
+import 'package:client_app/src/features/splash/widgets/splash_logo.widget.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onFinished;

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class HeroImage extends StatefulWidget {
-  final String imageUrl;
+  final ImageProvider image;
   final double opacity;
+  final ImageErrorWidgetBuilder? errorBuilder;
 
   const HeroImage({
     super.key,
-    required this.imageUrl,
+    required this.image,
     this.opacity = 0.5,
+    this.errorBuilder,
   });
 
   @override
@@ -47,13 +49,12 @@ class _HeroImageState extends State<HeroImage>
           scale: _scaleAnimation.value,
           child: Opacity(
             opacity: widget.opacity,
-            child: Image.network(
-              widget.imageUrl,
+            child: Image(
+              image: widget.image,
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
-              cacheWidth: 800,
-              cacheHeight: 1600,
+              errorBuilder: widget.errorBuilder,
             ),
           ),
         );

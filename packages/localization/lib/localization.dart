@@ -1,3 +1,3 @@
 library;
 
-export 'src/generated/app_localizations.dart';
+export 'package:localization/src/generated/app_localizations.dart';

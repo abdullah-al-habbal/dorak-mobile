@@ -56,5 +56,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get discoveryCardServices => 'الخدمات';
 
   @override
+  String get previous => 'رجوع';
+
+  @override
+  String get localeArabic => 'العربية';
+
+  @override
+  String get localeEnglish => 'English';
+
+  @override
   String get homeTitle => 'الرئيسية';
 }

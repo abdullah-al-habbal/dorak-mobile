@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
 
-import '../tokens/colors.token.dart';
-import '../tokens/dimensions.token.dart';
-import '../tokens/typography.token.dart';
+import 'package:design_system/src/tokens/colors.token.dart';
+import 'package:design_system/src/tokens/dimensions.token.dart';
+import 'package:design_system/src/tokens/typography.token.dart';
 
 class DorakTheme {
   static ThemeData get light => _build(Brightness.light, DorakColors.light);
   static ThemeData get dark => _build(Brightness.dark, DorakColors.dark);
 
-  static ThemeData _build(Brightness brightness, DorakColors c) {
+  static ThemeData forLocale(Locale locale, Brightness brightness) {
+    final isArabic = locale.languageCode == 'ar';
+    return _build(
+      brightness,
+      brightness == Brightness.dark ? DorakColors.dark : DorakColors.light,
+      fontFamily: isArabic
+          ? DorakTypography.fontFamilyArabic
+          : DorakTypography.fontFamily,
+      fontFamilyFallback: isArabic
+          ? [DorakTypography.fontFamily, 'Roboto', 'Arial']
+          : DorakTypography.fontFamilyFallback,
+    );
+  }
+
+  static ThemeData _build(
+    Brightness brightness,
+    DorakColors c, {
+    String fontFamily = DorakTypography.fontFamily,
+    List<String> fontFamilyFallback = DorakTypography.fontFamilyFallback,
+  }) {
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: c.primary,
@@ -46,8 +65,8 @@ class DorakTheme {
       brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: c.background,
-      fontFamily: DorakTypography.fontFamily,
-      fontFamilyFallback: DorakTypography.fontFamilyFallback,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       textTheme: TextTheme(
         displayLarge: DorakTypography.displayLg,
         headlineLarge: DorakTypography.headlineLg,

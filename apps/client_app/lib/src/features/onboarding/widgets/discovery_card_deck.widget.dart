@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:design_system/design_system.dart';
 
-import '../discovery_card_data.dart';
+import 'package:client_app/src/features/onboarding/discovery_card.entity.dart';
 
 class DiscoveryCardDeck extends StatefulWidget {
   final List<DiscoveryCardData> cards;

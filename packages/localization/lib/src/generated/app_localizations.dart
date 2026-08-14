@@ -188,6 +188,24 @@ abstract class AppLocalizations {
   /// **'Services'**
   String get discoveryCardServices;
 
+  /// Discovery screen back action
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get previous;
+
+  /// Locale toggle label to switch to Arabic
+  ///
+  /// In en, this message translates to:
+  /// **'العربية'**
+  String get localeArabic;
+
+  /// Locale toggle label to switch to English
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get localeEnglish;
+
   /// Home screen title
   ///
   /// In en, this message translates to:

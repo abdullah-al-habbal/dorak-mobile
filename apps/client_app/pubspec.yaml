@@ -36,8 +36,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_dotenv: ^6.0.1
 
   # Workspace packages
+  core:
+    path: ../../packages/core
   design_system:
     path: ../../packages/design_system
   localization:
@@ -67,6 +70,7 @@ flutter:
 
   assets:
     - assets/images/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

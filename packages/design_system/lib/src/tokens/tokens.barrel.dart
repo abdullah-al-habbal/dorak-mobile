@@ -1,5 +1,5 @@
 library;
 
-export 'colors.token.dart';
-export 'dimensions.token.dart';
-export 'typography.token.dart';
+export 'package:design_system/src/tokens/colors.token.dart';
+export 'package:design_system/src/tokens/dimensions.token.dart';
+export 'package:design_system/src/tokens/typography.token.dart';

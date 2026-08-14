@@ -3,11 +3,11 @@ import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
 class WelcomeContent extends StatelessWidget {
-  final VoidCallback onGetStarted;
+  final VoidCallback onNext;
 
   const WelcomeContent({
     super.key,
-    required this.onGetStarted,
+    required this.onNext,
   });
 
   @override
@@ -31,13 +31,13 @@ class WelcomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         const ProgressDots(
-          count: 4,
+          count: 2,
           activeIndex: 0,
         ),
         const SizedBox(height: 24),
         PrimaryButton(
-          label: l10n.onboardingGetStarted,
-          onPressed: onGetStarted,
+          label: l10n.next,
+          onPressed: onNext,
         ),
       ],
     );

@@ -56,5 +56,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryCardServices => 'Services';
 
   @override
+  String get previous => 'Back';
+
+  @override
+  String get localeArabic => 'العربية';
+
+  @override
+  String get localeEnglish => 'English';
+
+  @override
   String get homeTitle => 'Home';
 }

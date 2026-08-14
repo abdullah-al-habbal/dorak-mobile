@@ -279,7 +279,7 @@ Tracks MUST be executed in order unless an Architecture Decision Record explicit
 
 ## Track 00 — Repository & Architecture Audit
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -306,7 +306,7 @@ flutter test
 
 ## Track 01 — Design Tokens
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -349,7 +349,7 @@ docs/design_system/tokens/
 
 ## Track 02 — Themes & Semantics
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -369,7 +369,7 @@ packages/design_system
 
 ## Track 03 — Localization Foundation
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -389,7 +389,7 @@ packages/localization
 
 ## Track 04 — Result, Error & State Contracts
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -449,7 +449,7 @@ packages/core
 
 ## Track 07 — Networking
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -471,7 +471,7 @@ packages/core
 
 ## Track 08 — Interceptors & API Infrastructure
 
-**Status:** `PENDING`
+**Status:** `DONE`
 
 Objectives:
 
@@ -802,7 +802,7 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** `Track 00 — Repository & Architecture Audit`
+**Current Track:** `Track 05 — Storage`
 
 **Current Task:** Establish and validate the engineering documentation baseline.
 

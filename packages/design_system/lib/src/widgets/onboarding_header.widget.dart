@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../tokens/tokens.barrel.dart';
-import 'skip_button.widget.dart';
+import 'package:design_system/src/tokens/tokens.barrel.dart';
+import 'package:design_system/src/widgets/skip_button.widget.dart';
 
 class OnboardingHeader extends StatelessWidget {
   final String brandLabel;
   final String skipLabel;
   final VoidCallback onSkip;
+  final String? localeLabel;
+  final VoidCallback? onLocaleToggle;
 
   const OnboardingHeader({
     super.key,
     required this.brandLabel,
     required this.skipLabel,
     required this.onSkip,
+    this.localeLabel,
+    this.onLocaleToggle,
   });
 
   @override
@@ -41,9 +45,25 @@ class OnboardingHeader extends StatelessWidget {
               ),
             ],
           ),
-          SkipButton(
-            label: skipLabel,
-            onPressed: onSkip,
+          Row(
+            children: [
+              if (localeLabel != null && onLocaleToggle != null)
+                TextButton(
+                  onPressed: onLocaleToggle,
+                  style: TextButton.styleFrom(
+                    foregroundColor: colors.primary,
+                    textStyle: DorakTypography.labelLg,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(localeLabel!),
+                ),
+              SkipButton(
+                label: skipLabel,
+                onPressed: onSkip,
+              ),
+            ],
           ),
         ],
       ),

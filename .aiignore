@@ -1,0 +1,20 @@
+# AI agent indexing exclusions.
+# Agents must not index build artifacts, generated code, or tool caches.
+
+# Generated code (build_runner / json_serializable, freezed).
+*.g.dart
+*.freezed.dart
+**/generated/**
+
+# Tool caches.
+**/.dart_tool/
+**/.pub-cache/
+**/build/
+**.packages
+**/pubspec.lock
+
+# IDE / OS noise.
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.DS_Store

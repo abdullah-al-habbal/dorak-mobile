@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 class DorakTypography {
   static const String fontFamily = 'IBM Plex Sans';
 
-  static const List<String> fontFamilyFallback = ['Roboto', 'Arial'];
+  static const String fontFamilyArabic = 'IBM Plex Sans Arabic';
+
+  static const List<String> fontFamilyFallback = [
+    fontFamilyArabic,
+    'Roboto',
+    'Arial',
+  ];
 
   static const TextStyle displayLg = TextStyle(
     fontFamily: fontFamily,

@@ -2,20 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
-import 'onboarding_hero.dart';
-import 'widgets/skip_bottom_sheet.sheet.dart';
-import 'widgets/welcome_content.widget.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/widgets/onboarding_hero.widget.dart';
+import 'package:client_app/src/features/onboarding/widgets/skip_bottom_sheet.sheet.dart';
+import 'package:client_app/src/features/onboarding/widgets/welcome_content.widget.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  final VoidCallback onGetStarted;
+  final OnboardingConfigController onboardingConfig;
+  final VoidCallback onNext;
   final VoidCallback onSkipForNow;
   final VoidCallback onDontShowAgain;
+  final VoidCallback onLocaleToggle;
 
   const WelcomeScreen({
     super.key,
-    required this.onGetStarted,
+    required this.onboardingConfig,
+    required this.onNext,
     required this.onSkipForNow,
     required this.onDontShowAgain,
+    required this.onLocaleToggle,
   });
 
   @override
@@ -72,39 +77,45 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: colors.background,
-      body: Stack(
-        children: [
-          HeroImage(imageUrl: kOnboardingHeroUrl),
-          const GradientOverlay(),
-          SafeArea(
-            child: Column(
-              children: [
-                FadeTransition(
-                  opacity: _staggeredAnimations[0],
-                  child: OnboardingHeader(
-                    brandLabel: l10n.splashTitle,
-                    skipLabel: l10n.skip,
-                    onSkip: _showSkipBottomSheet,
-                  ),
-                ),
-                const Spacer(),
-                FadeTransition(
-                  opacity: _staggeredAnimations[2],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: WelcomeContent(
-                      onGetStarted: widget.onGetStarted,
+      body: SwipeNavigation(
+        onSwipeRight: widget.onNext,
+        child: Stack(
+          children: [
+            OnboardingHeroImage(controller: widget.onboardingConfig),
+            const GradientOverlay(),
+            SafeArea(
+              child: Column(
+                children: [
+                  FadeTransition(
+                    opacity: _staggeredAnimations[0],
+                    child: OnboardingHeader(
+                      brandLabel: l10n.splashTitle,
+                      skipLabel: l10n.skip,
+                      onSkip: _showSkipBottomSheet,
+                      localeLabel: isArabic ? l10n.localeEnglish : l10n.localeArabic,
+                      onLocaleToggle: widget.onLocaleToggle,
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+                  const Spacer(),
+                  FadeTransition(
+                    opacity: _staggeredAnimations[2],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: WelcomeContent(
+                        onNext: widget.onNext,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

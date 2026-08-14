@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../tokens/tokens.barrel.dart';
+import 'package:design_system/src/tokens/tokens.barrel.dart';
 
 class SkipButton extends StatelessWidget {
   final String label;

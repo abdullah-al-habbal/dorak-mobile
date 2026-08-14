@@ -1,0 +1,18 @@
+# Dorak monorepo shared lint baseline.
+# Each app/package analysis_options.yaml includes this file.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+
+linter:
+  rules:
+    always_declare_return_types: true
+    always_use_package_imports: true
+    avoid_dynamic_calls: false
+    prefer_single_quotes: true
+    unnecessary_lambdas: true
+    unawaited_futures: false

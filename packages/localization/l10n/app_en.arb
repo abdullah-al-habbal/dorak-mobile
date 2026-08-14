@@ -60,6 +60,18 @@
   "@discoveryCardServices": {
     "description": "Discovery card 3 label"
   },
+  "previous": "Back",
+  "@previous": {
+    "description": "Discovery screen back action"
+  },
+  "localeArabic": "العربية",
+  "@localeArabic": {
+    "description": "Locale toggle label to switch to Arabic"
+  },
+  "localeEnglish": "English",
+  "@localeEnglish": {
+    "description": "Locale toggle label to switch to English"
+  },
   "homeTitle": "Home",
   "@homeTitle": {
     "description": "Home screen title"
