@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Complete Your Profile - Dorak</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#686177",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1c1b1f",
+                        "surface-container-low": "#f7f2f8",
+                        "surface-variant": "#e5e1e7",
+                        "secondary-container": "#e8def9",
+                        "surface-container": "#f1ecf2",
+                        "primary-fixed-dim": "#cfbcff",
+                        "surface-tint": "#6750a4",
+                        "on-primary-container": "#e0d2ff",
+                        "on-tertiary-container": "#e0d3f5",
+                        "on-surface": "#1c1b1f",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#22005d",
+                        "outline": "#7a7582",
+                        "on-tertiary-fixed": "#1f1730",
+                        "surface-container-highest": "#e5e1e7",
+                        "tertiary-fixed": "#eaddff",
+                        "on-secondary-fixed": "#1e192b",
+                        "inverse-surface": "#313034",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f4eff5",
+                        "secondary": "#625b71",
+                        "secondary-fixed": "#e8def9",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#cbc4d2",
+                        "on-tertiary-fixed-variant": "#4b425d",
+                        "tertiary-fixed-dim": "#cdc1e2",
+                        "primary-fixed": "#e9ddff",
+                        "on-secondary-fixed-variant": "#4a4459",
+                        "tertiary-container": "#635a76",
+                        "secondary-fixed-dim": "#ccc2dc",
+                        "primary-container": "#6750a4",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#4b425d",
+                        "primary": "#4f378a",
+                        "surface": "#fdf8fd",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#ebe7ec",
+                        "on-primary-fixed-variant": "#4f378a",
+                        "inverse-primary": "#cfbcff",
+                        "surface-bright": "#fdf8fd",
+                        "surface-dim": "#ddd9de",
+                        "on-surface-variant": "#494551",
+                        "background": "#fdf8fd"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "container-max": "1280px"
+                    },
+                    fontFamily: {
+                        "headline-lg-mobile": ["IBM Plex Sans"],
+                        "title-lg": ["IBM Plex Sans"],
+                        "body-lg": ["IBM Plex Sans"],
+                        "headline-sm": ["IBM Plex Sans"],
+                        "label-md": ["IBM Plex Sans"],
+                        "headline-md": ["IBM Plex Sans"],
+                        "label-lg": ["IBM Plex Sans"],
+                        "display-lg": ["IBM Plex Sans"],
+                        "body-md": ["IBM Plex Sans"],
+                        "headline-lg": ["IBM Plex Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "500" }],
+                        "title-lg": ["22px", { lineHeight: "28px", fontWeight: "500" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-sm": ["24px", { lineHeight: "32px", fontWeight: "500" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.5px", fontWeight: "600" }],
+                        "headline-md": ["28px", { lineHeight: "36px", fontWeight: "500" }],
+                        "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.1px", fontWeight: "600" }],
+                        "display-lg": ["57px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "400" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'IBM Plex Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(253, 248, 253, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(203, 196, 210, 0.3);
+        }
+        .input-line {
+            border-bottom: 1px solid var(--tw-colors-outline-variant);
+            transition: border-color 0.3s ease;
+        }
+        .input-line:focus-within {
+            border-bottom-color: var(--tw-colors-primary);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop relative overflow-hidden">
+<!-- Decorative Background Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-[100px] opacity-30 z-0 pointer-events-none"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-secondary-fixed rounded-full mix-blend-multiply filter blur-[120px] opacity-40 z-0 pointer-events-none"></div>
+<div class="w-full max-w-[600px] z-10 glass-panel rounded-xl shadow-[0_8px_32px_rgba(103,80,164,0.08)] p-6 md:p-10 flex flex-col gap-8">
+<!-- Header -->
+<div class="text-center space-y-2">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-container text-on-primary-container mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 24px;">account_circle</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Complete Your Profile</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Tell us a bit more about yourself to personalize your Dorak experience.</p>
+</div>
+<!-- Form Content -->
+<div class="space-y-6">
+<!-- Profile Photo Section -->
+<div class="flex flex-col items-center gap-4">
+<div class="relative group cursor-pointer">
+<div class="w-24 h-24 rounded-full bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-primary group-hover:bg-primary-fixed">
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" style="font-size: 32px;">add_a_photo</span>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider">Upload Photo</span>
+</div>
+<!-- Bio Field -->
+<div class="space-y-1 input-line bg-surface-container-lowest rounded-t-[4px] px-4 py-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="bio">Bio</label>
+<textarea class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-lg text-body-lg text-on-surface placeholder-outline resize-none" id="bio" placeholder="Share a brief description about yourself..." rows="3"></textarea>
+</div>
+<!-- Style Preferences -->
+<div class="space-y-3">
+<span class="block font-label-lg text-label-lg text-on-surface-variant">Style Preferences (Select up to 3)</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-md text-body-md hover:bg-surface-variant transition-colors">Minimalist</button>
+<button class="px-4 py-2 rounded-full bg-primary-container text-on-primary-container font-body-md text-body-md shadow-sm border border-transparent">Classic</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-md text-body-md hover:bg-surface-variant transition-colors">Modern</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-md text-body-md hover:bg-surface-variant transition-colors">Bold</button>
+<button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-md text-body-md hover:bg-surface-variant transition-colors">Natural</button>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-4 mt-4">
+<button class="w-full py-3 px-6 bg-primary text-on-primary rounded-full font-label-lg text-label-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-sm">
+                Save &amp; Continue
+                <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+<button class="w-full py-3 px-6 bg-transparent border border-primary text-primary rounded-full font-label-lg text-label-lg hover:bg-primary-fixed hover:bg-opacity-20 transition-colors">
+                Skip
+            </button>
+<button class="w-full text-center py-2 font-label-md text-label-md text-secondary hover:text-on-surface hover:underline transition-all mt-2">
+                Don't show again
+            </button>
+</div>
+</div>
+<!-- Top Navigation Anchor (Suppressed based on logic for transactional/onboarding flow) -->
+<!-- Bottom Navigation Anchor (Suppressed based on logic for transactional/onboarding flow) -->
+</body></html>

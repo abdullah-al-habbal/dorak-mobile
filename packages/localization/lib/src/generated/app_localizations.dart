@@ -211,6 +211,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Home'**
   String get homeTitle;
+
+  /// Booking innovation screen headline
+  ///
+  /// In en, this message translates to:
+  /// **'Book when it works for you.'**
+  String get bookingTitle;
+
+  /// Booking innovation screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your service, professional, and time — then book in just a few taps.'**
+  String get bookingSubtitle;
+
+  /// Booking demo service card label
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Fade'**
+  String get bookingServiceLabel;
+
+  /// Booking demo service card meta
+  ///
+  /// In en, this message translates to:
+  /// **'45 min • \$65'**
+  String get bookingServiceMeta;
+
+  /// Booking demo professional name
+  ///
+  /// In en, this message translates to:
+  /// **'Marcus T.'**
+  String get bookingProfessionalLabel;
+
+  /// Booking demo professional rating
+  ///
+  /// In en, this message translates to:
+  /// **'4.9'**
+  String get bookingProfessionalRating;
+
+  /// Booking demo date label
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get bookingDateLabel;
+
+  /// Booking demo time label
+  ///
+  /// In en, this message translates to:
+  /// **'2:30 PM'**
+  String get bookingTimeLabel;
+
+  /// AI feature showcase screen headline
+  ///
+  /// In en, this message translates to:
+  /// **'Discover styles made for you.'**
+  String get aiTitle;
+
+  /// AI feature showcase screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Get personalized style recommendations based on your preferences and, if you choose, your face profile.'**
+  String get aiSubtitle;
+
+  /// AI demo match card label
+  ///
+  /// In en, this message translates to:
+  /// **'98% Match'**
+  String get aiMatchLabel;
+
+  /// AI demo recommendation card label
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get aiRecommendedLabel;
+
+  /// AI demo recommended style one
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Fade'**
+  String get aiStyleFade;
+
+  /// AI demo recommended style two
+  ///
+  /// In en, this message translates to:
+  /// **'Textured Crop'**
+  String get aiStyleCrop;
+
+  /// AI demo face shape chip label
+  ///
+  /// In en, this message translates to:
+  /// **'Face Shape: Oval'**
+  String get aiFaceShapeLabel;
+
+  /// AI demo privacy note
+  ///
+  /// In en, this message translates to:
+  /// **'Face analysis is entirely optional.'**
+  String get aiPrivacyNote;
+
+  /// Auth entry screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Dorak'**
+  String get authWelcomeTitle;
+
+  /// Auth entry screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to access your personalized experience, or continue as a guest to explore.'**
+  String get authSubtitle;
+
+  /// Auth entry primary CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get authLogIn;
+
+  /// Auth entry secondary CTA
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authCreateAccount;
+
+  /// Auth entry guest action
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get authContinueAsGuest;
+
+  /// Auth entry guest helper text
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Dorak without creating an account.'**
+  String get authGuestHint;
 }
 
 class _AppLocalizationsDelegate

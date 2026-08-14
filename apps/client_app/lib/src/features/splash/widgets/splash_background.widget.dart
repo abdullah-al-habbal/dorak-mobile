@@ -26,7 +26,7 @@ class SplashBackground extends StatelessWidget {
           child: Opacity(
             opacity: 0.03,
             child: Image.asset(
-              'assets/images/noise_overlay.svg',
+              'assets/images/noise_overlay.png',
               fit: BoxFit.cover,
               cacheWidth: 400,
               cacheHeight: 800,

@@ -75,5 +75,93 @@
   "homeTitle": "الرئيسية",
   "@homeTitle": {
     "description": "Home screen title"
+  },
+  "bookingTitle": "احجز متى يناسبك.",
+  "@bookingTitle": {
+    "description": "Booking innovation screen headline"
+  },
+  "bookingSubtitle": "اختر خدمتك ومحترفك والوقت المناسب — ثم احجز في بضع لمسات.",
+  "@bookingSubtitle": {
+    "description": "Booking innovation screen subtitle"
+  },
+  "bookingServiceLabel": "بريميوم فايد",
+  "@bookingServiceLabel": {
+    "description": "Booking demo service card label"
+  },
+  "bookingServiceMeta": "45 دقيقة • $65",
+  "@bookingServiceMeta": {
+    "description": "Booking demo service card meta"
+  },
+  "bookingProfessionalLabel": "ماركوس تي.",
+  "@bookingProfessionalLabel": {
+    "description": "Booking demo professional name"
+  },
+  "bookingProfessionalRating": "4.9",
+  "@bookingProfessionalRating": {
+    "description": "Booking demo professional rating"
+  },
+  "bookingDateLabel": "غدًا",
+  "@bookingDateLabel": {
+    "description": "Booking demo date label"
+  },
+  "bookingTimeLabel": "2:30 مساءً",
+  "@bookingTimeLabel": {
+    "description": "Booking demo time label"
+  },
+  "aiTitle": "اكتشف تسريحات صُممت من أجلك.",
+  "@aiTitle": {
+    "description": "AI feature showcase screen headline"
+  },
+  "aiSubtitle": "احصل على توصيات شخصية مبنية على تفضيلاتك، وإذا أردت، على ملامح وجهك.",
+  "@aiSubtitle": {
+    "description": "AI feature showcase screen subtitle"
+  },
+  "aiMatchLabel": "تطابق 98٪",
+  "@aiMatchLabel": {
+    "description": "AI demo match card label"
+  },
+  "aiRecommendedLabel": "موصى به",
+  "@aiRecommendedLabel": {
+    "description": "AI demo recommendation card label"
+  },
+  "aiStyleFade": "بريميوم فايد",
+  "@aiStyleFade": {
+    "description": "AI demo recommended style one"
+  },
+  "aiStyleCrop": "قصّة تكستشر كروب",
+  "@aiStyleCrop": {
+    "description": "AI demo recommended style two"
+  },
+  "aiFaceShapeLabel": "شكل الوجه: بيضاوي",
+  "@aiFaceShapeLabel": {
+    "description": "AI demo face shape chip label"
+  },
+  "aiPrivacyNote": "تحليل الوجه اختياري بالكامل.",
+  "@aiPrivacyNote": {
+    "description": "AI demo privacy note"
+  },
+  "authWelcomeTitle": "مرحباً بك في دوراك",
+  "@authWelcomeTitle": {
+    "description": "Auth entry screen title"
+  },
+  "authSubtitle": "سجّل الدخول للوصول إلى تجربتك المخصصة، أو تابع كزائر للاستكشاف.",
+  "@authSubtitle": {
+    "description": "Auth entry screen subtitle"
+  },
+  "authLogIn": "تسجيل الدخول",
+  "@authLogIn": {
+    "description": "Auth entry primary CTA"
+  },
+  "authCreateAccount": "إنشاء حساب",
+  "@authCreateAccount": {
+    "description": "Auth entry secondary CTA"
+  },
+  "authContinueAsGuest": "المتابعة كزائر",
+  "@authContinueAsGuest": {
+    "description": "Auth entry guest action"
+  },
+  "authGuestHint": "استكشف دوراك دون إنشاء حساب.",
+  "@authGuestHint": {
+    "description": "Auth entry guest helper text"
   }
 }

@@ -1,8 +1,7 @@
+import 'package:client_app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:client_app/main.dart';
 
 void main() {
   setUpAll(() {

@@ -7,6 +7,7 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
   final bool isDisabled;
+  final Color? backgroundColor;
 
   const PrimaryButton({
     super.key,
@@ -14,6 +15,7 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.isDisabled = false,
+    this.backgroundColor,
   });
 
   @override
@@ -25,7 +27,7 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: (isDisabled || isLoading) ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.primaryContainer,
+          backgroundColor: backgroundColor ?? colors.primaryContainer,
           foregroundColor: colors.onPrimary,
           disabledBackgroundColor: colors.outlineVariant,
           disabledForegroundColor: colors.onSurfaceVariant,

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Barber Profile - Kraseena</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e6e0e9",
+                        "secondary-fixed-dim": "#cdc0e9",
+                        "primary-container": "#6750a4",
+                        "surface": "#fdf7ff",
+                        "outline-variant": "#cbc4d2",
+                        "tertiary-fixed-dim": "#e7c365",
+                        "tertiary-fixed": "#ffdf93",
+                        "surface-container-high": "#ece6ee",
+                        "surface-container-low": "#f8f2fa",
+                        "tertiary": "#765b00",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#241a00",
+                        "primary-fixed": "#e9ddff",
+                        "surface-container": "#f2ecf4",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#503d00",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#4f378a",
+                        "on-background": "#1d1b20",
+                        "inverse-primary": "#cfbcff",
+                        "primary": "#4f378a",
+                        "on-surface": "#1d1b20",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary-fixed-variant": "#4b4263",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#ded8e0",
+                        "background": "#fdf7ff",
+                        "secondary": "#63597c",
+                        "surface-bright": "#fdf7ff",
+                        "on-surface-variant": "#494551",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#6750a4",
+                        "outline": "#7a7582",
+                        "on-primary-container": "#e0d2ff",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#c9a74d",
+                        "primary-fixed-dim": "#cfbcff",
+                        "inverse-on-surface": "#f5eff7",
+                        "inverse-surface": "#322f35",
+                        "secondary-container": "#e1d4fd",
+                        "on-secondary-container": "#645a7d",
+                        "on-secondary-fixed": "#1f1635",
+                        "on-primary-fixed": "#22005d",
+                        "surface-variant": "#e6e0e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "container-margin": "20px",
+                        "gutter": "12px",
+                        "xl": "48px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-main": ["IBM Plex Sans"],
+                        "display-lg": ["IBM Plex Sans"],
+                        "headline-md": ["IBM Plex Sans"],
+                        "display-lg-mobile": ["IBM Plex Sans"],
+                        "label-caps": ["IBM Plex Sans"]
+                    },
+                    "fontSize": {
+                        "arabic-override": ["110%", { "lineHeight": "1.8" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "display-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'IBM Plex Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased pb-24 md:pb-0 selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar -->
+<header class="bg-surface docked full-width top-0 z-40 sticky shadow-sm">
+<div class="flex justify-between items-center px-container-margin py-md w-full">
+<button class="text-primary hover:bg-surface-container-high rounded-full p-sm transition-colors duration-150 active:scale-95">
+<span class="material-symbols-outlined font-headline-md text-headline-md">arrow_back</span>
+</button>
+<h1 class="font-display-lg-mobile text-display-lg-mobile font-bold text-primary">Kraseena</h1>
+<button class="text-primary hover:bg-surface-container-high rounded-full p-sm transition-colors duration-150 active:scale-95">
+<span class="material-symbols-outlined font-headline-md text-headline-md">share</span>
+</button>
+</div>
+</header>
+<main class="max-w-4xl mx-auto md:px-container-margin">
+<!-- Header Section -->
+<section class="px-container-margin py-lg flex flex-col items-center md:items-start md:flex-row gap-lg md:gap-xl">
+<div class="relative">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-surface-container-highest shadow-sm">
+<img class="object-cover w-full h-full" data-alt="A highly detailed, professional headshot of a stylish male barber looking confidently at the camera. He has a perfectly groomed beard and a sharp fade haircut. The lighting is dramatic and moody, reflecting a high-end luxury men's grooming salon aesthetic with dark tones and warm ambient light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzVqcQeJqZDSdO6U_XNISTjB7uTCLSGG9nnb5iphVYR7cW1nWIzGIVOlGYxA3l8x2tOor_j55-2hqjlWpEIzZSLjqaroUjYXNig-mXzv6SyavIoK0lXsl9sM_8M_4_IG8fpogeXbY9XDbNWT2kAFshktUDoQtJATUYjbsQJzXKxjCInEbEg5dkvhDPA8Ao05GLY5mYVCHNSW5aGF7i14Gw_Xw_8TQ9nhJ8zMAFfaz1At4PXzLpwCC2"/>
+</div>
+<div class="absolute bottom-0 right-0 bg-surface rounded-full p-xs">
+<div class="bg-primary text-on-primary rounded-full w-8 h-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-label-caps" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-sm">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Ahmad K. <span class="text-on-surface-variant text-headline-md font-arabic-override align-middle ml-sm">أحمد ك.</span></h2>
+<p class="font-body-main text-body-main text-primary font-medium mt-xs">Master Barber &amp; Stylist</p>
+</div>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-lg py-sm rounded-full hover:bg-on-primary-fixed-variant transition-colors shadow-sm self-center md:self-start">
+                        Follow
+                    </button>
+</div>
+<div class="flex items-center justify-center md:justify-start gap-xs text-tertiary-container mt-sm">
+<span class="material-symbols-outlined text-headline-md" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">4.9</span>
+<span class="font-body-main text-body-main text-on-surface-variant">(120 Reviews)</span>
+</div>
+</div>
+</section>
+<!-- Stats Row -->
+<section class="px-container-margin py-md grid grid-cols-3 gap-md border-y border-surface-variant bg-surface-container-low">
+<div class="flex flex-col items-center text-center">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary font-bold">8</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mt-xs">Years Exp.</span>
+</div>
+<div class="flex flex-col items-center text-center border-l border-r border-surface-variant">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary font-bold">1.2k+</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mt-xs">Cuts</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary font-display-lg-mobile mb-xs">bolt</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Fast Resp.</span>
+</div>
+</section>
+<!-- About -->
+<section class="px-container-margin py-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">About <span class="font-arabic-override text-on-surface-variant text-body-main ml-sm">عن</span></h3>
+<p class="font-body-main text-body-main text-on-surface-variant max-w-3xl">
+                Specializing in classic fades, modern texturing, and precision beard sculpting. Bringing 8 years of luxury grooming experience to deliver a tailored, premium experience for every client.
+            </p>
+</section>
+<!-- Affiliations -->
+<section class="px-container-margin pb-lg">
+<a class="flex items-center gap-md p-md bg-surface-container rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/30" href="#">
+<div class="w-12 h-12 rounded-lg bg-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">storefront</span>
+</div>
+<div class="flex-1">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Currently At</p>
+<p class="font-headline-md text-headline-md text-on-surface">The Royal Barber</p>
+</div>
+<span class="material-symbols-outlined text-primary">chevron_right</span>
+</a>
+</section>
+<!-- Services -->
+<section class="px-container-margin py-lg bg-surface-container-lowest">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Services <span class="font-arabic-override text-on-surface-variant text-body-main ml-sm">الخدمات</span></h3>
+<div class="flex flex-col gap-sm">
+<!-- Service Item 1 -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-md bg-surface border border-outline-variant/20 rounded-xl hover:shadow-sm transition-shadow gap-md">
+<div class="flex-1">
+<div class="flex items-center gap-sm mb-xs">
+<h4 class="font-headline-md text-headline-md text-on-surface">Signature Fade</h4>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant text-sm">Precision fade tailored to your head shape, including a hot towel finish.</p>
+<div class="flex items-center gap-xs mt-sm bg-surface-container-high w-fit px-sm py-xs rounded-full">
+<span class="material-symbols-outlined text-[14px] text-primary">home</span>
+<span class="font-label-caps text-label-caps text-primary">At-Home Available</span>
+</div>
+</div>
+<div class="text-left sm:text-right w-full sm:w-auto pt-sm sm:pt-0 border-t sm:border-0 border-surface-variant mt-sm sm:mt-0">
+<p class="font-headline-md text-headline-md text-on-surface">150,000 SYP</p>
+<p class="font-body-main text-body-main text-on-surface-variant text-sm">~$10 USD</p>
+</div>
+</div>
+<!-- Service Item 2 -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-md bg-surface border border-outline-variant/20 rounded-xl hover:shadow-sm transition-shadow gap-md">
+<div class="flex-1">
+<div class="flex items-center gap-sm mb-xs">
+<h4 class="font-headline-md text-headline-md text-on-surface">Beard Sculpting</h4>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant text-sm">Detailed beard trim, shaping, and straight razor line-up with premium oils.</p>
+</div>
+<div class="text-left sm:text-right w-full sm:w-auto pt-sm sm:pt-0 border-t sm:border-0 border-surface-variant mt-sm sm:mt-0">
+<p class="font-headline-md text-headline-md text-on-surface">80,000 SYP</p>
+<p class="font-body-main text-body-main text-on-surface-variant text-sm">~$5.50 USD</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Portfolio Gallery -->
+<section class="px-container-margin py-lg">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-md text-headline-md text-on-surface">Work <span class="font-arabic-override text-on-surface-variant text-body-main ml-sm">أعمال</span></h3>
+<button class="text-primary font-label-caps text-label-caps uppercase tracking-wider hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-sm">
+<div class="aspect-square rounded-lg overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" data-alt="A high-quality close-up photograph of a male model with a sharp, flawless skin fade haircut and a meticulously groomed beard. The lighting is studio-quality, highlighting the precision of the cut against a dark, moody background fitting for a luxury men's barbershop portfolio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxXyEAyRkX4K_YakxAXzBiWetVrhurTJdboi76BEt6--tQIlIHRfDFSc5gkY3oO7ZktmyywYsVomIbxUhdVztJo487CaC85ack9K5lZBQjP68OonVTIaEBS75ITSK1rVXL_VTYxtIXhLdf256cqtT_cniO4Bwi8KYkmumHOcluCFg8jCe2chau_1XqNZK_YmSSMLFQgteHWVlS6EHBsz7lremA4S_xYRkvhJ_m40-wgt7osS0gD3k5"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" data-alt="A professional side-profile shot of a handsome man with a classic pompadour haircut and a well-shaped beard. The image exudes a premium, masculine aesthetic with warm, sophisticated lighting typical of a high-end grooming salon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1c_xTnrAsNyLQs-VISZi6TRJKaq1O7xssE47-aa6l5eg_d_NSnHcE6i1X0tNQGwsx2S8k-n3KIDtaAyB4NfJgCzosXj-CD_ZluSZJBhMQ-_Xt60rbx84SVuuGLXx6AVRh6LVyYgzpsM36IicJEohZqGmiF9a7KABbSMPDhxnnAWtdIfKDXqUgrFbKSFmuA5f5MAf8sWxoVYD3uLNHFtap-GhCq1C5OHoce_tov3wZD79SNhmBVcV0"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden bg-surface-variant hidden md:block">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" data-alt="An artistic, black and white photograph focusing on the back of a man's head showing a perfectly executed low fade and defined neckline. The style is clean, modern, and highly professional, showcasing the barber's technical skill in a luxury setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGk9s0TiQ6DRdqQWnbhO-wFQGOSomMgAYxouSAqe23T53se8LtQ38ZtodDSacKh0Q6XpmKg_3lVqNlVMjQBju0J57uDbSeAWQqEdMEb4zJ6rMz9POa-CJwNuIbtxcQmXnkWnPbYIj96xX4nYeeC08haAC7teuJUKVNnQPVSFUmP4Zv4gnQ5ZtQSQ6dlH-As8ECTZuUYcX0Q4VQ0KLZLmBW3diqBt-hQ61ImZubNblgj8hsbiPKq2Co"/>
+</div>
+</div>
+</section>
+<!-- Spacer for fixed bottom bar -->
+<div class="h-24 md:h-0"></div>
+</main>
+<!-- Fixed Action Button (Mobile) / Regular Button (Desktop) -->
+<div class="fixed bottom-0 w-full bg-surface-container-highest border-t border-outline-variant/20 p-container-margin z-50 md:relative md:bg-transparent md:border-0 md:pt-lg md:pb-xl flex justify-center">
+<button class="w-full max-w-md bg-primary text-on-primary font-headline-md text-headline-md py-md rounded-xl hover:bg-on-primary-fixed-variant transition-colors shadow-md flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">calendar_month</span>
+            Book Now
+        </button>
+</div>
+</body></html>

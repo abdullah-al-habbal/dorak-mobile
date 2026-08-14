@@ -8,5 +8,6 @@ export 'package:design_system/src/widgets/hero_image.widget.dart';
 export 'package:design_system/src/widgets/onboarding_header.widget.dart';
 export 'package:design_system/src/widgets/primary_button.widget.dart';
 export 'package:design_system/src/widgets/progress_dots.widget.dart';
+export 'package:design_system/src/widgets/secondary_button.widget.dart';
 export 'package:design_system/src/widgets/skip_button.widget.dart';
 export 'package:design_system/src/widgets/swipe_navigation.widget.dart';

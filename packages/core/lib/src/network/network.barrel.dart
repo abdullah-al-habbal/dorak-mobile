@@ -1,7 +1,10 @@
 export 'package:core/src/network/api.client.dart';
 export 'package:core/src/network/api_response.dto.dart';
+export 'package:core/src/network/dto/auth_response.dto.dart';
+export 'package:core/src/network/dto/client.dto.dart';
 export 'package:core/src/network/dto/onboarding_config.dto.dart';
 export 'package:core/src/network/endpoints/app.endpoints.dart';
+export 'package:core/src/network/endpoints/auth.endpoints.dart';
 export 'package:core/src/network/exceptions/api.exception.dart';
 export 'package:core/src/network/exceptions/network.exception.dart';
 export 'package:core/src/network/exceptions/validation.exception.dart';
@@ -13,4 +16,5 @@ export 'package:core/src/network/paginated_data.dto.dart';
 export 'package:core/src/network/pagination/page_pagination.notifier.dart';
 export 'package:core/src/network/pagination/scroll_pagination.notifier.dart';
 export 'package:core/src/network/pagination_meta.dto.dart';
+export 'package:core/src/network/repositories/auth.repository.dart';
 export 'package:core/src/network/repositories/onboarding_config.repository.dart';

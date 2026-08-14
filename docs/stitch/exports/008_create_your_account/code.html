@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Account - Dorak</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1b1f",
+                        "inverse-surface": "#313034",
+                        "on-tertiary-fixed": "#1f1730",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#ddd9de",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#ccc2dc",
+                        "on-background": "#1c1b1f",
+                        "on-primary-container": "#e0d2ff",
+                        "surface": "#fdf8fd",
+                        "tertiary": "#4b425d",
+                        "surface-bright": "#fdf8fd",
+                        "on-secondary-fixed-variant": "#4a4459",
+                        "surface-container-low": "#f7f2f8",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e5e1e7",
+                        "tertiary-container": "#635a76",
+                        "primary-fixed-dim": "#cfbcff",
+                        "on-primary-fixed-variant": "#4f378a",
+                        "outline": "#7a7582",
+                        "on-secondary": "#ffffff",
+                        "background": "#fdf8fd",
+                        "primary": "#4f378a",
+                        "surface-tint": "#6750a4",
+                        "inverse-on-surface": "#f4eff5",
+                        "tertiary-fixed-dim": "#cdc1e2",
+                        "on-tertiary-container": "#e0d3f5",
+                        "surface-container-high": "#ebe7ec",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e5e1e7",
+                        "on-primary-fixed": "#22005d",
+                        "on-secondary-container": "#686177",
+                        "on-surface-variant": "#494551",
+                        "secondary": "#625b71",
+                        "tertiary-fixed": "#eaddff",
+                        "outline-variant": "#cbc4d2",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#cfbcff",
+                        "on-tertiary-fixed-variant": "#4b425d",
+                        "on-secondary-fixed": "#1e192b",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#6750a4",
+                        "secondary-fixed": "#e8def9",
+                        "secondary-container": "#e8def9",
+                        "surface-container": "#f1ecf2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["IBM Plex Sans"],
+                        "headline-sm": ["IBM Plex Sans"],
+                        "display-lg": ["IBM Plex Sans"],
+                        "body-lg": ["IBM Plex Sans"],
+                        "headline-lg": ["IBM Plex Sans"],
+                        "body-md": ["IBM Plex Sans"],
+                        "label-lg": ["IBM Plex Sans"],
+                        "headline-md": ["IBM Plex Sans"],
+                        "title-lg": ["IBM Plex Sans"],
+                        "headline-lg-mobile": ["IBM Plex Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "600" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "500" }],
+                        "title-lg": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "500" }]
+                    },
+                    "animation": {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    "keyframes": {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+        .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+        
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            transform: translateY(-1.5rem) scale(0.85);
+            color: theme('colors.primary');
+        }
+        
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(253, 248, 253, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(103, 80, 164, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface font-body-lg text-on-surface antialiased min-h-screen flex flex-col overflow-x-hidden relative">
+<!-- Top Navigation (Transactional, minimal) -->
+<header class="bg-background dark:bg-on-background w-full px-margin-mobile md:px-margin-desktop h-16 flex justify-between items-center z-50 relative animate-fade-in-up stagger-1">
+<div class="flex items-center gap-4">
+<!-- Back Navigation -->
+<button aria-label="Go back" class="text-on-surface-variant hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-headline-md text-headline-md" data-icon="spa" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spa</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Dorak</span>
+</div>
+</div>
+<div></div>
+</header>
+<!-- Main Content Area with Split Layout on Desktop -->
+<main class="flex-1 w-full flex relative z-10">
+<!-- Background decorative elements for the minimalist corporate feel -->
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-fixed-dim rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-tertiary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style="animation-delay: 2s;"></div>
+</div>
+<div class="w-full max-w-container-max mx-auto flex flex-col md:flex-row h-full md:min-h-[calc(100vh-64px)]">
+<!-- Left Side: Form Container -->
+<div class="w-full md:w-1/2 flex flex-col justify-center px-margin-mobile md:px-margin-desktop py-12 md:py-0 relative z-20">
+<div class="w-full max-w-[420px] mx-auto">
+<div class="mb-10 animate-fade-in-up stagger-2">
+<h1 class="font-display-lg text-display-lg md:text-[48px] md:leading-[56px] text-on-surface mb-4 tracking-tight">Create your account</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Join Dorak for personalized grooming and effortless booking.</p>
+</div>
+<form class="space-y-6">
+<!-- Full Name (Floating Label) -->
+<div class="relative animate-fade-in-up stagger-3 group">
+<input class="floating-input w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-on-surface transition-colors peer data-[error=true]:border-error data-[error=true]:focus:border-error" id="fullname" placeholder=" " required="" type="text"/>
+<label class="floating-label absolute left-0 top-3 font-body-lg text-on-surface-variant transition-all duration-200 pointer-events-none origin-left peer-data-[error=true]:text-error" for="fullname">Full Name</label>
+<p class="hidden font-body-md text-body-md text-error mt-1 peer-data-[error=true]:block">This field is required</p>
+</div>
+<!-- Email or Phone -->
+<div class="relative animate-fade-in-up stagger-3 group" style="animation-delay: 0.35s">
+<input class="floating-input w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-on-surface transition-colors peer data-[error=true]:border-error data-[error=true]:focus:border-error" id="contact" placeholder=" " required="" type="text"/>
+<label class="floating-label absolute left-0 top-3 font-body-lg text-on-surface-variant transition-all duration-200 pointer-events-none origin-left peer-data-[error=true]:text-error" for="contact">Email or Phone</label>
+<p class="hidden font-body-md text-body-md text-error mt-1 peer-data-[error=true]:block">Please enter a valid email or phone number</p>
+</div>
+<!-- Password -->
+<div class="relative animate-fade-in-up stagger-4">
+<input class="floating-input w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 pr-10 font-body-lg text-on-surface transition-colors peer data-[error=true]:border-error data-[error=true]:focus:border-error" id="password" placeholder=" " required="" type="password"/>
+<label class="floating-label absolute left-0 top-3 font-body-lg text-on-surface-variant transition-all duration-200 pointer-events-none origin-left peer-data-[error=true]:text-error" for="password">Password</label>
+<button class="absolute right-0 top-3 text-on-surface-variant hover:text-primary transition-colors focus:outline-none" onclick="togglePasswordVisibility('password', 'pwd-icon-1')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="pwd-icon-1">visibility_off</span>
+</button>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">info</span>
+                                At least 8 characters
+                            </p>
+</div>
+<!-- Confirm Password -->
+<div class="relative animate-fade-in-up stagger-4" style="animation-delay: 0.45s">
+<input class="floating-input w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 pr-10 font-body-lg text-on-surface transition-colors peer data-[error=true]:border-error data-[error=true]:focus:border-error" id="confirm-password" placeholder=" " required="" type="password"/>
+<label class="floating-label absolute left-0 top-3 font-body-lg text-on-surface-variant transition-all duration-200 pointer-events-none origin-left peer-data-[error=true]:text-error" for="confirm-password">Confirm Password</label>
+<button class="absolute right-0 top-3 text-on-surface-variant hover:text-primary transition-colors focus:outline-none" onclick="togglePasswordVisibility('confirm-password', 'pwd-icon-2')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="pwd-icon-2">visibility_off</span>
+</button>
+<p class="hidden font-body-md text-body-md text-error mt-1 peer-data-[error=true]:block">Passwords do not match</p>
+</div>
+<!-- Actions -->
+<div class="pt-6 animate-fade-in-up stagger-5 flex flex-col gap-4">
+<button class="w-full bg-primary hover:bg-surface-tint text-on-primary font-label-lg text-label-lg py-4 px-6 rounded-full transition-all duration-200 shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 group data-[loading=true]:opacity-80 data-[loading=true]:pointer-events-none" type="submit">
+<span class="material-symbols-outlined text-[20px] hidden group-data-[loading=true]:block animate-spin">progress_activity</span>
+<span>Create Account</span>
+</button>
+<p class="text-center font-body-md text-body-md text-on-surface-variant mt-4">
+                                Already have an account? <a class="text-primary font-label-md text-label-md hover:underline decoration-1 underline-offset-2" href="#">Log In</a>
+</p>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Side: Imagery (Hidden on mobile) -->
+<div class="hidden md:block md:w-1/2 p-6 h-full min-h-[600px] animate-fade-in-up stagger-3">
+<div class="w-full h-full rounded-2xl overflow-hidden relative shadow-[0_8px_30px_rgb(103,80,164,0.08)]">
+<div class="w-full h-full bg-cover bg-center absolute inset-0" data-alt="A high-end, cinematic shot of modern luxury grooming products carefully arranged on a clean, pristine marble surface. Soft, highly diffused light creates a premium, tranquil atmosphere characteristic of top-tier spas. Subtle hints of deep purple and pristine white define the elegant, modern minimalist aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAZpcg0cvdjSa_gh7QS6a6d21H2Q7TKKyIdrr_BSWgYELY_ySU9xl2Q104PIYZzwKvQhTT_MFLi2Gzz52f7AHX4fMDES1xzv2MCcdLu-37pDqujJ2aE5rKchWXyupgii23R8cBsqtujrEWTl67q8xe6XNTCo544-bTSHdKld0JYlNahfYfvTbQKWt53JYXUfp8luYcahDJF9y4AW3byun-zVxcFCwgxqJOkA1jBn19d7UmiLnbrV0B0')"></div>
+<!-- Glassmorphism overlay card -->
+<div class="absolute bottom-8 left-8 right-8 glass-panel rounded-xl p-6 shadow-lg">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-1">Premium Experience</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Your journey to tailored grooming begins the moment you join. Experience seamless booking and personalized care.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        }
+    </script>
+</body></html>

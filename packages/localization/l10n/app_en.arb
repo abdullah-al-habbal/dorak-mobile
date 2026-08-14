@@ -75,5 +75,93 @@
   "homeTitle": "Home",
   "@homeTitle": {
     "description": "Home screen title"
+  },
+  "bookingTitle": "Book when it works for you.",
+  "@bookingTitle": {
+    "description": "Booking innovation screen headline"
+  },
+  "bookingSubtitle": "Choose your service, professional, and time — then book in just a few taps.",
+  "@bookingSubtitle": {
+    "description": "Booking innovation screen subtitle"
+  },
+  "bookingServiceLabel": "Premium Fade",
+  "@bookingServiceLabel": {
+    "description": "Booking demo service card label"
+  },
+  "bookingServiceMeta": "45 min • $65",
+  "@bookingServiceMeta": {
+    "description": "Booking demo service card meta"
+  },
+  "bookingProfessionalLabel": "Marcus T.",
+  "@bookingProfessionalLabel": {
+    "description": "Booking demo professional name"
+  },
+  "bookingProfessionalRating": "4.9",
+  "@bookingProfessionalRating": {
+    "description": "Booking demo professional rating"
+  },
+  "bookingDateLabel": "Tomorrow",
+  "@bookingDateLabel": {
+    "description": "Booking demo date label"
+  },
+  "bookingTimeLabel": "2:30 PM",
+  "@bookingTimeLabel": {
+    "description": "Booking demo time label"
+  },
+  "aiTitle": "Discover styles made for you.",
+  "@aiTitle": {
+    "description": "AI feature showcase screen headline"
+  },
+  "aiSubtitle": "Get personalized style recommendations based on your preferences and, if you choose, your face profile.",
+  "@aiSubtitle": {
+    "description": "AI feature showcase screen subtitle"
+  },
+  "aiMatchLabel": "98% Match",
+  "@aiMatchLabel": {
+    "description": "AI demo match card label"
+  },
+  "aiRecommendedLabel": "Recommended",
+  "@aiRecommendedLabel": {
+    "description": "AI demo recommendation card label"
+  },
+  "aiStyleFade": "Premium Fade",
+  "@aiStyleFade": {
+    "description": "AI demo recommended style one"
+  },
+  "aiStyleCrop": "Textured Crop",
+  "@aiStyleCrop": {
+    "description": "AI demo recommended style two"
+  },
+  "aiFaceShapeLabel": "Face Shape: Oval",
+  "@aiFaceShapeLabel": {
+    "description": "AI demo face shape chip label"
+  },
+  "aiPrivacyNote": "Face analysis is entirely optional.",
+  "@aiPrivacyNote": {
+    "description": "AI demo privacy note"
+  },
+  "authWelcomeTitle": "Welcome to Dorak",
+  "@authWelcomeTitle": {
+    "description": "Auth entry screen title"
+  },
+  "authSubtitle": "Sign in to access your personalized experience, or continue as a guest to explore.",
+  "@authSubtitle": {
+    "description": "Auth entry screen subtitle"
+  },
+  "authLogIn": "Log In",
+  "@authLogIn": {
+    "description": "Auth entry primary CTA"
+  },
+  "authCreateAccount": "Create Account",
+  "@authCreateAccount": {
+    "description": "Auth entry secondary CTA"
+  },
+  "authContinueAsGuest": "Continue as Guest",
+  "@authContinueAsGuest": {
+    "description": "Auth entry guest action"
+  },
+  "authGuestHint": "Explore Dorak without creating an account.",
+  "@authGuestHint": {
+    "description": "Auth entry guest helper text"
   }
 }

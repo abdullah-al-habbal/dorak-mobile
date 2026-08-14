@@ -31,12 +31,12 @@ class WelcomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         const ProgressDots(
-          count: 2,
+          count: 4,
           activeIndex: 0,
         ),
         const SizedBox(height: 24),
         PrimaryButton(
-          label: l10n.next,
+          label: l10n.onboardingGetStarted,
           onPressed: onNext,
         ),
       ],

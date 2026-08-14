@@ -41,14 +41,14 @@ class DiscoveryContent extends StatelessWidget {
         DiscoveryCardDeck(cards: cards),
         const SizedBox(height: 24),
         const ProgressDots(
-          count: 2,
+          count: 4,
           activeIndex: 1,
         ),
         const SizedBox(height: 24),
         Row(
           children: [
             Expanded(
-              child: SkipButton(
+              child: SecondaryButton(
                 label: l10n.previous,
                 onPressed: onPrevious,
               ),
@@ -56,7 +56,7 @@ class DiscoveryContent extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: PrimaryButton(
-                label: l10n.onboardingGetStarted,
+                label: l10n.next,
                 onPressed: onNext,
               ),
             ),
