@@ -1,0 +1,67 @@
+{
+  "@@locale": "ar",
+  "splashTitle": "Dorak",
+  "@splashTitle": {
+    "description": "App brand name displayed on splash screen"
+  },
+  "skip": "تخطي",
+  "@skip": {
+    "description": "Skip button label"
+  },
+  "onboardingWelcomeTitle": "تجربة العناية بك، من جديد.",
+  "@onboardingWelcomeTitle": {
+    "description": "Welcome screen headline"
+  },
+  "onboardingWelcomeSubtitle": "اكتشف نخبة المحترفين، واحجز بسهولة، وخصص رحلتك الأنيقة.",
+  "@onboardingWelcomeSubtitle": {
+    "description": "Welcome screen subtitle"
+  },
+  "onboardingGetStarted": "ابدأ الآن",
+  "@onboardingGetStarted": {
+    "description": "Primary CTA on welcome screen"
+  },
+  "skipOnboardingQuestion": "تخطي مرحلة التعريف؟",
+  "@skipOnboardingQuestion": {
+    "description": "Skip bottom sheet title"
+  },
+  "skipForNow": "تخطَّ الآن",
+  "@skipForNow": {
+    "description": "Skip bottom sheet primary action"
+  },
+  "dontShowAgain": "لا تظهر مجددًا",
+  "@dontShowAgain": {
+    "description": "Skip bottom sheet secondary action"
+  },
+  "cancel": "إلغاء",
+  "@cancel": {
+    "description": "Skip bottom sheet cancel action"
+  },
+  "discoveryTitle": "اعثر على الأنسب لك.",
+  "@discoveryTitle": {
+    "description": "Discovery screen headline"
+  },
+  "discoverySubtitle": "استكشف المتاجر القريبة وأفضل الحلاقين والخدمات المتميزة المصممة لاحتياجاتك.",
+  "@discoverySubtitle": {
+    "description": "Discovery screen subtitle"
+  },
+  "next": "التالي",
+  "@next": {
+    "description": "Discovery screen primary CTA"
+  },
+  "discoveryCardShops": "المتاجر",
+  "@discoveryCardShops": {
+    "description": "Discovery card 1 label"
+  },
+  "discoveryCardBarbers": "الحلاقون",
+  "@discoveryCardBarbers": {
+    "description": "Discovery card 2 label"
+  },
+  "discoveryCardServices": "الخدمات",
+  "@discoveryCardServices": {
+    "description": "Discovery card 3 label"
+  },
+  "homeTitle": "الرئيسية",
+  "@homeTitle": {
+    "description": "Home screen title"
+  }
+}

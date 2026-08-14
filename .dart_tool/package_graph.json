@@ -21,7 +21,10 @@
       "version": "1.0.0+1",
       "dependencies": [
         "cupertino_icons",
-        "flutter"
+        "design_system",
+        "flutter",
+        "flutter_localizations",
+        "localization"
       ],
       "devDependencies": [
         "flutter_lints",
@@ -78,7 +81,9 @@
       "name": "localization",
       "version": "0.0.1",
       "dependencies": [
-        "flutter"
+        "flutter",
+        "flutter_localizations",
+        "intl"
       ],
       "devDependencies": [
         "flutter_lints",
@@ -131,6 +136,24 @@
         "meta",
         "sky_engine",
         "vector_math"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
       ]
     },
     {

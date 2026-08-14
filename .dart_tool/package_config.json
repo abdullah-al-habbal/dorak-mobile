@@ -56,10 +56,22 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "flutter_localizations",
+      "rootUri": "file:///home/lenovo/development/flutter/packages/flutter_localizations",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///home/lenovo/development/flutter/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.10"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///home/lenovo/.pub-cache/hosted/pub.dev/intl-0.20.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "leak_tracker",

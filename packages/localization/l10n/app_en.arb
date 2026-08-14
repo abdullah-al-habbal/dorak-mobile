@@ -1,0 +1,67 @@
+{
+  "@@locale": "en",
+  "splashTitle": "Dorak",
+  "@splashTitle": {
+    "description": "App brand name displayed on splash screen"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button label"
+  },
+  "onboardingWelcomeTitle": "Your grooming experience, reimagined.",
+  "@onboardingWelcomeTitle": {
+    "description": "Welcome screen headline"
+  },
+  "onboardingWelcomeSubtitle": "Discover top-tier professionals, book with ease, and personalize your style journey.",
+  "@onboardingWelcomeSubtitle": {
+    "description": "Welcome screen subtitle"
+  },
+  "onboardingGetStarted": "Get Started",
+  "@onboardingGetStarted": {
+    "description": "Primary CTA on welcome screen"
+  },
+  "skipOnboardingQuestion": "Skip Onboarding?",
+  "@skipOnboardingQuestion": {
+    "description": "Skip bottom sheet title"
+  },
+  "skipForNow": "Skip for now",
+  "@skipForNow": {
+    "description": "Skip bottom sheet primary action"
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Skip bottom sheet secondary action"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Skip bottom sheet cancel action"
+  },
+  "discoveryTitle": "Find the perfect fit.",
+  "@discoveryTitle": {
+    "description": "Discovery screen headline"
+  },
+  "discoverySubtitle": "Explore nearby shops, expert barbers, and premium services tailored to your needs.",
+  "@discoverySubtitle": {
+    "description": "Discovery screen subtitle"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Discovery screen primary CTA"
+  },
+  "discoveryCardShops": "Shops",
+  "@discoveryCardShops": {
+    "description": "Discovery card 1 label"
+  },
+  "discoveryCardBarbers": "Barbers",
+  "@discoveryCardBarbers": {
+    "description": "Discovery card 2 label"
+  },
+  "discoveryCardServices": "Services",
+  "@discoveryCardServices": {
+    "description": "Discovery card 3 label"
+  },
+  "homeTitle": "Home",
+  "@homeTitle": {
+    "description": "Home screen title"
+  }
+}

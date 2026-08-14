@@ -1,1 +1,3 @@
-// Localization package
+library;
+
+export 'src/generated/app_localizations.dart';
