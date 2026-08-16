@@ -28,15 +28,12 @@ Rules:
 ## State Contracts
 
 * Async UI state is expressed with explicit loading/error/data (see
-  `state_management/async_state.md`).
-* Pagination state is encapsulated in **legacy** `ChangeNotifier` notifiers (see
-  `state_management/pagination.md`); Phase 4 replaces them with a Bloc/Stream
-  story.
-* `OnboardingConfigController` (`apps/client_app/.../onboarding_config.notifier.dart`)
-  is a **transitional** `ChangeNotifier` + repository (config, `isLoading`,
-  `error`, silent fallback to bundled assets). **Canonical new state is Pure
-  Bloc** (`flutter_bloc`) at the app layer — `ChangeNotifier` is not a target
-  pattern and no new instances may be added.
+  `state_management/pagination.md` for the paging story).
+* `OnboardingConfigBloc` (`apps/client_app/.../onboarding_config.bloc.dart`,
+  pure `bloc` over an `OnboardingConfigRepository`) holds config + `isLoading`
+  + `error` with silent fallback to bundled assets, and reloads on locale
+  switch. `ChangeNotifier` is not a target pattern and no new instances may be
+  added.
 
 ## Verification
 

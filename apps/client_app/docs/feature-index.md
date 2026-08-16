@@ -31,7 +31,7 @@
 - `lib/src/features/onboarding/widgets/ai_showcase_visual.widget.dart`
 
 ### Onboarding Infrastructure
-- `lib/src/features/onboarding/onboarding_config.notifier.dart` — `OnboardingConfigController`: loads `/app/onboarding-config` (locale-aware), reloads on locale switch.
+- `lib/src/features/onboarding/onboarding_config.bloc.dart` (with `.event.dart` / `.state.dart`) — `OnboardingConfigBloc`: loads `/app/onboarding-config` (locale-aware), reloads on locale switch, dedupes same-locale loads.
 - `lib/src/features/onboarding/widgets/skip_bottom_sheet.sheet.dart` — shared 3-option skip sheet; pops itself before Skip / Don't show again navigate.
 - Flow lives in `lib/src/core/navigation/app.router.dart` (go_router, not `main.dart`). `Skip for now` leaves `dontShowOnboarding` alone; `Don't show again` and finishing the tour persist it.
 
@@ -47,8 +47,8 @@
 
 ### Bootstrap & Navigation
 - `lib/main.dart` — binding init, dotenv, `SharedAppPreferences.create()`, then `DorakApp`.
-- `lib/app.dart` — builds secure storage → `ApiClient` (with `tokenProvider`) → `DioAuthRepository` → `SessionController` → `OnboardingConfigController`; starts `session.ready` unawaited so restore overlaps the splash. Test seams: `tokenStorage`, `authRepository`.
-- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); `router.go(AppRoutes.home)` clears the stack.
+- `lib/app.dart` — builds secure storage → `ApiClient` (with `tokenProvider`) → `DioAuthRepository` → `SessionBloc` → `OnboardingConfigBloc` → `LocaleBloc`; starts `session.ready` unawaited so restore overlaps the splash; subscribes the unauthorized stream → `UnauthorizedDetected` and locale → config reload. Test seams: `tokenStorage`, `authRepository`.
+- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); single session-stream listener re-runs the redirect and reacts to `SessionNotice` (auth/home/verify navigation) before acknowledging; `router.go(AppRoutes.home)` clears the stack.
 - `lib/src/core/navigation/app_routes.entity.dart` — `AppRoutes` path constants.
 - `lib/src/core/navigation/app_gate.entity.dart` — post-splash decision, wired as the router redirect (session first, onboarding flag second).
 

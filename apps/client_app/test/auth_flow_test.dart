@@ -16,12 +16,11 @@ import 'helpers/fakes.dart';
 void main() {
   late FakeAuthRepository repository;
   late InMemoryTokenStorage storage;
-  late SessionController session;
+  late SessionBloc session;
 
   setUp(() {
     repository = FakeAuthRepository();
     storage = InMemoryTokenStorage();
-    session = SessionController(repository, storage);
   });
 
   Future<AppRouter> pumpEntry(WidgetTester tester) async {
@@ -29,13 +28,17 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await session.ready;
+    session = SessionBloc(repository, storage);
     final router = buildRouter(
       session: session,
       preferences: InMemoryAppPreferences(),
+      apiClient: fakeApiClient(),
     );
-    router.router.go(AppRoutes.authEntry);
     await tester.pumpWidget(routerHarness(router));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    router.router.go(AppRoutes.authEntry);
     await tester.pumpAndSettle();
     return router;
   }
@@ -66,7 +69,7 @@ void main() {
 
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(storage.token, 'login-token');
-    expect(session.isAuthenticated, isTrue);
+    expect(session.state.isAuthenticated, isTrue);
   });
 
   testWidgets('rejected credentials keep the user on the login screen', (tester) async {

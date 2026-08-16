@@ -4,10 +4,14 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:localization/localization.dart';
 
+import 'package:client_app/src/core/locale/locale.bloc.dart';
+import 'package:client_app/src/core/locale/locale.event.dart';
 import 'package:client_app/src/core/navigation/app.router.dart';
-import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
 
 class DorakApp extends StatefulWidget {
   final AppPreferences preferences;
@@ -26,74 +30,81 @@ class DorakApp extends StatefulWidget {
 }
 
 class _DorakAppState extends State<DorakApp> {
-  final ValueNotifier<Locale> _locale = ValueNotifier<Locale>(
-    const Locale('en'),
-  );
   late final TokenStorage _tokenStorage;
   late final ApiClient _apiClient;
-  late final SessionController _session;
-  late final OnboardingConfigController _onboardingConfig;
+  late final SessionBloc _sessionBloc;
+  late final OnboardingConfigBloc _onboardingConfigBloc;
+  late final LocaleBloc _localeBloc;
   late final AppRouter _router;
+  late final StreamSubscription<void> _unauthorizedSubscription;
+  late final StreamSubscription<Locale> _localeSubscription;
 
   @override
   void initState() {
     super.initState();
     _tokenStorage = widget.tokenStorage ?? SecureTokenStorage();
+    _localeBloc = LocaleBloc();
     _apiClient = ApiClient(
       baseUrl: ConfigProvider.config.apiBaseV1Url,
-      localeResolver: () => _locale.value.languageCode,
+      localeResolver: () => _localeBloc.state.languageCode,
 
       tokenProvider: _tokenStorage.read,
       enableLogging: kDebugMode,
     );
-    _session = SessionController(
+    _sessionBloc = SessionBloc(
       widget.authRepository ?? DioAuthRepository(_apiClient),
       _tokenStorage,
     );
 
-    unawaited(_session.ready);
+    unawaited(_sessionBloc.ready);
 
-    _onboardingConfig = OnboardingConfigController(
+    _onboardingConfigBloc = OnboardingConfigBloc(
       DioOnboardingConfigRepository(_apiClient),
-      () => _locale.value,
     );
-    _onboardingConfig.load();
-    _locale.addListener(_onLocaleChanged);
+    _onboardingConfigBloc.add(
+      OnboardingConfigLoadRequested(localeCode: _localeBloc.state.languageCode),
+    );
+
+    _unauthorizedSubscription = _apiClient.unauthorizedStream.listen((_) {
+      _sessionBloc.add(UnauthorizedDetected());
+    });
+
+    _localeSubscription = _localeBloc.stream.listen((locale) {
+      _onboardingConfigBloc.add(
+        OnboardingConfigLoadRequested(localeCode: locale.languageCode),
+      );
+    });
 
     _router = AppRouter(
-      session: _session,
+      session: _sessionBloc,
       preferences: widget.preferences,
-      onboardingConfig: _onboardingConfig,
+      onboardingConfig: _onboardingConfigBloc,
       switchLocale: _switchLocale,
-      unauthorizedNotifier: _apiClient.unauthorizedNotifier,
+      apiClient: _apiClient,
     );
-  }
-
-  void _onLocaleChanged() {
-    _onboardingConfig.load();
   }
 
   @override
   void dispose() {
-    _locale.removeListener(_onLocaleChanged);
+    _unauthorizedSubscription.cancel();
+    _localeSubscription.cancel();
     _router.dispose();
-    _session.dispose();
-    _onboardingConfig.dispose();
-    _locale.dispose();
+    _sessionBloc.close();
+    _onboardingConfigBloc.close();
+    _localeBloc.close();
+    _apiClient.dispose();
     super.dispose();
   }
 
   void _switchLocale() {
-    _locale.value = _locale.value.languageCode == 'en'
-        ? const Locale('ar')
-        : const Locale('en');
+    _localeBloc.add(LocaleToggled());
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Locale>(
-      valueListenable: _locale,
-      builder: (context, locale, _) {
+    return BlocBuilder<LocaleBloc, Locale>(
+      bloc: _localeBloc,
+      builder: (context, locale) {
         return MaterialApp.router(
           title: 'Dorak',
           debugShowCheckedModeBanner: false,

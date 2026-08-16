@@ -1,22 +1,25 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
+import 'package:client_app/src/features/auth/auth_error.entity.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_background.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/login_content.widget.dart';
 
 class LoginScreen extends StatefulWidget {
-  final Future<void> Function(String email, String password) onSubmit;
+  final SessionBloc session;
   final VoidCallback onCreateAccount;
 
   final VoidCallback? onForgotPassword;
 
   const LoginScreen({
     super.key,
-    required this.onSubmit,
+    required this.session,
     required this.onCreateAccount,
     this.onForgotPassword,
   });
@@ -87,13 +90,32 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 448),
-                        child: LoginContent(
-                          titleAnimation: _staggeredAnimations[0],
-                          formAnimation: _staggeredAnimations[1],
-                          actionsAnimation: _staggeredAnimations[2],
-                          onSubmit: widget.onSubmit,
-                          onForgotPassword: widget.onForgotPassword,
-                          onCreateAccount: widget.onCreateAccount,
+                        child: BlocBuilder<SessionBloc, SessionState>(
+                          bloc: widget.session,
+                          builder: (context, state) {
+                            final error = state.error == null
+                                ? null
+                                : AuthError.from(
+                                    state.error!,
+                                    l10n,
+                                    unauthorizedMessage:
+                                        l10n.loginErrorInvalidCredentials,
+                                  );
+                            return LoginContent(
+                              titleAnimation: _staggeredAnimations[0],
+                              formAnimation: _staggeredAnimations[1],
+                              actionsAnimation: _staggeredAnimations[2],
+                              onSubmit: (email, password) => widget.session
+                                  .add(LoginRequested(
+                                email: email,
+                                password: password,
+                              )),
+                              error: error,
+                              isSubmitting: state.isLoading,
+                              onForgotPassword: widget.onForgotPassword,
+                              onCreateAccount: widget.onCreateAccount,
+                            );
+                          },
                         ),
                       ),
                     ),

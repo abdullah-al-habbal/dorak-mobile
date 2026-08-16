@@ -19,7 +19,7 @@ void main() {
     }
   }
 
-  test('401 on an authenticated non-lifecycle request fires the notifier',
+  test('401 on an authenticated non-lifecycle request fires the signal',
       () async {
     final api = clientWithStatuses(
       [401],
@@ -30,7 +30,7 @@ void main() {
     final error = await failingGet(api, '/client/profile');
 
     expect(error.isUnauthorized, isTrue);
-    expect(api.unauthorizedNotifier.fired, isTrue);
+    expect(api.unauthorizedSignalFired, isTrue);
   });
 
   test('403 is treated the same as 401', () async {
@@ -43,10 +43,10 @@ void main() {
     final error = await failingGet(api, '/client/profile');
 
     expect(error.isForbidden, isTrue);
-    expect(api.unauthorizedNotifier.fired, isTrue);
+    expect(api.unauthorizedSignalFired, isTrue);
   });
 
-  test('auth-lifecycle routes never fire the notifier', () async {
+  test('auth-lifecycle routes never fire the signal', () async {
     final paths = <String>[
       AuthEndpoints.login,
       AuthEndpoints.register,
@@ -70,7 +70,7 @@ void main() {
       final error = await failingGet(api, path);
 
       expect(error.isUnauthorized, isTrue);
-      expect(api.unauthorizedNotifier.fired, isFalse, reason: path);
+      expect(api.unauthorizedSignalFired, isFalse, reason: path);
     }
   });
 
@@ -84,7 +84,7 @@ void main() {
     final error = await failingGet(api, '/client/profile');
 
     expect(error.isUnauthorized, isTrue);
-    expect(api.unauthorizedNotifier.fired, isFalse);
+    expect(api.unauthorizedSignalFired, isFalse);
   });
 
   test('a transport failure is not a session expiry', () async {
@@ -107,7 +107,7 @@ void main() {
       api.get<int>('/client/profile', parser: (_) => 0),
       throwsA(isA<NetworkException>()),
     );
-    expect(api.unauthorizedNotifier.fired, isFalse);
+    expect(api.unauthorizedSignalFired, isFalse);
   });
 
   test('a 500 is not a session expiry', () async {
@@ -120,7 +120,7 @@ void main() {
     final error = await failingGet(api, '/client/profile');
 
     expect(error.isServerError, isTrue);
-    expect(api.unauthorizedNotifier.fired, isFalse);
+    expect(api.unauthorizedSignalFired, isFalse);
   });
 
   test('a burst of 401s fires exactly once until reset', () async {
@@ -131,20 +131,21 @@ void main() {
     );
 
     var notifications = 0;
-    api.unauthorizedNotifier.addListener(() => notifications++);
+    final subscription = api.unauthorizedStream.listen((_) => notifications++);
+    addTearDown(subscription.cancel);
 
     await failingGet(api, '/client/profile');
     await failingGet(api, '/client/profile');
     await failingGet(api, '/client/profile');
 
-    expect(api.unauthorizedNotifier.fired, isTrue);
+    expect(api.unauthorizedSignalFired, isTrue);
     expect(notifications, 1);
 
-    api.unauthorizedNotifier.reset();
+    api.resetUnauthorizedSignal();
 
     await failingGet(api, '/client/profile');
 
     expect(notifications, 2);
-    expect(api.unauthorizedNotifier.fired, isTrue);
+    expect(api.unauthorizedSignalFired, isTrue);
   });
 }

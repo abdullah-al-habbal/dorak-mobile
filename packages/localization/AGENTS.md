@@ -134,10 +134,9 @@ codebase idiom is `isRtl ? Icons.arrow_forward : Icons.arrow_back`.
 
 ## 7. Gotchas
 
-- **Locale is not persisted.** The EN/AR toggle lives in a `ValueNotifier` in
-  `DorakApp` and resets on restart. It is **transitional** (Phase 3 folds it
-  into a `SettingsBloc`). Persisting it is unowned work — it would go in
-  `AppPreferences` (`packages/core`).
+- **Locale is not persisted.** The EN/AR toggle lives in a `LocaleBloc` in
+  `DorakApp` and resets on restart. Persisting it is unowned work — it would
+  go in `AppPreferences` (`packages/core`).
 - **Generated files are committed** and excluded from the analyzer and the
   taxonomy checker. Do not add them to `.gitignore`, and do not edit them.
 - **No ARB parity test exists.** `test/localization_test.dart` is a placeholder.

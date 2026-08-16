@@ -1,23 +1,24 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
+import 'package:client_app/src/features/auth/auth_error.entity.dart';
 import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/verify_account_content.widget.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
+  final SessionBloc session;
   final String destination;
-  final Future<void> Function(String code) onVerify;
-  final Future<void> Function() onResend;
   final VoidCallback onSkip;
 
   const VerifyAccountScreen({
     super.key,
+    required this.session,
     required this.destination,
-    required this.onVerify,
-    required this.onResend,
     required this.onSkip,
   });
 
@@ -86,16 +87,33 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen>
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: colors.surfaceTint.withValues(alpha: 0.08),
+                              color:
+                                  colors.surfaceTint.withValues(alpha: 0.08),
                               blurRadius: 24,
                             ),
                           ],
                         ),
-                        child: VerifyAccountContent(
-                          destination: widget.destination,
-                          onVerify: widget.onVerify,
-                          onResend: widget.onResend,
-                          onSkip: widget.onSkip,
+                        child: BlocBuilder<SessionBloc, SessionState>(
+                          bloc: widget.session,
+                          builder: (context, state) {
+                            final error = state.error == null
+                                ? null
+                                : AuthError.from(
+                                    state.error!,
+                                    l10n,
+                                    unprocessableMessage: l10n.verifyErrorInvalid,
+                                  );
+                            return VerifyAccountContent(
+                              destination: widget.destination,
+                              onVerify: (code) => widget.session
+                                  .add(VerifyEmailRequested(code: code)),
+                              onResend: () => widget.session
+                                  .add(SendVerificationCodeRequested()),
+                              error: error,
+                              isVerifying: state.isLoading,
+                              onSkip: widget.onSkip,
+                            );
+                          },
                         ),
                       ),
                     ),

@@ -15,11 +15,6 @@ void main() {
 
   setUp(() {
     preferences = InMemoryAppPreferences();
-    final session = SessionController(
-      FakeAuthRepository(),
-      InMemoryTokenStorage(),
-    );
-    router = buildRouter(session: session, preferences: preferences);
   });
 
   Future<void> startTour(WidgetTester tester) async {
@@ -27,9 +22,16 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await router.session.ready;
-    router.router.go(AppRoutes.onboardingWelcome);
+    router = buildRouter(
+      session: SessionBloc(FakeAuthRepository(), InMemoryTokenStorage()),
+      preferences: preferences,
+      apiClient: fakeApiClient(),
+    );
     await tester.pumpWidget(routerHarness(router));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    router.router.go(AppRoutes.onboardingWelcome);
     await tester.pumpAndSettle();
     expect(find.byType(WelcomeScreen), findsOneWidget);
   }

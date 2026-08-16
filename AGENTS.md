@@ -110,15 +110,13 @@ mobile changes. Its contract is summarised in §8.
 
 1. **One HTTP stack.** Everything goes through `ApiClient` in `packages/core`.
    Never add `http`, never construct a bare `Dio` outside core.
-2. **One state-management approach.** **Pure Bloc** (`flutter_bloc`). UI emits
-   events, a `Bloc` owns business state, UI renders from state. No Riverpod,
-   Provider or GetIt — prohibited. **`ChangeNotifier` is not a target pattern.**
-   The remaining instances are transitional: Track 12/session infrastructure
-   (`SessionController`, `UnauthorizedNotifier`, `SessionNotice`) and the
-   legacy pagination notifiers (`page_pagination.notifier.dart`,
-   `scroll_pagination.notifier.dart`). They are kept as-is and must not be
-   extended; Phase 4 replaces them with Stream/Bloc. Do not add new
-   `ChangeNotifier` state.
+2. **One state-management approach.** **Bloc** — pure `bloc` in
+   `packages/core`, `flutter_bloc` in `apps/*`. UI emits events, a `Bloc`
+   owns business state, UI renders from state. No Riverpod, Provider or GetIt
+   — prohibited. **`ChangeNotifier` is not a target pattern.** The session,
+   unauthorized-signal and pagination `ChangeNotifier`s were migrated to
+   `SessionBloc` + `ApiClient.unauthorizedStream` in Phase 4; the `.notifier`
+   taxonomy role is gone. Do not reintroduce `ChangeNotifier` state.
 3. **One navigation approach.** **`go_router` only** — declarative route table,
    redirects for the launch gate and auth guards, `context.push/go/pop` in
    screens. **Navigator 1.0 and `AppNavigator` are gone from `client_app`**
@@ -160,11 +158,11 @@ Filenames are `<subject>.<role>.dart`. Enforced by `tool/check_taxonomy.dart`
 | `.dto.dart` | wire models (codegen) | `core`, `apps/*` |
 | `.endpoints.dart` | route constants, domain-split | `core`, `apps/*` |
 | `.repository.dart` | data-source contract + impl | `core`, `apps/*` |
-| `.provider.dart` / `.notifier.dart` | state / DI | `core`, `apps/*` |
+| `.provider.dart` | state / DI | `core`, `apps/*` |
 | `.storage.dart` | device persistence | **`core` only** |
 | `.navigator.dart` | **DEPRECATED** — legacy route-flow coordinators (removed from `client_app` in Phase 2) | only `business_app`/`stylist_app` stubs |
 | `.router.dart` | declarative `go_router` route table | `apps/*` only |
-| `.bloc.dart` / `.event.dart` / `.state.dart` | Pure Bloc feature state (Phase 3) | `apps/*`, `packages/feature_*` |
+| `.bloc.dart` / `.event.dart` / `.state.dart` | Bloc feature state (Phase 3) | `core`, `apps/*`, `packages/feature_*` |
 | `.client.dart` `.interceptor.dart` `.exception.dart` `.barrel.dart` | as named | anywhere |
 
 Files directly at `lib/` root (`main.dart`, `app.dart`, `core.dart`) are exempt.
@@ -250,11 +248,11 @@ declare `shared_preferences` themselves.
 
 ### Session — `packages/core/lib/src/session/`
 
-`SessionController extends ChangeNotifier`. `AuthStatus` is
+`SessionBloc` (pure `bloc`, no Flutter dependency). `AuthStatus` is
 `unknown | authenticated | guest`; `unknown` is pre-restore and must never be
 branched on — `await session.ready` first.
 
-`restore()`:
+`RestoreRequested`:
 
 ```
 no stored token          -> guest
@@ -264,9 +262,19 @@ refreshToken() succeeds  -> persist rotated token, authenticated
   other ApiException     -> authenticated, token kept
 ```
 
-Mutating calls (`login`, `register`, `verifyEmail`, `sendVerificationCode`)
-**rethrow** so screens can branch on `ValidationException`. `logout()` is the
-exception — it swallows the network failure and always clears local state.
+Mutating events (`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested`)
+emit `isLoading` then a notice on success; failures surface in `state.error`
+(typed via `AuthError.from` in the app). `LogoutRequested` swallows the network
+failure and always clears local state. `SendVerificationCodeRequested` errors
+are swallowed — registration already succeeded. `state.notice` carries the
+one-shot navigation signals consumed by the router's single stream listener
+(`sessionExpired`, `authenticationRequired`, `loginSucceeded`,
+`registrationSucceeded`, `verificationSucceeded`); the router acknowledges each
+via `NoticeAcknowledged`.
+
+Unauthorized: `ApiClient` owns a broadcast `unauthorizedStream` (fires once per
+401/403 burst until `resetUnauthorizedSignal()`). `client_app` forwards it to
+`UnauthorizedDetected`; the bloc drops to `guest` + raises `sessionExpired`.
 
 ### Navigation — `apps/client_app/lib/src/core/navigation/`
 
@@ -331,7 +339,7 @@ Authentication always outranks the onboarding flag.
   Socialite drivers, so it always 401s.
 - Per-route auth guards (beyond the launch gate + 401 redirect), guest guards,
   deep links, notifications.
-- Logout UI. `SessionController.logout()` exists with no affordance.
+- Logout UI. `SessionBloc` handles `LogoutRequested`; no affordance calls it.
 - DI container. Wiring is manual construction in `DorakApp.initState`.
 - Locale persistence. The toggle is in-memory and resets on restart.
 - `business_app` / `stylist_app` features. Both are untouched counter stubs
@@ -389,9 +397,9 @@ before "simplifying" any of them.**
 
 | Code | Why it is that way |
 |---|---|
-| `ApiClient(tokenProvider: _tokenStorage.read)` | Reads storage directly, not `SessionController`. `SessionController` depends on `ApiClient`; going the other way would be a construction cycle. Also the only thing that activates `AuthInterceptor`. |
+| `ApiClient(tokenProvider: _tokenStorage.read)` | Reads storage directly, not `SessionBloc`. `SessionBloc` depends on `ApiClient`; going the other way would be a construction cycle. Also the only thing that activates `AuthInterceptor`. |
 | `unawaited(_session.ready)` in `initState` | Restore runs concurrently with the 2500 ms splash so the gate adds no wait of its own. |
-| `AppGate` awaits `session.ready`, not `restore()` | `ready` memoises; `restore()` called directly would fire a second pass. |
+| `AppGate` awaits `session.ready`, not `RestoreRequested` | `ready` memoises the restore pass; re-adding `RestoreRequested` would fire a second pass. |
 | `goHome()` uses `pushAndRemoveUntil` | `pushReplacement` swaps only the top route — onboarding and auth screens stayed alive underneath Home and were reachable by back gesture, and from inside a bottom sheet it replaced the *sheet*. **Gone in Phase 2**: auth/onboarding success uses `context.go('/home')` (declarative `go_router`), which clears the stack by construction. |
 | `SkipBottomSheet` pops itself before invoking callbacks | Otherwise navigation fires while the modal route is still on top. It now pops with `context.pop()`. |
 | `_dismissForever` writes in `try`, navigates in `finally` | A failed preference write must not strand the user on the tour. |
@@ -456,9 +464,9 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 | File | Covers |
 |---|---|
 | `core/test/api_client_test.dart` | envelope parse, verbs, pagination, exception mapping |
-| `core/test/session_controller_test.dart` | all four `restore()` branches, login, register, verify, logout |
+| `core/test/session_bloc_test.dart` | all four `restore()` branches, login, register, verify, logout, notices |
 | `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, 401/422 mapping |
-| `core/test/unauthorized_notifier_test.dart` | Track 12 401/403 emission |
+| `core/test/unauthorized_signal_test.dart` | 401/403 burst emission + reset on the `unauthorizedStream` |
 | `core/test/storage_test.dart` | preference round-trip + defaults |
 | `client_app/test/widget_test.dart` | real `DorakApp` bootstrap: splash → gate → auth entry |
 | `client_app/test/app_gate_test.dart` | all six gate branches |
@@ -471,6 +479,10 @@ Rules:
 - Use the fakes in `client_app/test/helpers/fakes.dart` and
   `core/test/helpers/{fake_dio,fake_auth}.dart`. Never hit a real plugin or a
   real network.
+- **Construct `Bloc`s inside the `testWidgets` body, never in `setUp`.** A bloc
+  built in `setUp` lives outside the FakeAsync zone, so its event stream never
+  delivers and `await session.ready` hangs. Build it in the body (or in a
+  helper called from the body), then drive it with `pump`/`pumpAndSettle`.
 - `DorakApp` takes optional `tokenStorage` and `authRepository` **purely as
   test seams**. Leave them null in production.
 - `routerHarness(AppRouter)` builds a real `go_router`-driven

@@ -32,13 +32,12 @@
 - `ConfigProvider` — `.env` via dotenv (`app_config.entity.dart`, `config.provider.dart`).
 - `ApiClient` — Dio-based (`api.client.dart`).
 - Interceptors: `auth.interceptor.dart`, `locale.interceptor.dart`, `logging.interceptor.dart`, `retry.interceptor.dart`.
-- Contracts: `ApiResponse<T>` / `api_response.dto.dart`, `PaginatedData<T>`, `PaginationMeta`, exceptions (`ApiException`, `NetworkException`, `ValidationException`).
-- Pagination notifiers: `page_pagination.notifier.dart`, `scroll_pagination.notifier.dart` (**legacy** ChangeNotifier, Phase 4 replaces them).
+- Contracts: `ApiResponse<T>` / `api_response.dto.dart`, `PaginatedData<T>`, `PaginationMeta`, exceptions (`ApiException`, `NetworkException`, `ValidationException`). Paging **state** is app-layer Bloc work — the legacy pagination notifiers were deleted (see `docs/state_management/pagination.md`).
 - `endpoints/app.endpoints.dart`, `endpoints/auth.endpoints.dart` — domain-split endpoint declarations.
 - `onboarding_config.repository.dart` — `OnboardingConfigRepository` + `OnboardingConfigDto` (GET /api/v1/app/onboarding-config).
 - `auth.repository.dart` — `AuthRepository` + `DioAuthRepository`: login, register (sends `password_confirmation`), logout, refreshToken, sendEmailVerification, verifyEmail, forgotPassword, resetPassword. DTOs `AuthResponseDto`, `ClientDto`, `TokenResponseDto`.
 - **Storage** (`src/storage/`) — `TokenStorage` / `SecureTokenStorage` (flutter_secure_storage) and `AppPreferences` / `SharedAppPreferences` (shared_preferences, `dontShowOnboarding`). See `docs/core/storage.md`.
-- **Session** (`src/session/`) — `AuthStatus` + `SessionController` (`ChangeNotifier`, **transitional** — Phase 4 replaces it with a `SessionBloc`): restore / login / register / verify / logout. See `docs/core/session.md`.
+- **Session** (`src/session/`) — `SessionBloc` (pure `bloc`, `.bloc.dart`/`.event.dart`/`.state.dart` + `SessionNotice`): restore / login / register / verify / logout; one-shot notices consumed by the router's single stream listener. See `docs/core/session.md`.
 
 ### feature_floor_plan
 - Stub only — `feature_floor_plan.dart` barrel, no implementation yet.
@@ -66,7 +65,7 @@
 - `ai_showcase.screen.dart`, `ai_showcase_content.widget.dart`, `ai_showcase_visual.widget.dart` — avatar + face-shape chip, two recommendation cards with mini progress bars, decorative rings, privacy note, `ProgressDots(4, 3)`, Back + Get Started.
 
 ### Onboarding Infrastructure
-- `onboarding_config.notifier.dart` — `OnboardingConfigController`, loads `/app/onboarding-config` per locale, reloads on locale switch.
+- `onboarding_config.bloc.dart` (`.event.dart`/`.state.dart`) — `OnboardingConfigBloc`, loads `/app/onboarding-config` per locale, reloads on locale switch.
 - `skip_bottom_sheet.sheet.dart` — shared 3-option skip sheet (Skip / Don't show again / Cancel); dismisses itself before either decision navigates.
 - Flow wiring in `src/core/navigation/app.router.dart` (go_router). `Skip for now` leaves `dontShowOnboarding` untouched; `Don't show again` and completing the tour persist it. See `docs/flows/onboarding.md`.
 

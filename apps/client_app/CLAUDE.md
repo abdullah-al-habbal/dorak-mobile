@@ -39,7 +39,10 @@ Files at `lib/` root are exempt from the taxonomy checker; everything under
 1. **Screens are dumb.** A `.screen.dart` receives callbacks and renders. It
    must not call a repository, touch storage, or decide where to navigate next.
 2. **Flow logic lives in `AppRouter`** (`app.router.dart`), never inside a
-   screen or a bloc. Screens receive callbacks wired by the router.
+   screen or a bloc. Screens receive callbacks wired by the router. The router
+   owns the session stream listener: it re-runs the redirect on every state
+   change and reacts to `SessionNotice` (auth/home/verify navigation), then
+   acknowledges each notice via `NoticeAcknowledged`.
 3. **Navigation is go_router through `AppRouter`** — `router.push/go`, or
    `context.push/pop/go` inside screens. A local `context.pop()` to dismiss the
    current route or sheet is the established idiom. Bloc never navigates.
@@ -47,10 +50,10 @@ Files at `lib/` root are exempt from the taxonomy checker; everything under
    user-visible; add keys to both ARB files first.
 5. **No raw colours or text styles.** `DorakColors.of(context)`,
    `DorakTypography.*`, `DorakDimensions.*`. A `Color(0xFF…)` here is a defect.
-6. **No second HTTP, state or routing stack.** `ApiClient` from `core`; **Pure
-   Bloc** state; **go_router** routing. No Riverpod, Provider or GetIt.
-   `ChangeNotifier` is transitional only — `SessionController`/session notices
-   (Track 12) and legacy pagination notifiers; do not add new `ChangeNotifier`.
+6. **No second HTTP, state or routing stack.** `ApiClient` from `core`;
+   **Bloc** state (`flutter_bloc` at the app layer, pure `bloc` in core);
+   **go_router** routing. No Riverpod, Provider or GetIt. `ChangeNotifier` is
+   not used — do not add it.
 7. **DI is constructor wiring in `DorakApp.initState`.** There is no container.
    Add a field there and thread it down; do not introduce a service locator.
 8. **Test seams stay optional.** `DorakApp`'s `tokenStorage` and
@@ -83,3 +86,7 @@ flutter test                       # 26 tests
 
 Widget tests must use the fakes in `test/helpers/fakes.dart` and set a phone
 viewport — the 800×600 default overflows these screens.
+
+**Construct blocs inside the `testWidgets` body, never in `setUp`** — a bloc
+built in `setUp` sits outside the FakeAsync zone, so its event stream never
+delivers and `await session.ready` hangs. Drive it with `pump`/`pumpAndSettle`.

@@ -33,8 +33,9 @@ recorded in this file or in `docs/`.
 ## 3. Allowed file roles here
 
 `.client.dart` · `.interceptor.dart` · `.exception.dart` · `.dto.dart` ·
-`.entity.dart` · `.endpoints.dart` · `.repository.dart` · `.notifier.dart` ·
-`.provider.dart` · `.storage.dart` · `.barrel.dart`
+`.entity.dart` · `.endpoints.dart` · `.repository.dart` · `.bloc.dart` ·
+`.event.dart` · `.state.dart` · `.provider.dart` · `.storage.dart` ·
+`.barrel.dart`
 
 `.storage.dart` is **exclusive to this package** — the taxonomy checker rejects
 it anywhere else. `.screen.dart`, `.token.dart` and `.theme.dart` are rejected
@@ -69,19 +70,17 @@ here.
 
 ## 5. State management
 
-The session/unauthorized state that lives in this package is **transitional**:
-`SessionController`, `UnauthorizedNotifier` and `SessionNotice` are
-`ChangeNotifier`-based and stay as-is until Phase 4 replaces them with
-Stream/Bloc. The pagination notifiers (`page_pagination.notifier.dart`,
-`scroll_pagination.notifier.dart`) are **legacy** ChangeNotifier — do not
-extend them. Do not add new `ChangeNotifier` state here.
+Session state lives **in this package as a pure `bloc`** — `SessionBloc`,
+`SessionEvent`, `SessionState`, `SessionNotice` (no Flutter dependency). The
+unauthorized signal lives on `ApiClient` as a broadcast
+`unauthorizedStream` (fires once per 401/403 burst until reset). The former
+`ChangeNotifier` layer (`SessionController`, `UnauthorizedNotifier`) and the
+pagination notifiers were removed in Phase 4. **Do not add `ChangeNotifier`
+state here.**
 
-**Target state lives at the app layer as Pure Bloc** (`flutter_bloc`). Core
-stays framework-agnostic: it exposes repositories and the session stream
-surface; feature blocs consume them. No Riverpod, Provider or GetIt anywhere.
-
-Convention: mutating methods **rethrow** so callers can branch on
-`ValidationException`; `error` is also recorded for listeners.
+Convention: success sets a `SessionNotice` for the router; failures land in
+`state.error` — screens map via `AuthError.from` (app layer). No Riverpod,
+Provider or GetIt anywhere.
 
 ## 6. Verification
 

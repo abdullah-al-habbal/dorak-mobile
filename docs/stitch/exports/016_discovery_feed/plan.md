@@ -285,7 +285,7 @@ Do not introduce:
 * Riverpod
 * Provider
 * GetIt
-* ChangeNotifier state
+* `ChangeNotifier` state
 * another state library
 
 ---
@@ -1020,15 +1020,13 @@ The repository already documents pagination infrastructure.
 Inspect:
 
 ```text id="3tct51"
-page_pagination.notifier.dart      (legacy ChangeNotifier — do not extend)
-scroll_pagination.notifier.dart    (legacy ChangeNotifier — do not extend)
 docs/state_management/pagination.md
 ```
 
-The pagination notifiers are **legacy** — implement feed pagination in the
-`DiscoveryBloc` (or a dedicated pagination bloc) instead. Before building a new
-pagination solution, reuse the fetch contract these notifiers already encode
-(`PaginatedData<T>` + `PaginationMeta`).
+The legacy pagination `ChangeNotifier`s were **deleted** — implement feed
+pagination in the `DiscoveryBloc` (or a dedicated pagination bloc) instead.
+Reuse the fetch contract they used to encode: `ApiClient.getPaginated` +
+`PaginatedData<T>` + `PaginationMeta`.
 
 Preferred behavior:
 
@@ -1223,8 +1221,7 @@ repository
 ```
 
 (flutter_bloc — see the locked architecture; `ChangeNotifier` is not a target
-pattern. Track 12 session infra and the pagination notifiers are the only
-remaining exceptions and are transitional.)
+pattern.)
 
 Expected state categories:
 

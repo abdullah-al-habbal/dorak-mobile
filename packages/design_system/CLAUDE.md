@@ -32,7 +32,7 @@ Forbidden, without exception:
 
 `.token.dart` and `.theme.dart` are **exclusive to this package** — the
 taxonomy checker rejects them anywhere else. `.screen.dart`, `.dto.dart`,
-`.entity.dart`, `.repository.dart`, `.notifier.dart` and `.endpoints.dart` are
+`.entity.dart`, `.repository.dart` and `.endpoints.dart` are
 all rejected here.
 
 ## 4. Hard rules

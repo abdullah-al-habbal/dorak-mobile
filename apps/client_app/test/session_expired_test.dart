@@ -13,28 +13,30 @@ import 'helpers/fakes.dart';
 void main() {
   late FakeAuthRepository repository;
   late InMemoryTokenStorage storage;
-  late SessionController session;
-  late UnauthorizedNotifier unauthorizedNotifier;
+  late SessionBloc session;
+  late ApiClient apiClient;
   late AppRouter router;
 
   setUp(() {
     repository = FakeAuthRepository();
-    storage = InMemoryTokenStorage('valid-token');
-    session = SessionController(repository, storage);
-    unauthorizedNotifier = UnauthorizedNotifier();
+  });
+
+  void createSession({String? token, bool dontShowOnboarding = false}) {
+    storage = InMemoryTokenStorage(token);
+    session = SessionBloc(repository, storage);
+    apiClient = fakeApiClient();
     router = buildRouter(
       session: session,
-      preferences: InMemoryAppPreferences(),
-      unauthorizedNotifier: unauthorizedNotifier,
+      preferences: InMemoryAppPreferences(dontShowOnboarding: dontShowOnboarding),
+      apiClient: apiClient,
     );
-  });
+  }
 
   Future<void> pumpHome(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1290, 2796);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await session.ready;
     await tester.pumpWidget(routerHarness(router));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(seconds: 3));
@@ -44,25 +46,27 @@ void main() {
   testWidgets(
       'a mid-session 401 clears the session and replaces the stack with auth entry',
       (tester) async {
+    createSession(token: 'valid-token');
     await pumpHome(tester);
     expect(find.byType(HomeScreen), findsOneWidget);
 
-    unauthorizedNotifier.fire();
+    session.add(UnauthorizedDetected());
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
     expect(find.byType(HomeScreen), findsNothing);
     expect(storage.token, isNull);
-    expect(session.status, AuthStatus.guest);
-    expect(session.notice, SessionNotice.none);
+    expect(session.state.status, AuthStatus.guest);
+    expect(session.state.notice, SessionNotice.none);
   });
 
   testWidgets('a burst of 401s opens auth entry exactly once', (tester) async {
+    createSession(token: 'valid-token');
     await pumpHome(tester);
 
-    unauthorizedNotifier.fire();
-    unauthorizedNotifier.fire();
-    unauthorizedNotifier.fire();
+    session.add(UnauthorizedDetected());
+    session.add(UnauthorizedDetected());
+    session.add(UnauthorizedDetected());
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
@@ -72,9 +76,10 @@ void main() {
 
   testWidgets('a guest action raises authenticationRequired and pushes auth entry',
       (tester) async {
+    createSession(token: 'valid-token');
     await pumpHome(tester);
 
-    session.requireAuthentication();
+    session.add(RequireAuthentication());
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
@@ -88,8 +93,9 @@ void main() {
   });
 
   testWidgets('after expiry the user can sign back in', (tester) async {
+    createSession(token: 'valid-token');
     await pumpHome(tester);
-    unauthorizedNotifier.fire();
+    session.add(UnauthorizedDetected());
     await tester.pumpAndSettle();
     expect(find.byType(AuthEntryScreen), findsOneWidget);
 
@@ -104,22 +110,18 @@ void main() {
 
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(storage.token, 'login-token');
-    expect(session.isAuthenticated, isTrue);
+    expect(session.state.isAuthenticated, isTrue);
   });
 
   testWidgets('a revoked token at restore does not raise sessionExpired',
       (tester) async {
     repository.refreshTokenError = unauthorized();
-    router = buildRouter(
-      session: session,
-      preferences: InMemoryAppPreferences(dontShowOnboarding: true),
-      unauthorizedNotifier: unauthorizedNotifier,
-    );
+    createSession(token: 'valid-token', dontShowOnboarding: true);
 
     await pumpHome(tester);
 
-    expect(session.status, AuthStatus.guest);
-    expect(session.notice, SessionNotice.none);
+    expect(session.state.status, AuthStatus.guest);
+    expect(session.state.notice, SessionNotice.none);
     expect(storage.token, isNull);
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.byType(AuthEntryScreen), findsNothing);

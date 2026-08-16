@@ -72,8 +72,9 @@ Backend paginated responses carry `meta.pagination`:
 {"total": 25, "count": 2, "per_page": 15, "current_page": 1, "total_pages": 2}
 ```
 
-Decode with `getPaginated`, drive UI with `PagePaginationNotifier` /
-`ScrollPaginationNotifier` (see `state_management/pagination.md`).
+Decode with `getPaginated`. Paging **state** is app-layer Bloc work — the
+legacy `PagePaginationNotifier` / `ScrollPaginationNotifier` `ChangeNotifier`s
+were deleted in Phase 4 (see `state_management/pagination.md`).
 
 ## Repositories
 

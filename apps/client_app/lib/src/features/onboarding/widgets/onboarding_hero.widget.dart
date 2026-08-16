@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:design_system/design_system.dart';
 
-import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.state.dart';
 
 class OnboardingHeroImage extends StatelessWidget {
-  final OnboardingConfigController controller;
+  final OnboardingConfigBloc bloc;
 
   const OnboardingHeroImage({
     super.key,
-    required this.controller,
+    required this.bloc,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: controller,
-      builder: (context, _) {
-        final url = controller.heroImageUrl;
+    return BlocBuilder<OnboardingConfigBloc, OnboardingConfigState>(
+      bloc: bloc,
+      builder: (context, state) {
+        final url = state.heroImageUrl;
         final image = (url == null || url.isEmpty)
             ? const AssetImage('assets/images/onboarding_hero.jpg')
                 as ImageProvider

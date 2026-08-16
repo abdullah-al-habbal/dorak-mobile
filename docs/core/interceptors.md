@@ -23,15 +23,15 @@ Adds `Authorization: Bearer <token>` when a `tokenProvider` is supplied.
 Provider returns `null`/empty → header omitted. Token rotation happens
 outside the interceptor (session layer).
 
-### Global 401/403 detection (Track 12)
+### Global 401/403 detection
 
 `AuthInterceptor.onError` watches responses for a dead session and raises it
 through a single channel:
 
 ```text
 401/403 + bearer attached + not an auth-lifecycle path
-        -> UnauthorizedNotifier.fire()
-        -> (app layer) SessionController.handleUnauthorized() -> redirect
+        -> ApiClient.reportUnauthorized() (once per burst, stream)
+        -> (app layer) SessionBloc.add(UnauthorizedDetected()) -> redirect
 ```
 
 Conditions — all three must hold before anything fires:
@@ -53,10 +53,10 @@ no infinite-loop risk. The interceptor always calls `handler.next(err)`; the
 error still surfaces as an `ApiException` at the call site, so existing
 call-site error handling is unchanged.
 
-`UnauthorizedNotifier` (`lib/src/network/unauthorized.notifier.dart`) fires at
-most **once per burst**: concurrent 401/403 responses collapse into a single
-`fire()`, and the app layer calls `reset()` after handling. This is what
-prevents double navigations and repeated token clears under load.
+`ApiClient.unauthorizedStream` fires at most **once per burst**: concurrent
+401/403 responses collapse into a single emission (`reportUnauthorized` sets a
+flag), and the app layer calls `resetUnauthorizedSignal()` after handling.
+This is what prevents double navigations and repeated token clears under load.
 
 ## LoggingInterceptor
 

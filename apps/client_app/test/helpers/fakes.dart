@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
-import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
 Widget routerHarness(AppRouter appRouter) {
   return MaterialApp.router(
@@ -19,9 +19,9 @@ Widget routerHarness(AppRouter appRouter) {
 }
 
 AppRouter buildRouter({
-  required SessionController session,
+  required SessionBloc session,
   required AppPreferences preferences,
-  UnauthorizedNotifier? unauthorizedNotifier,
+  required ApiClient apiClient,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
@@ -29,11 +29,19 @@ AppRouter buildRouter({
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
     switchLocale: switchLocale,
-    unauthorizedNotifier: unauthorizedNotifier ?? UnauthorizedNotifier(),
+    apiClient: apiClient,
   );
 }
 
 void _noSwitchLocale() {}
+
+ApiClient fakeApiClient() {
+  return ApiClient(
+    baseUrl: 'https://api.example.com',
+    tokenProvider: () async => null,
+    enableLogging: false,
+  );
+}
 
 class InMemoryTokenStorage implements TokenStorage {
   String? token;
@@ -150,11 +158,8 @@ class FakeOnboardingConfigRepository implements OnboardingConfigRepository {
   }
 }
 
-OnboardingConfigController fakeOnboardingConfig() {
-  return OnboardingConfigController(
-    FakeOnboardingConfigRepository(),
-    () => const Locale('en'),
-  );
+OnboardingConfigBloc fakeOnboardingConfig() {
+  return OnboardingConfigBloc(FakeOnboardingConfigRepository());
 }
 
 ApiException unauthorized() => const ApiException(

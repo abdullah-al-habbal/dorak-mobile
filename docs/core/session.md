@@ -4,16 +4,15 @@ Status: `DONE`
 
 ## Purpose
 
-`SessionController` (`packages/core/lib/src/session/session.notifier.dart`) owns
-the authenticated-session lifecycle: restoration, login, registration, email
-verification, logout.
+`SessionBloc` (`packages/core/lib/src/session/session.bloc.dart` + `.event.dart`
++ `.state.dart`) owns the authenticated-session lifecycle: restoration, login,
+registration, email verification, logout. It is a pure `bloc` — **no Flutter
+dependency** — over `AuthRepository` + `TokenStorage`. UI never calls it
+directly; it dispatches `SessionEvent`s and reads `SessionState`.
 
-It is a `ChangeNotifier` + repository, exposing state plus `isLoading` and
-`error`. **Status: transitional.** The session layer predates the locked Pure
-Bloc architecture; it stays as a `ChangeNotifier` until Phase 4 replaces it
-with a `SessionBloc`/`AuthBloc` over an `AuthenticationRepository`, and the
-unauthorized wiring with a Stream-based signal. Do not extend it — no new
-`ChangeNotifier` state anywhere.
+Success and failure never rethrow: mutating events emit `isLoading`, land
+failures in `state.error`, and set a one-shot `SessionNotice` on success. The
+app layer maps errors via `AuthError.from` and drives navigation from notices.
 
 ## State
 
@@ -23,16 +22,20 @@ unauthorized wiring with a Stream-based signal. Do not extend it — no new
 `ready` first.
 
 ```dart
-AuthStatus get status;
-ClientDto? get client;
-bool get isAuthenticated;
-bool get isLoading;
-Object? get error;
-Future<void> get ready;   // completes when restore() has resolved status
+SessionState {
+  AuthStatus status;
+  ClientDto? client;
+  bool isAuthenticated;
+  bool isLoading;
+  Object? error;
+  SessionNotice notice;
+}
+Future<void> get ready;   // completes when restore has resolved status
 ```
 
-`ready` memoises the restore, so repeated awaits join the in-flight call instead
-of firing a second one.
+`ready` memoises the restore pass (`_restoration ??=`), so concurrent awaiters
+join the in-flight restore instead of firing a second one. Re-adding
+`RestoreRequested` after `ready` would run the probe again — don't.
 
 ## Restoration
 
@@ -61,54 +64,64 @@ Branch on `isUnauthorized`, never on `code`.
 
 ## Mutations
 
-`login`, `register`, `sendVerificationCode`, `verifyEmail` all **rethrow** so
-the calling screen can branch on `ValidationException` for per-field errors;
-`error` is recorded for listeners as well.
+`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested` go through a
+shared `_run` helper: emit `isLoading`, run the action, then emit the success
+state + notice, or emit `error` on failure. Screens observe `state.error` /
+`state.isLoading` through a `BlocBuilder`.
 
-`logout` is the exception: it swallows the network failure and clears local
-state regardless. A token we can no longer reach is worse than one the server
-still holds.
+`LogoutRequested` is the exception: it swallows the network failure, always
+clears local storage, and emits a fresh `guest` state.
 
-`register` requires `passwordConfirmation` — the backend applies Laravel's
-`confirmed` rule and rejects the request without it.
+`SendVerificationCodeRequested` swallows errors — registration already
+succeeded and the token is stored; a failed dispatch must not block the verify
+screen, which has Resend.
+
+`RegisterRequested` requires `passwordConfirmation` — the backend applies
+Laravel's `confirmed` rule and rejects the request without it.
 
 ## Token attachment
 
 `ApiClient` receives `tokenProvider: tokenStorage.read`, which activates
-`AuthInterceptor`. The provider reads storage directly rather than the
-controller, so `SessionController -> ApiClient` stays a one-way dependency.
+`AuthInterceptor`. The provider reads storage directly rather than the bloc, so
+`SessionBloc -> ApiClient` stays a one-way dependency.
 
-## Global notices (Track 12)
+## Global notices
 
-`SessionController` broadcasts two global UI states through `notice`
-(`SessionNotice`: `none | sessionExpired | authenticationRequired`):
+`SessionNotice` (`none | sessionExpired | authenticationRequired |
+loginSucceeded | registrationSucceeded | verificationSucceeded`) is the
+router's one-shot navigation signal.
 
-* `handleUnauthorized()` — called by the app layer when `AuthInterceptor`
-  fires `UnauthorizedNotifier` on a 401/403. Clears the token, drops to
-  `guest`, and raises `sessionExpired`. The notice is set **synchronously**
-  before the storage clear, so a burst of concurrent 401s collapses into one
-  clear and one notification.
-* `requireAuthentication()` — raised by any guest-guarded action. Broadcasts
-  `authenticationRequired` without touching the session.
-* `acknowledgeNotice()` — the app layer calls this after handling a notice
-  (typically after navigating), re-arming the notifier for the next burst.
+Unauthorized flow:
 
-Any mutating call (`restore`, `login`, `register`, `verify`, `logout`) resets
-`notice` to `none`, so a fresh auth attempt clears a stale prompt.
+* `ApiClient` owns a broadcast `unauthorizedStream`. `AuthInterceptor` calls
+  `reportUnauthorized()` on a 401/403 for an authenticated, non-lifecycle
+  request; the client fires **once per burst** and stays silent until
+  `resetUnauthorizedSignal()`, so a burst of concurrent 401s collapses into one
+  notification.
+* The app layer forwards the signal to `UnauthorizedDetected`. The bloc dedupes
+  against an already-raised `sessionExpired`, clears the token, drops to
+  `guest`, and raises the notice.
+* `RequireAuthentication` raises `authenticationRequired` (guest-guarded
+  action) without touching the session.
+* `NoticeAcknowledged` clears the notice — the app layer sends it after
+  navigating, re-arming the signal for the next burst.
 
-The app layer (`AppRouter`, see `navigation/routes.md`) listens to the
-notifier and the notice and owns all redirect navigation — core never imports
-app code and never navigates.
+Any mutating event resets `notice` to `none`, so a fresh auth attempt clears a
+stale prompt.
+
+The app layer (`AppRouter`, see `navigation/guards.md`) owns **one** session
+stream listener that re-runs the router redirect and reacts to notices. Core
+never imports app code and never navigates.
 
 ## Not yet implemented
 
 Password recovery (`forgotPassword` / `resetPassword` exist on the repository
 but no screen calls them), social login, `changePassword`, and profile
-endpoints.
+endpoints. Logout has a bloc handler but no UI affordance.
 
 ## Verification
 
 ```bash
 dart run melos run analyze
-dart run melos run test   # packages/core/test/session_controller_test.dart
+dart run melos run test   # packages/core/test/session_bloc_test.dart
 ```

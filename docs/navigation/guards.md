@@ -28,24 +28,25 @@ Key properties:
 - **Per-route auth guards.** No screen refuses to build for a guest. Nothing
   currently needs to — Home is a placeholder — but any authenticated feature
   screen will need one. The mechanism to express it exists: a guest-guarded
-  action calls `SessionController.requireAuthentication()`, which raises the
-  `authenticationRequired` global state (Track 12).
+  action adds `RequireAuthentication` to the session bloc, which raises the
+  `authenticationRequired` notice.
 - **Profile-completion guards** (Track 17).
 - **Deep-link guards.** Deep links are not implemented at all.
 
-## Session-expired handling (Track 12, DONE)
+## Session-expired handling (DONE)
 
 `AuthInterceptor` (`docs/core/interceptors.md`) raises a 401/403 on an
-authenticated, non-auth-lifecycle request through `UnauthorizedNotifier`. The
-app layer routes it back to auth:
+authenticated, non-auth-lifecycle request through `ApiClient.reportUnauthorized`
+(broadcast `unauthorizedStream`, once per burst). The app layer routes it back
+to auth:
 
 ```text
 401/403 (authenticated, non-lifecycle)
-  -> UnauthorizedNotifier.fire()        (once per burst)
-  -> SessionController.handleUnauthorized()
+  -> ApiClient.unauthorizedStream fires   (once per burst)
+  -> (app) SessionBloc.add(UnauthorizedDetected())
   -> notice == sessionExpired
   -> AppRouter listener -> router.push<void>(/auth)
-  -> acknowledgeNotice() + notifier.reset()
+  -> NoticeAcknowledged + apiClient.resetUnauthorizedSignal()
 ```
 
 A dead-session screen is never back-navigated into because the redirect runs on

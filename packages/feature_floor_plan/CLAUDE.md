@@ -38,17 +38,17 @@ What `tool/check_taxonomy.dart` actually permits here today:
 - `.router.dart` — go_router route tables are app-owned; do not use here.
 - `.token.dart` / `.theme.dart` — `design_system` only.
 - `.storage.dart` — `core` only.
-- **`.repository.dart` · `.dto.dart` · `.entity.dart` · `.notifier.dart` ·
+- **`.repository.dart` · `.dto.dart` · `.entity.dart` ·
   `.endpoints.dart`** — the checker restricts these to `packages/core` and
   `apps/*/lib`, and a feature package is **not** in that allow-list.
 
 That last group is the one that will bite: a feature package with its own data
-layer or `ChangeNotifier` cannot currently express it. Either put the data
+layer cannot currently express it. Either put the data
 access in `core`, or extend `tool/check_taxonomy.dart` deliberately — as was
 done for `.storage.dart` and `.navigator.dart` — and record the change in the
 root `CLAUDE.md` §1 table. Do not work around it with a misleading suffix.
 `.bloc.dart` / `.event.dart` / `.state.dart` **are** permitted here — build
-feature state as Blocs, not notifiers.
+feature state as Blocs.
 
 ## 4. Hard rules
 

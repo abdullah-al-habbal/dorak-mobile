@@ -12,7 +12,9 @@ class LoginContent extends StatefulWidget {
   final Animation<double> titleAnimation;
   final Animation<double> formAnimation;
   final Animation<double> actionsAnimation;
-  final Future<void> Function(String email, String password) onSubmit;
+  final void Function(String email, String password) onSubmit;
+  final AuthError? error;
+  final bool isSubmitting;
 
   final VoidCallback? onForgotPassword;
   final VoidCallback onCreateAccount;
@@ -23,6 +25,8 @@ class LoginContent extends StatefulWidget {
     required this.formAnimation,
     required this.actionsAnimation,
     required this.onSubmit,
+    required this.error,
+    required this.isSubmitting,
     required this.onCreateAccount,
     this.onForgotPassword,
   });
@@ -36,10 +40,6 @@ class _LoginContentState extends State<LoginContent> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _isSubmitting = false;
-  AuthError? _error;
-  Map<String, List<String>> _serverFieldErrors = const {};
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -47,49 +47,29 @@ class _LoginContentState extends State<LoginContent> {
     super.dispose();
   }
 
-  String? _serverError(String field) {
-    final messages = _serverFieldErrors[field];
-    if (messages == null || messages.isEmpty) return null;
-    return messages.first;
+  @override
+  void didUpdateWidget(covariant LoginContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.error != null && oldWidget.error == null) {
+      _formKey.currentState?.validate();
+    }
   }
 
-  Future<void> _submit() async {
-    final l10n = AppLocalizations.of(context)!;
+  String? _serverError(String field) => widget.error?.firstErrorFor(field);
 
-    setState(() {
-      _error = null;
-      _serverFieldErrors = const {};
-    });
-
+  void _submit() {
     if (_formKey.currentState?.validate() != true) return;
-
-    setState(() => _isSubmitting = true);
-    try {
-      await widget.onSubmit(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      final error = AuthError.from(
-        e,
-        l10n,
-        unauthorizedMessage: l10n.loginErrorInvalidCredentials,
-      );
-      setState(() {
-        _error = error;
-        _serverFieldErrors = error.fieldErrors;
-      });
-      _formKey.currentState?.validate();
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
+    widget.onSubmit(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
+    final error = widget.error;
 
     return Form(
       key: _formKey,
@@ -127,7 +107,7 @@ class _LoginContentState extends State<LoginContent> {
                   label: l10n.loginEmailLabel,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   validator: (value) =>
                       AuthValidators.email(value, l10n) ?? _serverError('email'),
                 ),
@@ -136,7 +116,7 @@ class _LoginContentState extends State<LoginContent> {
                   label: l10n.loginPasswordLabel,
                   controller: _passwordController,
                   isPassword: true,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _submit(),
                   validator: (value) =>
@@ -158,18 +138,18 @@ class _LoginContentState extends State<LoginContent> {
                     child: SkipButton(
                       label: l10n.loginForgotPassword,
                       onPressed: widget.onForgotPassword!,
-                      isDisabled: _isSubmitting,
+                      isDisabled: widget.isSubmitting,
                     ),
                   ),
-                if (_error != null) ...[
+                if (error != null) ...[
                   const SizedBox(height: 8),
-                  AuthErrorBanner(message: _error!.message),
+                  AuthErrorBanner(message: error.message),
                 ],
                 const SizedBox(height: 16),
                 PrimaryButton(
                   label: l10n.loginButton,
                   onPressed: _submit,
-                  isLoading: _isSubmitting,
+                  isLoading: widget.isSubmitting,
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -183,7 +163,8 @@ class _LoginContentState extends State<LoginContent> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _isSubmitting ? null : widget.onCreateAccount,
+                      onPressed:
+                          widget.isSubmitting ? null : widget.onCreateAccount,
                       style: TextButton.styleFrom(
                         foregroundColor: colors.primary,
                         textStyle: DorakTypography.labelLg,

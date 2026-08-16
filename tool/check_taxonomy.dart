@@ -11,7 +11,6 @@ const roles = <String>{
   'endpoints',
   'repository',
   'provider',
-  'notifier',
   'barrel',
   'client',
   'interceptor',
@@ -83,7 +82,6 @@ void main(List<String> args) {
       if ((role == 'repository' ||
               role == 'dto' ||
               role == 'entity' ||
-              role == 'notifier' ||
               role == 'endpoints') &&
           !isCore &&
           !isApp) {
@@ -104,9 +102,9 @@ void main(List<String> args) {
           );
         }
       }
-      if (blocRoles.contains(role) && !isApp && !isFeaturePackage) {
+      if (blocRoles.contains(role) && !isApp && !isCore && !isFeaturePackage) {
         violations.add(
-          '$path: role $role allowed only in apps/*/lib or packages/feature_*/lib',
+          '$path: role $role allowed only in apps/*/lib, packages/core, or packages/feature_*/lib',
         );
       }
       if (role == 'router' && !isApp) {

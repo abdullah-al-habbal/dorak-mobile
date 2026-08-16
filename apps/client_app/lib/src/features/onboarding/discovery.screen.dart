@@ -3,13 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
-import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/widgets/discovery_content.widget.dart';
 import 'package:client_app/src/features/onboarding/widgets/onboarding_hero.widget.dart';
 import 'package:client_app/src/features/onboarding/widgets/skip_bottom_sheet.sheet.dart';
 
 class DiscoveryScreen extends StatefulWidget {
-  final OnboardingConfigController onboardingConfig;
+  final OnboardingConfigBloc onboardingConfig;
   final VoidCallback onNext;
   final VoidCallback onSkipForNow;
   final VoidCallback onDontShowAgain;
@@ -87,7 +87,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
         onSwipeLeft: () => context.pop(),
         child: Stack(
           children: [
-            OnboardingHeroImage(controller: widget.onboardingConfig),
+            OnboardingHeroImage(bloc: widget.onboardingConfig),
             const GradientOverlay(),
             SafeArea(
               child: Column(

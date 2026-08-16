@@ -46,11 +46,11 @@ All Dart files in this codebase **MUST** follow the explicit dot-suffix taxonomy
 | `.dto.dart` | Data Transfer Objects for network/storage serialization. | `packages/core`, `apps/*/data` |
 | `.endpoints.dart` | Domain-split API route declarations. | `packages/core/network/endpoints` |
 | `.repository.dart` | Repository contracts and implementations. | `packages/core`, `apps/*` |
-| `.provider.dart` / `.notifier.dart` | State management and dependency injection providers. | `apps/*`, `packages/feature_*` |
+| `.provider.dart` | State management and dependency injection providers. | `core`, `apps/*` |
 | `.storage.dart` | Device persistence contracts and implementations (secure storage, preferences, cache). | `packages/core` only |
 | `.navigator.dart` | **DEPRECATED** — legacy route-flow coordinators (removed from `client_app` in Phase 2) | only `business_app`/`stylist_app` stubs |
 | `.router.dart` | Declarative `go_router` route table + redirects. | `apps/*` only |
-| `.bloc.dart` / `.event.dart` / `.state.dart` | Pure Bloc feature state (Phase 3). | `apps/*`, `packages/feature_*` |
+| `.bloc.dart` / `.event.dart` / `.state.dart` | Bloc feature state (Phase 3). | `packages/core`, `apps/*`, `packages/feature_*` |
 | `.barrel.dart` | Explicit package or feature re-exports. | Anywhere requiring grouped exports |
 
 ### Strict Rules
@@ -105,14 +105,12 @@ To maximize token efficiency and prevent auto-import collisions:
 
 ## 3b. State & Navigation Architecture (locked)
 
-**State — Pure Bloc.** UI emits events; a `Bloc` owns business state; UI
-renders from state. `flutter_bloc` only. No Riverpod, Provider or GetIt.
-**`ChangeNotifier` is not a target pattern** — the only remaining instances are
-transitional Track 12/session infrastructure (`SessionController`,
-`UnauthorizedNotifier`, `SessionNotice`) and the legacy pagination notifiers
-(`page_pagination.notifier.dart`, `scroll_pagination.notifier.dart`). Keep them
-as-is; do not extend them; Phase 4 replaces them with Stream/Bloc. Do not add
-new `ChangeNotifier` state.
+**State — Bloc.** UI emits events; a `Bloc` owns business state; UI renders
+from state. Pure `bloc` in `packages/core`, `flutter_bloc` in `apps/*`. No
+Riverpod, Provider or GetIt. **`ChangeNotifier` is not a target pattern** — the
+session, unauthorized-signal and pagination notifiers were migrated to
+`SessionBloc` / `ApiClient.unauthorizedStream` (Phase 4) and the `.notifier`
+taxonomy role is removed. Do not reintroduce `ChangeNotifier` state.
 
 **Navigation — go_router only.** Declarative route table, redirects for the
 launch gate and auth guards, `context.push/go/pop` in screens. Navigator 1.0

@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'client.dto.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
-class ClientDto {
+class ClientDto extends Equatable {
   @JsonKey(defaultValue: '')
   final String id;
   @JsonKey(defaultValue: '')
@@ -21,4 +22,7 @@ class ClientDto {
 
   factory ClientDto.fromJson(Map<String, dynamic> json) =>
       _$ClientDtoFromJson(json);
+
+  @override
+  List<Object?> get props => [id, name, email, phone];
 }

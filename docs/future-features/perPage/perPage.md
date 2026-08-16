@@ -4,18 +4,9 @@ Status: `DEFERRED` — not implemented. Codified for future execution.
 
 ## Problem
 
-Both pagination notifiers in `packages/core` (legacy `ChangeNotifier`,
-transitional until Phase 4) hardcode a default page size:
-
-```dart
-// page_pagination.notifier.dart
-PagePaginationNotifier({required this.fetch, this.perPage = 15});
-
-// scroll_pagination.notifier.dart
-ScrollPaginationNotifier({required this.fetch, this.perPage = 15});
-```
-
-The value `15` is duplicated in the client and cannot change without an app
+Pagination calls in `packages/core` hardcode a default page size at the call
+site (`perPage = 15` in `getPaginated` query params). The value `15` is
+duplicated in the client and cannot change without an app
 release. The backend already returns the authoritative page size in every
 paginated envelope (`meta.pagination.per_page`), so the client should learn
 it once and reuse it everywhere.
@@ -24,7 +15,7 @@ it once and reuse it everywhere.
 
 On app start, the client fetches the small set of application-wide settings
 it needs (starting with `pagination.per_page`) from a new backend
-`ApplicationSetting` key-value store. Pagination notifiers then default to
+`ApplicationSetting` key-value store. Pagination then defaults to
 the server-provided `per_page` instead of a hardcoded literal.
 
 ## Backend — `Modules\ApplicationSetting`
@@ -85,24 +76,25 @@ settings endpoint is hot on app cold-start.
 * New `AppSettingsRepository` + `DioAppSettingsRepository` in
   `packages/core` (dot-suffix `.repository.dart`), endpoint in
   `app.endpoints.dart` (`appSettings`).
-* New `AppSettingsController` (`ChangeNotifier`) constructed at bootstrap in
-  `apps/client_app/lib/main.dart` (mirror of
-  `OnboardingConfigController`). Requests only needed keys, e.g.
+* New `SettingsBloc` (pure `bloc`, `.bloc.dart`/`.event.dart`/`.state.dart`)
+  constructed at bootstrap in `apps/client_app/lib/main.dart` (mirror of
+  `OnboardingConfigBloc`). Requests only needed keys, e.g.
   `['pagination.per_page']`.
-  > Architecture note (Phase 2): new app state is Pure Bloc — implement this
-  > as a `SettingsBloc`, not a `ChangeNotifier`. The spec above is otherwise
-  > unchanged.
 * Default `perPage`: `pagination.per_page` from settings, falling back to
   `15` while loading or on failure (never blocks startup).
 
 ### Wire into pagination
 
-* `PagePaginationNotifier` / `ScrollPaginationNotifier` keep their optional
-  `perPage` parameter (explicit callers still override), but default it
-  from the settings controller instead of a literal:
+> The legacy pagination `ChangeNotifier`s were deleted (see
+> `state_management/pagination.md`). The `perPage` default belongs on the
+> feature's pagination Bloc.
+
+* The feature pagination Bloc keeps an optional `perPage` parameter (explicit
+  callers still override), but defaults it from the settings bloc instead of a
+  literal:
 
 ```dart
-final pager = PagePaginationNotifier(
+final pager = FeedBloc(
   fetch: repository.fetchBranches,
   perPage: appSettings.paginationPerPage, // default 15 while unknown
 );

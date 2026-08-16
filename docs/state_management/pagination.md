@@ -1,70 +1,42 @@
 # Pagination
 
-Status: `DONE` — but the notifiers are **legacy** `ChangeNotifier` (Phase 4
-replaces them with a Bloc/Stream pagination story; do not extend them).
+Status: `DONE` — transport layer only. The legacy `PagePaginationNotifier` /
+`ScrollPaginationNotifier` `ChangeNotifier`s were **deleted** in Phase 4.
+Paging UI state is now app-layer Bloc work; nothing in `packages/core`
+implements a pager anymore.
 
-## Purpose
+## What core provides
 
-Two ready-made pagination state machines in `packages/core`:
-
-* `PagePaginationNotifier<T>` — page-based UI (Next / Previous, page
-  indicator, numbered pages). Pages are 1-based to match the backend
-  `meta.pagination.current_page`.
-* `ScrollPaginationNotifier<T>` — infinite scroll. Appends pages as the
-  user scrolls and stops once the last page is reached.
-
-Both wrap a fetch callback taking a page number and returning
+`ApiClient.getPaginated` decodes the backend page envelope into a
 `PaginatedData<T>` (items + `PaginationMeta`):
 
 ```dart
-final pager = PagePaginationNotifier(
-  fetch: ({required int page, int perPage = 15}) =>
-      repository.fetchBranches(page: page, perPage: perPage),
+final page = await api.getPaginated(
+  '/client/discovery-feed',
+  parser: DiscoveryDto.fromJson,
+  queryParameters: {'page': 2, 'perPage': 15},
 );
+page.items;      // List<T>
+page.meta.page;        // 1-based, matches meta.pagination.current_page
+page.meta.perPage;
+page.meta.totalPages;  // drives hasMore: page < totalPages
 ```
 
-## PagePaginationNotifier
+## Feature paging state
 
-```dart
-pager.loadFirst();          // page 1
-pager.next();                // page 2
-pager.previous();            // back
-pager.goTo(3);
-pager.refresh();             // reload current page
+Paging is business state, so it belongs in a Bloc at the app layer (see
+`docs/state_management/`). The locked pattern:
 
-// State
-pager.items;
-pager.currentPage;
-pager.totalPages;
-pager.hasPrev;               // currentPage > 1
-pager.hasNext;               // currentPage < totalPages
-pager.isLoading;
-pager.error;                 // ApiException?
-```
+* a `<feed>_bloc.dart` (`.event.dart` + `.state.dart`) owns `items`,
+  `page`, `hasMore`, `isLoading`, `error`;
+* `LoadMoreRequested` fetches `page + 1` when `hasMore`; `RefreshRequested`
+  reloads page 1;
+* fetch errors land in `state.error`, keeping the last loaded items — retry is
+  an explicit user action.
 
-## ScrollPaginationNotifier
-
-```dart
-final scroller = ScrollPaginationNotifier(
-  fetch: ({required int page, int perPage = 15}) =>
-      repository.fetchFeed(page: page),
-);
-
-scroller.loadFirst();
-scroller.onScroll(controller);   // attach a ScrollController
-scroller.loadMore();             // manual trigger
-```
-
-`onScroll` fires `loadMore` when the scroll position approaches the end
-(~200 px threshold). Once the last page is appended, `hasMore` is false and
-further scrolls are no-ops.
-
-## Error Handling
-
-Fetch errors are recorded in `error` (`ApiException?`) and the previous
-page's items are kept. Retry is an explicit user action (`refresh()` or
-calling `loadFirst()` again).
+A shared paging Bloc in `packages/core` is not built yet; do not reintroduce a
+`ChangeNotifier` pager to fill the gap.
 
 ## Verification
 
-Covered by `packages/core/test/pagination_test.dart`.
+Envelope decode is covered by `packages/core/test/api_client_test.dart`.

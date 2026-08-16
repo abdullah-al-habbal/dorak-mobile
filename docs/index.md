@@ -506,11 +506,10 @@ packages/core/network
 > Locked (Phase 2): **Pure Bloc** (`flutter_bloc`) is the canonical
 > state-management architecture. UI emits events; `Bloc` owns business state;
 > UI renders from state. No Riverpod, Provider or GetIt. `ChangeNotifier` is
-> **not** a target pattern — the surviving instances are transitional Track 12
-> /session infrastructure (`SessionController`, `UnauthorizedNotifier`,
-> `SessionNotice`) and legacy pagination notifiers; Phase 4 replaces them with
-> Stream/Bloc. This track still owes the async / loading / empty / error /
-> refresh conventions.
+> **not** a target pattern — the session layer runs on `SessionBloc` (pure
+> `bloc`) with `ApiClient.unauthorizedStream` for the 401 signal, and the
+> pagination notifiers were deleted. This track still owes the async / loading /
+> empty / error / refresh conventions.
 
 Objectives:
 
@@ -606,16 +605,16 @@ Implement reusable:
 * Offline. — `PENDING`
 * Retry. — `PENDING`
 * Session expired. — `DONE` (401/403 on an authenticated request →
-  `SessionController.handleUnauthorized()` → `SessionRedirect` → auth entry
-  with `replace: true`)
-* Authentication required. — `DONE` (guest action calls
-  `SessionController.requireAuthentication()` → auth entry pushed on top)
+  `ApiClient.unauthorizedStream` → `SessionBloc.add(UnauthorizedDetected())` →
+  auth entry)
+* Authentication required. — `DONE` (guest action adds `RequireAuthentication`
+  → auth entry pushed on top)
 * Permission required. — `PENDING`
 
 Implementation targets:
 
 ```text
-packages/core     # UnauthorizedNotifier, SessionController notices
+packages/core     # ApiClient.unauthorizedStream + SessionBloc notices
 apps/*            # AppRouter listener redirects to /auth on sessionExpired
 packages/design_system
 ```
@@ -862,11 +861,10 @@ The agent MUST NOT skip directly to feature implementation.
 
 Post-Phase-2 the repository is aligned on the locked architecture: **Pure Bloc**
 state (flutter_bloc) and **go_router** navigation (no Navigator 1.0, no
-`AppNavigator`). The session/unauthorized layer (`SessionController`,
-`UnauthorizedNotifier`, `SessionNotice`) and the pagination notifiers are
-transitional `ChangeNotifier` and stay until Phase 4 replaces them with
-Stream/Bloc. Do not add new `ChangeNotifier` state and do not reintroduce
-`.navigator.dart`.
+`AppNavigator`). The session/unauthorized layer is fully Bloc + Stream since
+Phase 4: `SessionBloc` + `ApiClient.unauthorizedStream`; the pagination
+`ChangeNotifier`s were deleted. Do not add new `ChangeNotifier` state and do not
+reintroduce `.navigator.dart`.
 
 ---
 

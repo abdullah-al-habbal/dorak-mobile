@@ -12,12 +12,14 @@ class SignUpContent extends StatefulWidget {
   final Animation<double> titleAnimation;
   final Animation<double> formAnimation;
   final Animation<double> actionsAnimation;
-  final Future<void> Function({
+  final void Function({
     required String name,
     required String email,
     required String password,
     required String passwordConfirmation,
   }) onSubmit;
+  final AuthError? error;
+  final bool isSubmitting;
   final VoidCallback onLogInLink;
 
   const SignUpContent({
@@ -26,6 +28,8 @@ class SignUpContent extends StatefulWidget {
     required this.formAnimation,
     required this.actionsAnimation,
     required this.onSubmit,
+    required this.error,
+    required this.isSubmitting,
     required this.onLogInLink,
   });
 
@@ -40,10 +44,6 @@ class _SignUpContentState extends State<SignUpContent> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
 
-  bool _isSubmitting = false;
-  AuthError? _error;
-  Map<String, List<String>> _serverFieldErrors = const {};
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -53,47 +53,31 @@ class _SignUpContentState extends State<SignUpContent> {
     super.dispose();
   }
 
-  String? _serverError(String field) {
-    final messages = _serverFieldErrors[field];
-    if (messages == null || messages.isEmpty) return null;
-    return messages.first;
+  @override
+  void didUpdateWidget(covariant SignUpContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.error != null && oldWidget.error == null) {
+      _formKey.currentState?.validate();
+    }
   }
 
-  Future<void> _submit() async {
-    final l10n = AppLocalizations.of(context)!;
+  String? _serverError(String field) => widget.error?.firstErrorFor(field);
 
-    setState(() {
-      _error = null;
-      _serverFieldErrors = const {};
-    });
-
+  void _submit() {
     if (_formKey.currentState?.validate() != true) return;
-
-    setState(() => _isSubmitting = true);
-    try {
-      await widget.onSubmit(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        passwordConfirmation: _confirmController.text,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      final error = AuthError.from(e, l10n);
-      setState(() {
-        _error = error;
-        _serverFieldErrors = error.fieldErrors;
-      });
-      _formKey.currentState?.validate();
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
-    }
+    widget.onSubmit(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      passwordConfirmation: _confirmController.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
+    final error = widget.error;
 
     return Form(
       key: _formKey,
@@ -131,7 +115,7 @@ class _SignUpContentState extends State<SignUpContent> {
                   label: l10n.signUpFullNameLabel,
                   controller: _nameController,
                   keyboardType: TextInputType.name,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   validator: (value) =>
                       AuthValidators.required(value, l10n) ??
                       _serverError('name'),
@@ -141,7 +125,7 @@ class _SignUpContentState extends State<SignUpContent> {
                   label: l10n.signUpEmailLabel,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   validator: (value) =>
                       AuthValidators.email(value, l10n) ??
                       _serverError('email'),
@@ -151,7 +135,7 @@ class _SignUpContentState extends State<SignUpContent> {
                   label: l10n.signUpPasswordLabel,
                   controller: _passwordController,
                   isPassword: true,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   helperText: l10n.signUpPasswordHint,
                   validator: (value) =>
                       AuthValidators.password(value, l10n) ??
@@ -162,7 +146,7 @@ class _SignUpContentState extends State<SignUpContent> {
                   label: l10n.signUpConfirmPasswordLabel,
                   controller: _confirmController,
                   isPassword: true,
-                  enabled: !_isSubmitting,
+                  enabled: !widget.isSubmitting,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _submit(),
                   validator: (value) => AuthValidators.passwordConfirmation(
@@ -180,14 +164,14 @@ class _SignUpContentState extends State<SignUpContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (_error != null) ...[
-                  AuthErrorBanner(message: _error!.message),
+                if (error != null) ...[
+                  AuthErrorBanner(message: error.message),
                   const SizedBox(height: 12),
                 ],
                 PrimaryButton(
                   label: l10n.signUpButton,
                   onPressed: _submit,
-                  isLoading: _isSubmitting,
+                  isLoading: widget.isSubmitting,
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -201,7 +185,8 @@ class _SignUpContentState extends State<SignUpContent> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _isSubmitting ? null : widget.onLogInLink,
+                      onPressed:
+                          widget.isSubmitting ? null : widget.onLogInLink,
                       style: TextButton.styleFrom(
                         foregroundColor: colors.primary,
                         textStyle: DorakTypography.labelLg,

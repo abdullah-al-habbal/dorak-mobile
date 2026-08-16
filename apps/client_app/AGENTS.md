@@ -22,7 +22,7 @@ lib/src/core/navigation/
 lib/src/features/
   splash/                         splash.screen.dart + 2 widgets
   auth/                           4 screens + 9 widgets + 2 entities
-  onboarding/                     4 screens + 9 widgets + config notifier
+  onboarding/                     4 screens + 9 widgets + config bloc
   home/                           home.screen.dart (placeholder)
   discovery/ booking/ profile/    empty scaffolding directories
 lib/src/core/di/ theme/           empty
@@ -40,9 +40,11 @@ runApp(DorakApp(preferences: preferences));
 ```
 
 `DorakApp.initState` builds, in order: `SecureTokenStorage` → `ApiClient`
-(with `tokenProvider`) → `DioAuthRepository` → `SessionController` →
-`OnboardingConfigController`, then starts `session.ready` **unawaited** and
-constructs `AppRouter` (go_router, handed to `MaterialApp.router`).
+(with `tokenProvider`) → `DioAuthRepository` → `SessionBloc` →
+`OnboardingConfigBloc` → `LocaleBloc`, then starts `session.ready` **unawaited**
+and constructs `AppRouter` (go_router, handed to `MaterialApp.router`). The
+router and the api client subscribe to their streams; all are closed in
+`dispose()`.
 
 The splash is the router's initial route — it renders from the first frame.
 No post-frame push.
@@ -129,7 +131,7 @@ directories.
 
 | Code | Why |
 |---|---|
-| `ApiClient(tokenProvider: _tokenStorage.read)` | Reads storage, not `SessionController` — the controller depends on the client, so the reverse would be a cycle. Also the only thing that installs `AuthInterceptor`. |
+| `ApiClient(tokenProvider: _tokenStorage.read)` | Reads storage, not `SessionBloc` — the bloc depends on the client, so the reverse would be a cycle. Also the only thing that installs `AuthInterceptor`. |
 | `unawaited(_session.ready)` in `initState` | Restore overlaps the 2500 ms splash, so the gate adds no wait. |
 | `AppGate` awaits `session.ready`, not `restore()` | `ready` memoises; calling `restore()` would fire a second pass. |
 | `router.go(AppRoutes.home)` on auth/onboarding success | go_router's declarative `go` clears the stack by construction — no `pushAndRemoveUntil` bookkeeping. (Pre-Phase 2, `AppNavigator.goHome` used `pushAndRemoveUntil` because `pushReplacement` swapped only the top route and could replace a sheet.) |

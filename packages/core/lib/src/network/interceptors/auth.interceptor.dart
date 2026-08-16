@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 import 'package:core/src/network/endpoints/auth.endpoints.dart';
-import 'package:core/src/network/unauthorized.notifier.dart';
 
 class AuthInterceptor extends Interceptor {
   static const String _socialPrefix = '/client/social/';
@@ -19,11 +18,11 @@ class AuthInterceptor extends Interceptor {
   };
 
   final Future<String?> Function() tokenProvider;
-  final UnauthorizedNotifier unauthorizedNotifier;
+  final void Function() reportUnauthorized;
 
   AuthInterceptor({
     required this.tokenProvider,
-    required this.unauthorizedNotifier,
+    required this.reportUnauthorized,
   });
 
   @override
@@ -51,7 +50,7 @@ class AuthInterceptor extends Interceptor {
     if (carriedBearer &&
         !isAuthLifecycle &&
         (status == 401 || status == 403)) {
-      unauthorizedNotifier.fire();
+      reportUnauthorized();
     }
 
     handler.next(err);

@@ -65,7 +65,7 @@ and `business_app` (laying a branch out) are expected to need it.
 
 - **No `.screen.dart` here.** The taxonomy checker allows that role only under
   `apps/*/lib`. Export widgets; let the app own the page.
-- **`repository` / `dto` / `entity` / `notifier` / `endpoints` are also
+- **`repository` / `dto` / `entity` / `endpoints` are also
   rejected** in feature packages by the current checker — they are restricted to
   `packages/core` and `apps/*/lib`. Either put data access in `core` or extend
   `tool/check_taxonomy.dart` deliberately first.

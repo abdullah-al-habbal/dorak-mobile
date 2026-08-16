@@ -14,71 +14,76 @@ import 'package:client_app/src/features/home/home.screen.dart';
 import 'package:client_app/src/features/onboarding/ai_showcase.screen.dart';
 import 'package:client_app/src/features/onboarding/booking.screen.dart';
 import 'package:client_app/src/features/onboarding/discovery.screen.dart';
-import 'package:client_app/src/features/onboarding/onboarding_config.notifier.dart';
+import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/welcome.screen.dart';
 import 'package:client_app/src/features/splash/splash.screen.dart';
 
 class AppRouter {
-  final SessionController session;
+  final SessionBloc session;
   final AppPreferences preferences;
-  final OnboardingConfigController onboardingConfig;
+  final OnboardingConfigBloc onboardingConfig;
   final VoidCallback switchLocale;
-  final UnauthorizedNotifier unauthorizedNotifier;
+  final ApiClient apiClient;
 
   late final GoRouter router;
+  late final StreamSubscription<SessionState> _sessionSubscription;
 
   AppRouter({
     required this.session,
     required this.preferences,
     required this.onboardingConfig,
     required this.switchLocale,
-    required this.unauthorizedNotifier,
+    required this.apiClient,
   }) {
     router = GoRouter(
       initialLocation: AppRoutes.splash,
-      refreshListenable: session,
       redirect: _redirect,
       routes: _routes(),
     );
-    unauthorizedNotifier.addListener(_onUnauthorized);
-    session.addListener(_onSessionChanged);
+    _sessionSubscription = session.stream.listen(_onSessionChanged);
   }
 
   void dispose() {
-    session.removeListener(_onSessionChanged);
-    unauthorizedNotifier.removeListener(_onUnauthorized);
+    _sessionSubscription.cancel();
     router.dispose();
   }
 
-  void _onUnauthorized() {
-    unawaited(session.handleUnauthorized());
-  }
-
-  String? _redirect(Object context, GoRouterState state) {
-    if (session.status != AuthStatus.unknown) return null;
-    return state.matchedLocation == AppRoutes.splash ? null : AppRoutes.splash;
-  }
-
-  void _onSessionChanged() {
-    switch (session.notice) {
+  void _onSessionChanged(SessionState state) {
+    router.refresh();
+    switch (state.notice) {
       case SessionNotice.sessionExpired:
         router.go(AppRoutes.authEntry);
-        session.acknowledgeNotice();
-        unauthorizedNotifier.reset();
+        session.add(NoticeAcknowledged());
+        apiClient.resetUnauthorizedSignal();
       case SessionNotice.authenticationRequired:
         router.push<void>(AppRoutes.authEntry);
-        session.acknowledgeNotice();
-        unauthorizedNotifier.reset();
+        session.add(NoticeAcknowledged());
+        apiClient.resetUnauthorizedSignal();
+      case SessionNotice.loginSucceeded:
+        router.go(AppRoutes.home);
+        session.add(NoticeAcknowledged());
+      case SessionNotice.registrationSucceeded:
+        session.add(SendVerificationCodeRequested());
+        router.push<void>(AppRoutes.authVerify, extra: state.client?.email ?? '');
+        session.add(NoticeAcknowledged());
+      case SessionNotice.verificationSucceeded:
+        router.go(AppRoutes.home);
+        session.add(NoticeAcknowledged());
       case SessionNotice.none:
         break;
     }
+  }
+
+  String? _redirect(Object context, GoRouterState state) {
+    if (session.state.status != AuthStatus.unknown) return null;
+    return state.matchedLocation == AppRoutes.splash ? null : AppRoutes.splash;
   }
 
   Future<void> _leaveSplash() async {
     await session.ready;
     router.go(
       AppGate.resolve(
-        isAuthenticated: session.isAuthenticated,
+        isAuthenticated: session.state.isAuthenticated,
         dontShowOnboarding: preferences.dontShowOnboarding,
       ),
     );
@@ -92,24 +97,6 @@ class AppRouter {
     } finally {
       router.go(AppRoutes.home);
     }
-  }
-
-  Future<void> _register({
-    required String name,
-    required String email,
-    required String password,
-    required String passwordConfirmation,
-  }) async {
-    await session.register(
-      name: name,
-      email: email,
-      password: password,
-      passwordConfirmation: passwordConfirmation,
-    );
-    try {
-      await session.sendVerificationCode();
-    } catch (_) {}
-    router.push<void>(AppRoutes.authVerify, extra: email);
   }
 
   List<RouteBase> _routes() {
@@ -168,10 +155,7 @@ class AppRouter {
           GoRoute(
             path: AppRoutes.loginSegment,
             builder: (context, state) => LoginScreen(
-              onSubmit: (email, password) async {
-                await session.login(email: email, password: password);
-                router.go(AppRoutes.home);
-              },
+              session: session,
               onCreateAccount: () => router.push<void>(AppRoutes.authRegister),
               onForgotPassword: null,
             ),
@@ -179,19 +163,15 @@ class AppRouter {
           GoRoute(
             path: AppRoutes.registerSegment,
             builder: (context, state) => SignUpScreen(
-              onSubmit: _register,
+              session: session,
               onLogInLink: () => router.push<void>(AppRoutes.authLogin),
             ),
           ),
           GoRoute(
             path: AppRoutes.verifySegment,
             builder: (context, state) => VerifyAccountScreen(
+              session: session,
               destination: state.extra as String? ?? '',
-              onVerify: (code) async {
-                await session.verifyEmail(code);
-                router.go(AppRoutes.home);
-              },
-              onResend: session.sendVerificationCode,
               onSkip: () => router.go(AppRoutes.home),
             ),
           ),

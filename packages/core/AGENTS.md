@@ -26,11 +26,13 @@ lib/src/
     endpoints/                           app · auth (+ endpoints.barrel.dart, orphaned)
     exceptions/                          api · network · validation
     interceptors/                        auth · locale · logging · retry
-    pagination/                          page_pagination · scroll_pagination notifiers
     repositories/                        auth · onboarding_config
   session/
     auth_status.entity.dart              AuthStatus enum
-    session.notifier.dart                SessionController
+    session.bloc.dart                    SessionBloc
+    session.event.dart                   SessionEvent (9 events)
+    session.state.dart                   SessionState
+    session_notice.entity.dart           SessionNotice
     session.barrel.dart
   storage/
     token.storage.dart                   TokenStorage + SecureTokenStorage
@@ -113,19 +115,22 @@ Non-envelope payload → `ApiException(status, 'INVALID_RESPONSE')`.
 
 ## 5. Session
 
-`SessionController extends ChangeNotifier` over `AuthRepository` +
-`TokenStorage`.
+`SessionBloc` (pure `bloc` — no Flutter dependency) over `AuthRepository` +
+`TokenStorage`. Drive it with `SessionEvent`s; read `SessionState`.
 
 ```dart
-AuthStatus get status;      // unknown | authenticated | guest
-ClientDto? get client;
-bool get isAuthenticated;
-bool get isLoading;
-Object? get error;
-Future<void> get ready;     // memoised restore()
+SessionState {
+  AuthStatus status;       // unknown | authenticated | guest
+  ClientDto? client;
+  bool isAuthenticated;
+  bool isLoading;
+  Object? error;
+  SessionNotice notice;    // one-shot navigation signals
+}
+Future<void> get ready;    // memoised restore pass
 ```
 
-`restore()`:
+`RestoreRequested`:
 
 ```
 no stored token          -> guest
@@ -135,8 +140,18 @@ refreshToken() succeeds  -> persist rotated token, authenticated
   other ApiException     -> authenticated, token kept
 ```
 
-`logout()` swallows the network failure and always clears local state.
-Everything else rethrows.
+`LogoutRequested` swallows the network failure and always clears local state.
+`SendVerificationCodeRequested` swallows errors (registration already
+succeeded). Login/register/verify failures land in `state.error`; success sets
+the matching `SessionNotice` (`loginSucceeded`, `registrationSucceeded`,
+`verificationSucceeded`), which the app's router consumes and acknowledges via
+`NoticeAcknowledged`. `UnauthorizedDetected` dedupes against an already-raised
+`sessionExpired` and drops to `guest`.
+
+Unauthorized is signalled separately: `ApiClient.unauthorizedStream` fires
+**once per burst** of 401/403 on authenticated, non-lifecycle requests, then
+stays silent until `resetUnauthorizedSignal()`. `client_app` forwards it to the
+session bloc.
 
 ## 6. Storage
 
@@ -159,7 +174,7 @@ declare `shared_preferences` themselves.
 | New wire model | `dto/<name>.dto.dart` with `@JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)` + `part`, export from `network.barrel.dart`, run `melos run build` |
 | New backend domain | new `<domain>.endpoints.dart` + `<domain>.repository.dart`; do not extend `auth.endpoints.dart` |
 | New persisted value | extend `AppPreferences` (non-secret) or `TokenStorage` (secret), keep the abstract contract |
-| New shared async state | **not** a `.notifier.dart`. Transitional `ChangeNotifier` here is legacy (pagination) or Track 12 session infra; new state goes to app-layer `Bloc`s. Extend this package only when a repository/stream seam is missing |
+| New shared async state | a `Bloc` (`.bloc.dart` + `.event.dart` + `.state.dart`, pure `bloc` package) here when the state is core infrastructure, otherwise an app-layer `Bloc`. Never a `ChangeNotifier`. |
 
 ## 8. Gotchas
 
@@ -181,23 +196,24 @@ declare `shared_preferences` themselves.
 - **`NetworkException` exposes `DioExceptionType`**, so any package
   constructing one in a test needs a `dio` dev dependency.
 - **A 401/403 on an authenticated request is reported, not swallowed.**
-  `ApiClient.unauthorizedNotifier` emits (`UnauthorizedNotifier`,
-  Track 12); `client_app`'s `SessionController.handleUnauthorized()` then
-  surfaces the session-expired notice and the router redirects to auth.
+  `ApiClient.unauthorizedStream` emits once per burst
+  (`reportUnauthorized()` + `resetUnauthorizedSignal()`);
+  `client_app` forwards it to `UnauthorizedDetected`, which surfaces the
+  session-expired notice and the router redirects to auth.
 
 ## 9. Tests
 
-`packages/core/test/` — 59 tests.
+`packages/core/test/` — 57 tests.
 
 | File | Covers |
 |---|---|
 | `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, 401/422 mapping |
-| `session_controller_test.dart` | all four `restore()` branches, `ready` idempotence, login/register/verify/logout |
-| `unauthorized_notifier_test.dart` | Track 12: 401/403 emission on authenticated requests |
+| `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, login/register/verify/logout, notice emission |
+| `unauthorized_signal_test.dart` | 401/403 burst emission + reset, lifecycle routes, no-bearer, transport, 5xx |
 | `storage_test.dart` | preference defaults + round-trip |
-| `pagination_test.dart`, `onboarding_config_repository_test.dart` | as named |
+| `onboarding_config_repository_test.dart` | as named |
 
 Helpers: `test/helpers/fake_dio.dart` (interceptor-based fake, envelope
 builders, `clientWith`), `test/helpers/fake_auth.dart` (`InMemoryTokenStorage`,

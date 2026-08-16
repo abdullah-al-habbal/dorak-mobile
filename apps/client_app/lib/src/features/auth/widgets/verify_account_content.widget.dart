@@ -14,8 +14,10 @@ class VerifyAccountContent extends StatefulWidget {
   static const int resendCooldownSeconds = 60;
 
   final String destination;
-  final Future<void> Function(String code) onVerify;
-  final Future<void> Function() onResend;
+  final void Function(String code) onVerify;
+  final void Function() onResend;
+  final AuthError? error;
+  final bool isVerifying;
   final VoidCallback onSkip;
 
   const VerifyAccountContent({
@@ -23,6 +25,8 @@ class VerifyAccountContent extends StatefulWidget {
     required this.destination,
     required this.onVerify,
     required this.onResend,
+    required this.error,
+    required this.isVerifying,
     required this.onSkip,
   });
 
@@ -36,8 +40,6 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
 
   Timer? _cooldownTimer;
   int _cooldown = VerifyAccountContent.resendCooldownSeconds;
-  bool _isVerifying = false;
-  bool _isResending = false;
   AuthError? _error;
 
   @override
@@ -51,6 +53,7 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
       VerifyAccountContent.codeLength,
       (_) => FocusNode(),
     );
+    _error = widget.error;
     _startCooldown();
   }
 
@@ -64,6 +67,14 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
       node.dispose();
     }
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant VerifyAccountContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.error, widget.error)) {
+      _error = widget.error;
+    }
   }
 
   void _startCooldown() {
@@ -111,7 +122,7 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
     _focusNodes[index - 1].requestFocus();
   }
 
-  Future<void> _verify() async {
+  void _verify() {
     final l10n = AppLocalizations.of(context)!;
     final code = _code;
     if (code.length < VerifyAccountContent.codeLength) {
@@ -119,49 +130,22 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
       return;
     }
 
-    setState(() {
-      _isVerifying = true;
-      _error = null;
-    });
-    try {
-      await widget.onVerify(code);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = AuthError.from(
-          e,
-          l10n,
-          unprocessableMessage: l10n.verifyErrorInvalid,
-        );
-      });
-    } finally {
-      if (mounted) setState(() => _isVerifying = false);
-    }
+    setState(() => _error = null);
+    widget.onVerify(code);
   }
 
-  Future<void> _resend() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    setState(() {
-      _isResending = true;
-      _error = null;
-    });
-    try {
-      await widget.onResend();
-      if (mounted) _startCooldown();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _error = AuthError.from(e, l10n));
-    } finally {
-      if (mounted) setState(() => _isResending = false);
-    }
+  void _resend() {
+    setState(() => _error = null);
+    widget.onResend();
+    _startCooldown();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
-    final busy = _isVerifying || _isResending;
+    final error = _error;
+    final busy = widget.isVerifying;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -193,7 +177,7 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
                   focusNode: _focusNodes[i],
                   autofocus: i == 0,
                   enabled: !busy,
-                  hasError: _error != null,
+                  hasError: error != null,
                   onChanged: (value) => _onDigitChanged(i, value),
                   onBackspaceWhenEmpty: () => _onBackspaceWhenEmpty(i),
                 ),
@@ -204,16 +188,13 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
         const SizedBox(height: 16),
         SizedBox(
           height: 24,
-          child: _error == null
-              ? null
-              : AuthErrorBanner(message: _error!.message),
+          child: error == null ? null : AuthErrorBanner(message: error.message),
         ),
         const SizedBox(height: 8),
         PrimaryButton(
           label: l10n.verifyButton,
           onPressed: _verify,
-          isLoading: _isVerifying,
-          isDisabled: _isResending,
+          isLoading: widget.isVerifying,
         ),
         const SizedBox(height: 12),
         Wrap(
