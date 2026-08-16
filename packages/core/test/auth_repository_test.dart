@@ -41,8 +41,6 @@ void main() {
   });
 
   test('register sends password_confirmation', () async {
-    // Backend RegisterRequest applies Laravel's `confirmed` rule; omitting this
-    // key made every signup fail validation.
     RequestOptions? captured;
     final fake = fakeDio(
       handler: (options) {
@@ -112,7 +110,6 @@ void main() {
   });
 
   test('logout tolerates a response with no data key', () async {
-    // `noContent()` on the backend answers 200 with the `data` key omitted.
     RequestOptions? captured;
     final fake = fakeDio(
       handler: (options) {
@@ -172,7 +169,6 @@ void main() {
         data: errorEnvelope(
           code: 'UNAUTHORIZED',
           statusCode: 401,
-          // The backend really does return the raw translation key here.
           message: 'core::messages.invalid_credentials',
         ),
       ),

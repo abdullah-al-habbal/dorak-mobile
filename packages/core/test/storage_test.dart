@@ -20,9 +20,6 @@ void main() {
       final prefs = await SharedAppPreferences.create();
 
       await prefs.setDontShowOnboarding(true);
-
-      // Synchronous read matters: the launch gate branches on it without an
-      // await.
       expect(prefs.dontShowOnboarding, isTrue);
     });
 

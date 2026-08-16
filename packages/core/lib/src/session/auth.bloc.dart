@@ -68,8 +68,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _repository.sendEmailVerification();
     } catch (_) {
-      // Registration already succeeded; a failed dispatch must not block
-      // reaching the verify screen, which has Resend.
     }
   }
 

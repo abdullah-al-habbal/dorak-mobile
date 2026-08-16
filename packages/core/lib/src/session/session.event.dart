@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:core/src/network/dto/client.dto.dart';
+
 abstract class SessionEvent extends Equatable {
   const SessionEvent();
 
@@ -16,3 +18,12 @@ class UnauthorizedDetected extends SessionEvent {}
 class RequireAuthentication extends SessionEvent {}
 
 class SignalAcknowledged extends SessionEvent {}
+
+class AuthSessionMirror extends SessionEvent {
+  const AuthSessionMirror(this.client);
+
+  final ClientDto client;
+
+  @override
+  List<Object?> get props => [client];
+}

@@ -66,8 +66,6 @@ void main() {
 
     blocTest<SessionBloc, SessionState>(
       'offline start keeps the session instead of logging out',
-      // Sanctum tokens have no server-side expiry, so a transport failure is no
-      // evidence the session died.
       build: () {
         storage.token = 'stored-token';
         repository.refreshTokenError = offline();

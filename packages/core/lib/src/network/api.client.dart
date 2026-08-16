@@ -23,9 +23,6 @@ class ApiClient {
       StreamController<void>.broadcast();
   bool _unauthorizedFired = false;
 
-  /// Emits once per 401/403 on an authenticated, non-lifecycle request, then
-  /// stays silent until [resetUnauthorizedSignal]. Consumers own the burst
-  /// collapse.
   Stream<void> get unauthorizedStream => _unauthorizedController.stream;
 
   bool get unauthorizedSignalFired => _unauthorizedFired;

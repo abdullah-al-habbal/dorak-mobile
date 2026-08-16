@@ -64,6 +64,9 @@ class AppRouter {
         router.push<void>(AppRoutes.authEntry);
         session.add(SignalAcknowledged());
         apiClient.resetUnauthorizedSignal();
+      case SessionSignal.loginSucceeded:
+      case SessionSignal.registrationSucceeded:
+      case SessionSignal.verificationSucceeded:
       case SessionSignal.none:
         break;
     }
@@ -81,6 +84,8 @@ class AppRouter {
       case SessionSignal.verificationSucceeded:
         router.go(AppRoutes.home);
         auth.add(AuthSignalAcknowledged());
+      case SessionSignal.sessionExpired:
+      case SessionSignal.authenticationRequired:
       case SessionSignal.none:
         break;
     }

@@ -28,8 +28,6 @@ class OnboardingHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Flexible so the brand yields space to the locale toggle + Skip
-          // instead of overflowing the row on narrow phones.
           Flexible(
             child: Row(
               mainAxisSize: MainAxisSize.min,

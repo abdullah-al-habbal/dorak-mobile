@@ -46,7 +46,7 @@ void main() {
       ),
       expect: () => [
         const AuthState(isSubmitting: true),
-        const AuthState(isSubmitting: false, error: unauthorized()),
+        AuthState(isSubmitting: false, error: unauthorized()),
       ],
       verify: (bloc) {
         expect(bloc.state.client, isNull);

@@ -42,9 +42,6 @@ void main(List<String> args) {
       final path = entity.path; 
       if (path.contains('/generated/')) continue;
       if (path.endsWith('.g.dart') || path.endsWith('.freezed.dart')) continue;
-      // Third-party plugin sources are symlinked under the desktop ephemeral
-      // dirs once any plugin with a desktop implementation is added. They are
-      // not first-party code and the taxonomy does not govern them.
       if (path.contains('/.plugin_symlinks/')) continue;
       if (path.contains('/ephemeral/')) continue;
       if (path.contains('/build/') || path.contains('/.dart_tool/')) continue;

@@ -21,6 +21,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<UnauthorizedDetected>(_onUnauthorizedDetected);
     on<RequireAuthentication>(_onRequireAuthentication);
     on<SignalAcknowledged>(_onSignalAcknowledged);
+    on<AuthSessionMirror>(_onAuthSessionMirror);
     _authSubscription = _authBloc.stream.listen(_onAuthChanged);
   }
 
@@ -31,8 +32,6 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void>? _restoration;
 
-  /// Completes once the session status resolves (leaves [AuthStatus.unknown]).
-  /// Memoised: concurrent callers join the same in-flight restore.
   Future<void> get ready => _restoration ??= _restoreUntilResolved();
 
   @override
@@ -47,9 +46,16 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
         state.client == authState.client) {
       return;
     }
+    add(AuthSessionMirror(authState.client!));
+  }
+
+  void _onAuthSessionMirror(
+    AuthSessionMirror event,
+    Emitter<SessionState> emit,
+  ) {
     emit(state.copyWith(
       status: AuthStatus.authenticated,
-      client: authState.client,
+      client: event.client,
     ));
   }
 

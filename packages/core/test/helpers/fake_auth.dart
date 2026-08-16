@@ -142,7 +142,6 @@ class FakeAuthRepository implements AuthRepository {
 ApiException unauthorized() => const ApiException(
       statusCode: 401,
       code: 'UNKNOWN',
-      // What Laravel's guard actually returns — the envelope is bypassed.
       message: 'Unauthenticated.',
     );
 
