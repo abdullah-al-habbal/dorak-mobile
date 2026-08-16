@@ -4,7 +4,8 @@ Status: `DEFERRED` — not implemented. Codified for future execution.
 
 ## Problem
 
-Both pagination notifiers in `packages/core` hardcode a default page size:
+Both pagination notifiers in `packages/core` (legacy `ChangeNotifier`,
+transitional until Phase 4) hardcode a default page size:
 
 ```dart
 // page_pagination.notifier.dart
@@ -88,6 +89,9 @@ settings endpoint is hot on app cold-start.
   `apps/client_app/lib/main.dart` (mirror of
   `OnboardingConfigController`). Requests only needed keys, e.g.
   `['pagination.per_page']`.
+  > Architecture note (Phase 2): new app state is Pure Bloc — implement this
+  > as a `SettingsBloc`, not a `ChangeNotifier`. The spec above is otherwise
+  > unchanged.
 * Default `perPage`: `pagination.per_page` from settings, falling back to
   `15` while loading or on failure (never blocks startup).
 

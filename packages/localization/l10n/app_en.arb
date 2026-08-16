@@ -163,5 +163,151 @@
   "authGuestHint": "Explore Dorak without creating an account.",
   "@authGuestHint": {
     "description": "Auth entry guest helper text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button tooltip"
+  },
+  "loginTitle": "Welcome Back",
+  "@loginTitle": {
+    "description": "Login screen title"
+  },
+  "loginSubtitle": "Sign in to your account",
+  "@loginSubtitle": {
+    "description": "Login screen subtitle"
+  },
+  "loginEmailLabel": "Email",
+  "@loginEmailLabel": {
+    "description": "Login email field label"
+  },
+  "loginPasswordLabel": "Password",
+  "@loginPasswordLabel": {
+    "description": "Login password field label"
+  },
+  "loginForgotPassword": "Forgot Password?",
+  "@loginForgotPassword": {
+    "description": "Login forgot password link"
+  },
+  "loginButton": "Log In",
+  "@loginButton": {
+    "description": "Login submit button"
+  },
+  "loginSignUpPrompt": "Don't have an account?",
+  "@loginSignUpPrompt": {
+    "description": "Login footer prompt before the sign-up link"
+  },
+  "loginCreateAccountLink": "Create Account",
+  "@loginCreateAccountLink": {
+    "description": "Login footer sign-up link"
+  },
+  "loginErrorInvalidCredentials": "Invalid email or password",
+  "@loginErrorInvalidCredentials": {
+    "description": "Login 401 error message"
+  },
+  "signUpTitle": "Create your account",
+  "@signUpTitle": {
+    "description": "Sign-up screen title"
+  },
+  "signUpSubtitle": "Join Dorak for personalized grooming and effortless booking.",
+  "@signUpSubtitle": {
+    "description": "Sign-up screen subtitle"
+  },
+  "signUpFullNameLabel": "Full Name",
+  "@signUpFullNameLabel": {
+    "description": "Sign-up full name field label"
+  },
+  "signUpEmailLabel": "Email",
+  "@signUpEmailLabel": {
+    "description": "Sign-up email field label"
+  },
+  "signUpPasswordLabel": "Password",
+  "@signUpPasswordLabel": {
+    "description": "Sign-up password field label"
+  },
+  "signUpConfirmPasswordLabel": "Confirm Password",
+  "@signUpConfirmPasswordLabel": {
+    "description": "Sign-up confirm password field label"
+  },
+  "signUpPasswordHint": "At least 8 characters",
+  "@signUpPasswordHint": {
+    "description": "Sign-up password requirement hint"
+  },
+  "signUpButton": "Create Account",
+  "@signUpButton": {
+    "description": "Sign-up submit button"
+  },
+  "signUpAlreadyHaveAccount": "Already have an account?",
+  "@signUpAlreadyHaveAccount": {
+    "description": "Sign-up footer prompt before the login link"
+  },
+  "signUpLogInLink": "Log In",
+  "@signUpLogInLink": {
+    "description": "Sign-up footer login link"
+  },
+  "verifyTitle": "Verify Your Account",
+  "@verifyTitle": {
+    "description": "Verify account screen title"
+  },
+  "verifySubtitle": "Enter the 6-digit code we sent to {email}",
+  "@verifySubtitle": {
+    "description": "Verify account subtitle with the masked destination",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyButton": "Verify & Continue",
+  "@verifyButton": {
+    "description": "Verify account submit button"
+  },
+  "verifyDidNotReceive": "Didn't receive the code?",
+  "@verifyDidNotReceive": {
+    "description": "Verify account resend prompt"
+  },
+  "verifyResend": "Resend Code",
+  "@verifyResend": {
+    "description": "Verify account resend action"
+  },
+  "verifyResendDisabled": "Resend Code ({seconds}s)",
+  "@verifyResendDisabled": {
+    "description": "Verify account resend action during cooldown",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "verifyErrorInvalid": "Invalid code. Please try again.",
+  "@verifyErrorInvalid": {
+    "description": "Verify account invalid code error"
+  },
+  "verifySkip": "Verify later",
+  "@verifySkip": {
+    "description": "Verify account skip action"
+  },
+  "fieldRequired": "This field is required",
+  "@fieldRequired": {
+    "description": "Form validation error for an empty required field"
+  },
+  "fieldInvalidEmail": "Please enter a valid email address",
+  "@fieldInvalidEmail": {
+    "description": "Form validation error for a malformed email"
+  },
+  "fieldPasswordTooShort": "Password must be at least 8 characters",
+  "@fieldPasswordTooShort": {
+    "description": "Form validation error for a short password"
+  },
+  "fieldPasswordMismatch": "Passwords do not match",
+  "@fieldPasswordMismatch": {
+    "description": "Form validation error when confirm password differs"
+  },
+  "errorNetwork": "No connection. Check your network and try again.",
+  "@errorNetwork": {
+    "description": "Transport failure message"
+  },
+  "errorGeneric": "Something went wrong. Please try again.",
+  "@errorGeneric": {
+    "description": "Fallback error message"
   }
 }

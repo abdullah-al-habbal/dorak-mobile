@@ -135,4 +135,113 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authGuestHint => 'استكشف دوراك دون إنشاء حساب.';
+
+  @override
+  String get back => 'رجوع';
+
+  @override
+  String get loginTitle => 'مرحباً بعودتك';
+
+  @override
+  String get loginSubtitle => 'سجّل الدخول إلى حسابك';
+
+  @override
+  String get loginEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get loginPasswordLabel => 'كلمة المرور';
+
+  @override
+  String get loginForgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get loginButton => 'تسجيل الدخول';
+
+  @override
+  String get loginSignUpPrompt => 'ليس لديك حساب؟';
+
+  @override
+  String get loginCreateAccountLink => 'إنشاء حساب';
+
+  @override
+  String get loginErrorInvalidCredentials =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+
+  @override
+  String get signUpTitle => 'أنشئ حسابك';
+
+  @override
+  String get signUpSubtitle =>
+      'انضم إلى دوراك للحصول على عناية شخصية وحجز سهل.';
+
+  @override
+  String get signUpFullNameLabel => 'الاسم الكامل';
+
+  @override
+  String get signUpEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get signUpPasswordLabel => 'كلمة المرور';
+
+  @override
+  String get signUpConfirmPasswordLabel => 'تأكيد كلمة المرور';
+
+  @override
+  String get signUpPasswordHint => 'على الأقل 8 أحرف';
+
+  @override
+  String get signUpButton => 'إنشاء حساب';
+
+  @override
+  String get signUpAlreadyHaveAccount => 'لديك حساب بالفعل؟';
+
+  @override
+  String get signUpLogInLink => 'تسجيل الدخول';
+
+  @override
+  String get verifyTitle => 'تحقق من حسابك';
+
+  @override
+  String verifySubtitle(String email) {
+    return 'أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى $email';
+  }
+
+  @override
+  String get verifyButton => 'تحقق واستمر';
+
+  @override
+  String get verifyDidNotReceive => 'لم تستلم الرمز؟';
+
+  @override
+  String get verifyResend => 'إعادة إرسال الرمز';
+
+  @override
+  String verifyResendDisabled(int seconds) {
+    return 'إعادة إرسال الرمز ($secondsث)';
+  }
+
+  @override
+  String get verifyErrorInvalid => 'رمز غير صحيح. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get verifySkip => 'التحقق لاحقاً';
+
+  @override
+  String get fieldRequired => 'هذا الحقل مطلوب';
+
+  @override
+  String get fieldInvalidEmail => 'يرجى إدخال بريد إلكتروني صحيح';
+
+  @override
+  String get fieldPasswordTooShort =>
+      'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل';
+
+  @override
+  String get fieldPasswordMismatch => 'كلمات المرور غير متطابقة';
+
+  @override
+  String get errorNetwork => 'لا يوجد اتصال. تحقق من شبكتك وحاول مرة أخرى.';
+
+  @override
+  String get errorGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 }

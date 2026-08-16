@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
@@ -69,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       context,
       onSkipForNow: widget.onSkipForNow,
       onDontShowAgain: widget.onDontShowAgain,
-      onCancel: () => Navigator.pop(context),
+      onCancel: () => context.pop(),
     );
   }
 

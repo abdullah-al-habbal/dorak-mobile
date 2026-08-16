@@ -28,22 +28,30 @@ class OnboardingHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.spa,
-                color: colors.primary,
-                size: 28,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                brandLabel,
-                style: DorakTypography.headlineSm.copyWith(
+          // Flexible so the brand yields space to the locale toggle + Skip
+          // instead of overflowing the row on narrow phones.
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.spa,
                   color: colors.primary,
-                  fontWeight: FontWeight.bold,
+                  size: 28,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    brandLabel,
+                    overflow: TextOverflow.ellipsis,
+                    style: DorakTypography.headlineSm.copyWith(
+                      color: colors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Row(
             children: [

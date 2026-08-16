@@ -16,7 +16,15 @@ const roles = <String>{
   'client',
   'interceptor',
   'exception',
+  'storage',
+  'navigator',
+  'bloc',
+  'event',
+  'state',
+  'router',
 };
+
+const blocRoles = <String>{'bloc', 'event', 'state'};
 
 final roleRegex = RegExp(r'^[a-z0-9_]+\.([a-z0-9]+)\.dart$');
 
@@ -35,6 +43,12 @@ void main(List<String> args) {
       final path = entity.path; 
       if (path.contains('/generated/')) continue;
       if (path.endsWith('.g.dart') || path.endsWith('.freezed.dart')) continue;
+      // Third-party plugin sources are symlinked under the desktop ephemeral
+      // dirs once any plugin with a desktop implementation is added. They are
+      // not first-party code and the taxonomy does not govern them.
+      if (path.contains('/.plugin_symlinks/')) continue;
+      if (path.contains('/ephemeral/')) continue;
+      if (path.contains('/build/') || path.contains('/.dart_tool/')) continue;
       if (!path.contains('/lib/')) continue;
 
       final parts = path.split('/lib/');
@@ -48,6 +62,7 @@ void main(List<String> args) {
         '${root.path}/packages/design_system/',
       );
       final isCore = path.startsWith('${root.path}/packages/core/');
+      final isFeaturePackage = path.startsWith('${root.path}/packages/feature_');
 
       final match = roleRegex.firstMatch(name);
       final role = match?.group(1);
@@ -73,6 +88,29 @@ void main(List<String> args) {
           !isCore &&
           !isApp) {
         violations.add('$path: role $role allowed only in packages/core or apps/*/lib');
+      }
+      if (role == 'storage' && !isCore) {
+        violations.add('$path: .storage.dart allowed only in packages/core');
+      }
+      if (role == 'navigator') {
+        final isStub =
+            path.startsWith('${root.path}/apps/business_app/') ||
+                path.startsWith('${root.path}/apps/stylist_app/');
+        if (!isApp || !isStub) {
+          violations.add(
+            '$path: .navigator.dart is DEPRECATED (legacy route-flow '
+            'coordinators) — allowed only in the untouched business_app / '
+            'stylist_app stubs; use go_router (.router.dart) instead',
+          );
+        }
+      }
+      if (blocRoles.contains(role) && !isApp && !isFeaturePackage) {
+        violations.add(
+          '$path: role $role allowed only in apps/*/lib or packages/feature_*/lib',
+        );
+      }
+      if (role == 'router' && !isApp) {
+        violations.add('$path: .router.dart allowed only in apps/*/lib');
       }
     }
   }

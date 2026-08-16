@@ -343,6 +343,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Explore Dorak without creating an account.'**
   String get authGuestHint;
+
+  /// Back button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Login screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get loginTitle;
+
+  /// Login screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to your account'**
+  String get loginSubtitle;
+
+  /// Login email field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get loginEmailLabel;
+
+  /// Login password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginPasswordLabel;
+
+  /// Login forgot password link
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get loginForgotPassword;
+
+  /// Login submit button
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get loginButton;
+
+  /// Login footer prompt before the sign-up link
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get loginSignUpPrompt;
+
+  /// Login footer sign-up link
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get loginCreateAccountLink;
+
+  /// Login 401 error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password'**
+  String get loginErrorInvalidCredentials;
+
+  /// Sign-up screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get signUpTitle;
+
+  /// Sign-up screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Join Dorak for personalized grooming and effortless booking.'**
+  String get signUpSubtitle;
+
+  /// Sign-up full name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get signUpFullNameLabel;
+
+  /// Sign-up email field label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get signUpEmailLabel;
+
+  /// Sign-up password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get signUpPasswordLabel;
+
+  /// Sign-up confirm password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get signUpConfirmPasswordLabel;
+
+  /// Sign-up password requirement hint
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get signUpPasswordHint;
+
+  /// Sign-up submit button
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get signUpButton;
+
+  /// Sign-up footer prompt before the login link
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get signUpAlreadyHaveAccount;
+
+  /// Sign-up footer login link
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get signUpLogInLink;
+
+  /// Verify account screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Your Account'**
+  String get verifyTitle;
+
+  /// Verify account subtitle with the masked destination
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code we sent to {email}'**
+  String verifySubtitle(String email);
+
+  /// Verify account submit button
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Continue'**
+  String get verifyButton;
+
+  /// Verify account resend prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive the code?'**
+  String get verifyDidNotReceive;
+
+  /// Verify account resend action
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get verifyResend;
+
+  /// Verify account resend action during cooldown
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code ({seconds}s)'**
+  String verifyResendDisabled(int seconds);
+
+  /// Verify account invalid code error
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid code. Please try again.'**
+  String get verifyErrorInvalid;
+
+  /// Verify account skip action
+  ///
+  /// In en, this message translates to:
+  /// **'Verify later'**
+  String get verifySkip;
+
+  /// Form validation error for an empty required field
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// Form validation error for a malformed email
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get fieldInvalidEmail;
+
+  /// Form validation error for a short password
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get fieldPasswordTooShort;
+
+  /// Form validation error when confirm password differs
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get fieldPasswordMismatch;
+
+  /// Transport failure message
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your network and try again.'**
+  String get errorNetwork;
+
+  /// Fallback error message
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorGeneric;
 }
 
 class _AppLocalizationsDelegate

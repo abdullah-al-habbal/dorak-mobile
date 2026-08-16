@@ -163,5 +163,151 @@
   "authGuestHint": "استكشف دوراك دون إنشاء حساب.",
   "@authGuestHint": {
     "description": "Auth entry guest helper text"
+  },
+  "back": "رجوع",
+  "@back": {
+    "description": "Back button tooltip"
+  },
+  "loginTitle": "مرحباً بعودتك",
+  "@loginTitle": {
+    "description": "Login screen title"
+  },
+  "loginSubtitle": "سجّل الدخول إلى حسابك",
+  "@loginSubtitle": {
+    "description": "Login screen subtitle"
+  },
+  "loginEmailLabel": "البريد الإلكتروني",
+  "@loginEmailLabel": {
+    "description": "Login email field label"
+  },
+  "loginPasswordLabel": "كلمة المرور",
+  "@loginPasswordLabel": {
+    "description": "Login password field label"
+  },
+  "loginForgotPassword": "نسيت كلمة المرور؟",
+  "@loginForgotPassword": {
+    "description": "Login forgot password link"
+  },
+  "loginButton": "تسجيل الدخول",
+  "@loginButton": {
+    "description": "Login submit button"
+  },
+  "loginSignUpPrompt": "ليس لديك حساب؟",
+  "@loginSignUpPrompt": {
+    "description": "Login footer prompt before the sign-up link"
+  },
+  "loginCreateAccountLink": "إنشاء حساب",
+  "@loginCreateAccountLink": {
+    "description": "Login footer sign-up link"
+  },
+  "loginErrorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+  "@loginErrorInvalidCredentials": {
+    "description": "Login 401 error message"
+  },
+  "signUpTitle": "أنشئ حسابك",
+  "@signUpTitle": {
+    "description": "Sign-up screen title"
+  },
+  "signUpSubtitle": "انضم إلى دوراك للحصول على عناية شخصية وحجز سهل.",
+  "@signUpSubtitle": {
+    "description": "Sign-up screen subtitle"
+  },
+  "signUpFullNameLabel": "الاسم الكامل",
+  "@signUpFullNameLabel": {
+    "description": "Sign-up full name field label"
+  },
+  "signUpEmailLabel": "البريد الإلكتروني",
+  "@signUpEmailLabel": {
+    "description": "Sign-up email field label"
+  },
+  "signUpPasswordLabel": "كلمة المرور",
+  "@signUpPasswordLabel": {
+    "description": "Sign-up password field label"
+  },
+  "signUpConfirmPasswordLabel": "تأكيد كلمة المرور",
+  "@signUpConfirmPasswordLabel": {
+    "description": "Sign-up confirm password field label"
+  },
+  "signUpPasswordHint": "على الأقل 8 أحرف",
+  "@signUpPasswordHint": {
+    "description": "Sign-up password requirement hint"
+  },
+  "signUpButton": "إنشاء حساب",
+  "@signUpButton": {
+    "description": "Sign-up submit button"
+  },
+  "signUpAlreadyHaveAccount": "لديك حساب بالفعل؟",
+  "@signUpAlreadyHaveAccount": {
+    "description": "Sign-up footer prompt before the login link"
+  },
+  "signUpLogInLink": "تسجيل الدخول",
+  "@signUpLogInLink": {
+    "description": "Sign-up footer login link"
+  },
+  "verifyTitle": "تحقق من حسابك",
+  "@verifyTitle": {
+    "description": "Verify account screen title"
+  },
+  "verifySubtitle": "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى {email}",
+  "@verifySubtitle": {
+    "description": "Verify account subtitle with the masked destination",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyButton": "تحقق واستمر",
+  "@verifyButton": {
+    "description": "Verify account submit button"
+  },
+  "verifyDidNotReceive": "لم تستلم الرمز؟",
+  "@verifyDidNotReceive": {
+    "description": "Verify account resend prompt"
+  },
+  "verifyResend": "إعادة إرسال الرمز",
+  "@verifyResend": {
+    "description": "Verify account resend action"
+  },
+  "verifyResendDisabled": "إعادة إرسال الرمز ({seconds}ث)",
+  "@verifyResendDisabled": {
+    "description": "Verify account resend action during cooldown",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "verifyErrorInvalid": "رمز غير صحيح. يرجى المحاولة مرة أخرى.",
+  "@verifyErrorInvalid": {
+    "description": "Verify account invalid code error"
+  },
+  "verifySkip": "التحقق لاحقاً",
+  "@verifySkip": {
+    "description": "Verify account skip action"
+  },
+  "fieldRequired": "هذا الحقل مطلوب",
+  "@fieldRequired": {
+    "description": "Form validation error for an empty required field"
+  },
+  "fieldInvalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+  "@fieldInvalidEmail": {
+    "description": "Form validation error for a malformed email"
+  },
+  "fieldPasswordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+  "@fieldPasswordTooShort": {
+    "description": "Form validation error for a short password"
+  },
+  "fieldPasswordMismatch": "كلمات المرور غير متطابقة",
+  "@fieldPasswordMismatch": {
+    "description": "Form validation error when confirm password differs"
+  },
+  "errorNetwork": "لا يوجد اتصال. تحقق من شبكتك وحاول مرة أخرى.",
+  "@errorNetwork": {
+    "description": "Transport failure message"
+  },
+  "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+  "@errorGeneric": {
+    "description": "Fallback error message"
   }
 }

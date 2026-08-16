@@ -103,6 +103,7 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
 ApiClient clientWithStatuses(
   List<int> statuses, {
   int maxRetries = 3,
+  Future<String?> Function()? tokenProvider,
 }) {
   final dio = Dio(BaseOptions(baseUrl: 'http://test/api/v1'));
   late final FakeHttpClientAdapter adapter;
@@ -127,5 +128,6 @@ ApiClient clientWithStatuses(
     dio: dio,
     enableLogging: false,
     maxRetries: maxRetries,
+    tokenProvider: tokenProvider,
   );
 }

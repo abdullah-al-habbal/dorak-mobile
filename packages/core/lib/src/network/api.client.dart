@@ -7,6 +7,7 @@ import 'package:core/src/network/interceptors/auth.interceptor.dart';
 import 'package:core/src/network/interceptors/locale.interceptor.dart';
 import 'package:core/src/network/interceptors/logging.interceptor.dart';
 import 'package:core/src/network/interceptors/retry.interceptor.dart';
+import 'package:core/src/network/unauthorized.notifier.dart';
 import 'package:core/src/network/paginated_data.dto.dart';
 import 'package:core/src/network/pagination_meta.dto.dart';
 
@@ -17,6 +18,7 @@ class ApiClient {
   static const Duration defaultReceiveTimeout = Duration(seconds: 30);
 
   final Dio dio;
+  final UnauthorizedNotifier unauthorizedNotifier = UnauthorizedNotifier();
 
   ApiClient({
     required String baseUrl,
@@ -36,7 +38,11 @@ class ApiClient {
     this.dio.interceptors
       ..add(LocaleInterceptor(resolver: localeResolver ?? () => 'en'))
       ..addAll([
-        if (tokenProvider != null) AuthInterceptor(tokenProvider: tokenProvider),
+        if (tokenProvider != null)
+          AuthInterceptor(
+            tokenProvider: tokenProvider,
+            unauthorizedNotifier: unauthorizedNotifier,
+          ),
         if (enableLogging) LoggingInterceptor(),
         RetryInterceptor(dio: this.dio, maxRetries: maxRetries),
       ]);

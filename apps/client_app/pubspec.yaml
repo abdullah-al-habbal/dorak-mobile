@@ -38,6 +38,16 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_dotenv: ^6.0.1
 
+  # State management. Pure Bloc — Cubit, ChangeNotifier application state,
+  # Provider, Riverpod and GetIt are prohibited (see CLAUDE.md).
+  flutter_bloc: ^9.1.1
+  # Value equality for bloc events/states, so an identical state does not
+  # re-emit and re-trigger the go_router redirect.
+  equatable: ^2.0.7
+  # The single application router. Owns the route tree, redirects and guards.
+  # Deliberately NOT in packages/core — core must not depend on Flutter routing.
+  go_router: ^17.2.1
+
   # Workspace packages
   core:
     path: ../../packages/core
@@ -47,8 +57,15 @@ dependencies:
     path: ../../packages/localization
 
 dev_dependencies:
+  # Test-only: NetworkException carries a DioExceptionType, so constructing one
+  # in a fake requires the dio types.
+  dio: ^5.7.0
   flutter_test:
     sdk: flutter
+
+  # Bloc testing convention. Pulls mocktail transitively; hand-written fakes in
+  # test/helpers/ remain the rule for repositories and storage.
+  bloc_test: ^10.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

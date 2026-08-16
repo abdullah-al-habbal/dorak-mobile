@@ -28,7 +28,11 @@ melos:
       description: Resolve all workspace dependencies (native pub workspaces).
 
     generate:
-      run: melos exec --scope="localization" -- "flutter gen-l10n"
+      exec:
+        command: flutter gen-l10n
+        concurrency: 1
+      packageFilters:
+        scope: localization
       description: Regenerate localization ARB output in the localization package.
 
     build:
@@ -38,11 +42,15 @@ melos:
       description: Run code generation (build_runner) in packages that declare json_serializable.
 
     analyze:
-      run: melos exec -- "flutter analyze"
+      exec:
+        command: flutter analyze
+        concurrency: 1
       description: Run static analysis in every workspace package.
 
     test:
-      run: melos exec -- "flutter test"
+      exec:
+        command: flutter test
+        concurrency: 1
       description: Run tests in every workspace package.
 
     taxonomy:
@@ -51,9 +59,9 @@ melos:
 
     verify:
       run: |
-        melos run generate &&
-        melos run build &&
-        melos run analyze &&
-        melos run taxonomy &&
-        melos run test
+        dart run melos run generate &&
+        dart run melos run build &&
+        dart run melos run analyze &&
+        dart run melos run taxonomy &&
+        dart run melos run test
       description: Full verification gate (generate, build, analyze, taxonomy, test).

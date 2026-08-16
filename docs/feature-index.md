@@ -33,9 +33,12 @@
 - `ApiClient` — Dio-based (`api.client.dart`).
 - Interceptors: `auth.interceptor.dart`, `locale.interceptor.dart`, `logging.interceptor.dart`, `retry.interceptor.dart`.
 - Contracts: `ApiResponse<T>` / `api_response.dto.dart`, `PaginatedData<T>`, `PaginationMeta`, exceptions (`ApiException`, `NetworkException`, `ValidationException`).
-- Pagination notifiers: `page_pagination.notifier.dart`, `scroll_pagination.notifier.dart`.
-- `endpoints/app.endpoints.dart` — domain-split endpoint declarations.
+- Pagination notifiers: `page_pagination.notifier.dart`, `scroll_pagination.notifier.dart` (**legacy** ChangeNotifier, Phase 4 replaces them).
+- `endpoints/app.endpoints.dart`, `endpoints/auth.endpoints.dart` — domain-split endpoint declarations.
 - `onboarding_config.repository.dart` — `OnboardingConfigRepository` + `OnboardingConfigDto` (GET /api/v1/app/onboarding-config).
+- `auth.repository.dart` — `AuthRepository` + `DioAuthRepository`: login, register (sends `password_confirmation`), logout, refreshToken, sendEmailVerification, verifyEmail, forgotPassword, resetPassword. DTOs `AuthResponseDto`, `ClientDto`, `TokenResponseDto`.
+- **Storage** (`src/storage/`) — `TokenStorage` / `SecureTokenStorage` (flutter_secure_storage) and `AppPreferences` / `SharedAppPreferences` (shared_preferences, `dontShowOnboarding`). See `docs/core/storage.md`.
+- **Session** (`src/session/`) — `AuthStatus` + `SessionController` (`ChangeNotifier`, **transitional** — Phase 4 replaces it with a `SessionBloc`): restore / login / register / verify / logout. See `docs/core/session.md`.
 
 ### feature_floor_plan
 - Stub only — `feature_floor_plan.dart` barrel, no implementation yet.
@@ -64,11 +67,23 @@
 
 ### Onboarding Infrastructure
 - `onboarding_config.notifier.dart` — `OnboardingConfigController`, loads `/app/onboarding-config` per locale, reloads on locale switch.
-- `skip_bottom_sheet.sheet.dart` — shared 3-option skip sheet (Skip / Don't show again / Cancel).
-- Flow wiring in `main.dart`: Splash → Welcome → Discovery → Booking → AiShowcase → Home (manual `Navigator.push`/`pushReplacement`, callback-driven; locale toggle threaded through every screen; EN/AR + RTL).
+- `skip_bottom_sheet.sheet.dart` — shared 3-option skip sheet (Skip / Don't show again / Cancel); dismisses itself before either decision navigates.
+- Flow wiring in `src/core/navigation/app.router.dart` (go_router). `Skip for now` leaves `dontShowOnboarding` untouched; `Don't show again` and completing the tour persist it. See `docs/flows/onboarding.md`.
+
+### Authentication — Stitch 006–009
+- `auth_entry.screen.dart` (006) — now reachable; its three callbacks are bound by `app.router.dart`.
+- `login.screen.dart` + `login_content.widget.dart` (007).
+- `sign_up.screen.dart` + `sign_up_content.widget.dart` (008) — 4 fields; the confirm field feeds `password_confirmation`.
+- `verify_account.screen.dart` + `verify_account_content.widget.dart` + `otp_input_field.widget.dart` (009) — 6-digit code, 60 s resend cooldown, masked destination, non-blocking skip.
+- Shared: `auth_text_field.widget.dart`, `auth_header.widget.dart`, `auth_error_banner.widget.dart`, `auth_validators.entity.dart`, `auth_error.entity.dart` (maps exceptions to local ARB strings — backend `message` values are untranslated keys).
+
+### Navigation & Launch Gate
+- `src/core/navigation/app.router.dart` — `AppRouter` (go_router): route table + redirects; success paths use `router.go('/home')`, which clears the stack.
+- `src/core/navigation/app_routes.entity.dart` — `AppRoutes` path constants.
+- `src/core/navigation/app_gate.entity.dart` — post-splash decision (`AppGate.decide`, wired as the router redirect): session first, onboarding flag second. See `docs/flows/app_launch.md`.
 
 ### Home
-- `home.screen.dart` — placeholder landing (`homeTitle`), real dashboard TBD.
+- `home.screen.dart` — placeholder landing (`homeTitle`), real dashboard TBD. No logout affordance yet.
 
 ### Empty Scaffolds (not implemented)
 - `features/discovery/{data,domain,presentation}`, `features/booking/{data,domain,presentation}`, `features/profile/` — directories only, no files.
@@ -98,10 +113,10 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 003 | Onboarding Discovery | CL-03 | ✅ Migrated |
 | 004 | Onboarding Booking | CL-04 | ✅ Migrated |
 | 005 | Onboarding AI Showcase | CL-05 | ✅ Migrated |
-| 006 | Authentication Entry | CL-08 | ⏳ Pending |
-| 007 | Login | CL-08 | ⏳ Pending |
-| 008 | Create Your Account | CL-08 | ⏳ Pending |
-| 009 | Verify Your Account | CL-08 | ⏳ Pending |
+| 006 | Authentication Entry | CL-08 | ✅ Migrated |
+| 007 | Login | CL-08 | ✅ Migrated |
+| 008 | Create Your Account | CL-08 | ✅ Migrated |
+| 009 | Verify Your Account | CL-08 | ✅ Migrated |
 | 010 | Complete Your Profile | CL-08 | ⏳ Pending |
 | 011 | Forgot Password | CL-08 | ⏳ Pending |
 | 012 | Forgot Password OTP | CL-08 | ⏳ Pending |
@@ -135,7 +150,12 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-10 | Onboarding Infrastructure (config fetch, skip sheet, flow) | client_app | ✅ Complete | — |
 | FE-11 | Home placeholder | client_app | ✅ Complete | — |
 | FE-12 | Floor Plan package | feature_floor_plan | ⏸ Stub | Track pending |
+| FE-13 | Storage (secure token + preferences) | core | ✅ Complete | Track 05 |
+| FE-14 | Session management (`SessionController`) | core | ✅ Complete | Track 06 |
+| FE-15 | Auth repository (full endpoint surface) | core | ✅ Complete | Track 06 |
+| FE-16 | Launch gate + navigation coordinators | client_app | ✅ Complete | Tracks 10–11 |
+| FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |
 
 ### Not Started
-- Auth flow (Stitch 006–014), Discovery Feed (016), Branch Floor Plan & Booking (017), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020).
+- Password recovery (Stitch 010–014), Discovery Feed (016), Branch Floor Plan & Booking (017), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020).
 - `business_app` and `stylist_app` features — both apps are skeletons.

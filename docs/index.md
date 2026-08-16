@@ -26,6 +26,8 @@ The two sources must remain separate and must not silently replace each other.
 
 Before modifying code, an AI agent MUST:
 
+0. Read `/AGENTS.md` — the entry point (feature inventory, backend contract,
+   non-obvious decisions, testing conventions).
 1. Read `/CLAUDE.md`.
 2. Read this file.
 3. Identify the current Track and Task.
@@ -408,16 +410,18 @@ packages/core
 
 ## Track 05 — Storage
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
 
 Objectives:
 
-* Secure credentials/tokens.
-* Local preferences.
-* Onboarding persistence.
-* `"Don't show again"` persistence.
-* Profile-completion persistence.
-* Cache strategy.
+* Secure credentials/tokens. — `DONE` (`TokenStorage` / `SecureTokenStorage`)
+* Local preferences. — `DONE` (`AppPreferences` / `SharedAppPreferences`)
+* Onboarding persistence. — `DONE`
+* `"Don't show again"` persistence. — `DONE`
+* Profile-completion persistence. — `PENDING` (blocked on Track 17)
+* Cache strategy. — `PENDING`
+
+Documentation: `docs/core/storage.md`.
 
 Implementation target:
 
@@ -429,15 +433,20 @@ packages/core
 
 ## Track 06 — Session Management
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
 
 Objectives:
 
-* Session restoration.
-* Session expiration.
-* Logout.
-* Authentication state.
-* Token lifecycle.
+* Session restoration. — `DONE` (`SessionController.restore`, probed via
+  `POST /client/refresh-token`; the backend has no `GET /client/me`)
+* Session expiration. — `DONE`. A dead token is detected on cold start, and —
+  since Track 12 — mid-session revocation is caught by `AuthInterceptor` and
+  redirected to auth (`docs/core/session.md`, `docs/core/interceptors.md`).
+* Logout. — `DONE` (`SessionController.logout`; no UI affordance yet)
+* Authentication state. — `DONE` (`AuthStatus`)
+* Token lifecycle. — `DONE` (issue, rotate on restore, clear on 401/logout)
+
+Documentation: `docs/core/session.md`.
 
 Implementation target:
 
@@ -492,7 +501,16 @@ packages/core/network
 
 ## Track 09 — State Management
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
+
+> Locked (Phase 2): **Pure Bloc** (`flutter_bloc`) is the canonical
+> state-management architecture. UI emits events; `Bloc` owns business state;
+> UI renders from state. No Riverpod, Provider or GetIt. `ChangeNotifier` is
+> **not** a target pattern — the surviving instances are transitional Track 12
+> /session infrastructure (`SessionController`, `UnauthorizedNotifier`,
+> `SessionNotice`) and legacy pagination notifiers; Phase 4 replaces them with
+> Stream/Bloc. This track still owes the async / loading / empty / error /
+> refresh conventions.
 
 Objectives:
 
@@ -517,15 +535,18 @@ packages/feature_*
 
 ## Track 10 — Dependency Injection & Bootstrap
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
 
 Objectives:
 
-* Application bootstrap.
-* Dependency registration.
-* Environment initialization.
-* Core service initialization.
-* Application lifecycle.
+* Application bootstrap. — `DONE` for `client_app` (`main.dart` + `app.dart`;
+  see `docs/flows/app_launch.md`). `business_app` / `stylist_app` untouched.
+* Dependency registration. — `PARTIAL`. Wiring is manual construction in
+  `DorakApp.initState` with constructor seams for tests. No DI container.
+* Environment initialization. — `DONE` (dotenv + `ConfigProvider`)
+* Core service initialization. — `DONE` (storage, `ApiClient`, session,
+  onboarding config)
+* Application lifecycle. — `PENDING`
 
 Implementation target:
 
@@ -537,17 +558,23 @@ apps/*
 
 ## Track 11 — Navigation
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
 
 Objectives:
 
-* Route definitions.
-* Nested navigation.
-* Authentication guards.
-* Guest guards.
-* Profile-completion guards.
-* Deep links.
-* Notification-driven navigation.
+* Route definitions. — `DONE`. go_router route table in
+  `app.router.dart` (`AppRouter`) + `app_routes.entity.dart`. Navigator 1.0
+  and `.navigator.dart` coordinators were **removed in Phase 2**.
+* Nested navigation. — `PENDING`
+* Authentication guards. — `PARTIAL`. The launch gate (`AppGate.decide`,
+  installed as the router redirect) guards entry into the app; there are no
+  per-route guards.
+* Guest guards. — `PENDING`
+* Profile-completion guards. — `PENDING` (blocked on Track 17)
+* Deep links. — `PENDING`
+* Notification-driven navigation. — `PENDING`
+
+Documentation: `docs/navigation/routes.md`, `docs/navigation/guards.md`.
 
 Implementation target:
 
@@ -559,27 +586,37 @@ apps/*/src/core/navigation/
 
 ## Track 12 — Global UI States
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
+
+This track's current task — the `session_expired` and `authentication_required`
+states plus the 401 wiring — is `DONE` (see `docs/core/interceptors.md`,
+`docs/core/session.md`, `docs/navigation/guards.md`). The remaining states below
+are still pending.
 
 Objectives:
 
 Implement reusable:
 
-* Full-page loading.
-* Inline loading.
-* Button loading.
-* Shimmer.
-* Empty.
-* Error.
-* Offline.
-* Retry.
-* Session expired.
-* Authentication required.
-* Permission required.
+* Full-page loading. — `PENDING`
+* Inline loading. — `PENDING`
+* Button loading. — `PENDING`
+* Shimmer. — `PENDING`
+* Empty. — `PENDING`
+* Error. — `PENDING`
+* Offline. — `PENDING`
+* Retry. — `PENDING`
+* Session expired. — `DONE` (401/403 on an authenticated request →
+  `SessionController.handleUnauthorized()` → `SessionRedirect` → auth entry
+  with `replace: true`)
+* Authentication required. — `DONE` (guest action calls
+  `SessionController.requireAuthentication()` → auth entry pushed on top)
+* Permission required. — `PENDING`
 
-Implementation target:
+Implementation targets:
 
 ```text
+packages/core     # UnauthorizedNotifier, SessionController notices
+apps/*            # AppRouter listener redirects to /auth on sessionExpired
 packages/design_system
 ```
 
@@ -679,27 +716,30 @@ Every implemented component MUST map to its corresponding Markdown specification
 
 ## Track 16 — Authentication
 
-**Status:** `PENDING`
+**Status:** `IN_PROGRESS`
 
 Implementation order:
 
 ```text
-Splash
+Splash                      DONE  (Stitch 001)
 ↓
-Application Initialization
+Application Initialization  DONE  (main.dart + app.dart + AppGate)
 ↓
-Onboarding
+Onboarding                  DONE  (Stitch 002–005; Skip ≠ Don't show again)
 ↓
-Authentication Entry
+Authentication Entry        DONE  (Stitch 006, now reachable)
 ↓
-Login / Register
+Login / Register            DONE  (Stitch 007–008, live backend)
 ↓
-Verification
+Verification                DONE  (Stitch 009, non-blocking)
 ↓
-Password Recovery
+Password Recovery           PENDING  (Stitch 011–014)
 ↓
-Session Restoration
+Session Restoration         DONE  (see Track 06)
 ```
+
+Documentation: `docs/authentication/auth_flow.md`, `docs/flows/app_launch.md`,
+`docs/flows/onboarding.md`, `docs/flows/guest_access.md`.
 
 ---
 
@@ -802,11 +842,31 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** `Track 05 — Storage`
+**Current Track:** `Track 12 — Global UI States`
 
-**Current Task:** Establish and validate the engineering documentation baseline.
+**Current Task:** Done. The `session_expired` and `authentication_required`
+global states are implemented and the 401 interceptor wiring redirects a
+revoked token to auth instead of throwing at the call site — closing the open
+item on Track 06. See `docs/core/interceptors.md`, `docs/core/session.md`,
+`docs/navigation/guards.md`, and `app.router.dart`.
+
+Tracks 05, 06, 10, 11 and 16 are `IN_PROGRESS` with their remaining objectives
+listed inline above. The auth + onboarding launch flow is delivered end to end:
+see `docs/flows/app_launch.md`.
 
 The agent MUST NOT skip directly to feature implementation.
+
+---
+
+# 6b. Phase 2 Reconciliation Note
+
+Post-Phase-2 the repository is aligned on the locked architecture: **Pure Bloc**
+state (flutter_bloc) and **go_router** navigation (no Navigator 1.0, no
+`AppNavigator`). The session/unauthorized layer (`SessionController`,
+`UnauthorizedNotifier`, `SessionNotice`) and the pagination notifiers are
+transitional `ChangeNotifier` and stay until Phase 4 replaces them with
+Stream/Bloc. Do not add new `ChangeNotifier` state and do not reintroduce
+`.navigator.dart`.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: Kraseena High-End Grooming & Beauty
+name: Dorak High-End Grooming & Beauty
 colors:
   surface: '#fdf7ff'
   surface-dim: '#ded8e0'

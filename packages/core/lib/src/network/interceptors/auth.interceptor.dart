@@ -1,9 +1,30 @@
 import 'package:dio/dio.dart';
 
-class AuthInterceptor extends Interceptor {
-  final Future<String?> Function() tokenProvider;
+import 'package:core/src/network/endpoints/auth.endpoints.dart';
+import 'package:core/src/network/unauthorized.notifier.dart';
 
-  AuthInterceptor({required this.tokenProvider});
+class AuthInterceptor extends Interceptor {
+  static const String _socialPrefix = '/client/social/';
+
+  static const Set<String> _authLifecyclePaths = {
+    AuthEndpoints.login,
+    AuthEndpoints.register,
+    AuthEndpoints.logout,
+    AuthEndpoints.refreshToken,
+    AuthEndpoints.forgotPassword,
+    AuthEndpoints.resetPassword,
+    AuthEndpoints.verifyEmail,
+    AuthEndpoints.sendEmailVerification,
+    AuthEndpoints.changePassword,
+  };
+
+  final Future<String?> Function() tokenProvider;
+  final UnauthorizedNotifier unauthorizedNotifier;
+
+  AuthInterceptor({
+    required this.tokenProvider,
+    required this.unauthorizedNotifier,
+  });
 
   @override
   Future<void> onRequest(
@@ -15,5 +36,24 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final status = err.response?.statusCode;
+    final path = err.requestOptions.path;
+    final carriedBearer = (err.requestOptions.headers['Authorization'] as String?)
+            ?.startsWith('Bearer ') ??
+        false;
+    final isAuthLifecycle = _authLifecyclePaths.contains(path) ||
+        path.startsWith(_socialPrefix);
+
+    if (carriedBearer &&
+        !isAuthLifecycle &&
+        (status == 401 || status == 403)) {
+      unauthorizedNotifier.fire();
+    }
+
+    handler.next(err);
   }
 }

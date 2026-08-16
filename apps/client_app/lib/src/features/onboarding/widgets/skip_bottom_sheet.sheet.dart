@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
@@ -13,9 +14,15 @@ class SkipBottomSheet {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _SkipBottomSheetContent(
-        onSkipForNow: onSkipForNow,
-        onDontShowAgain: onDontShowAgain,
+      builder: (sheetContext) => _SkipBottomSheetContent(
+        onSkipForNow: () {
+          sheetContext.pop();
+          onSkipForNow();
+        },
+        onDontShowAgain: () {
+          sheetContext.pop();
+          onDontShowAgain();
+        },
         onCancel: onCancel,
       ),
     );

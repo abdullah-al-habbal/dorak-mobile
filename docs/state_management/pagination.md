@@ -1,6 +1,7 @@
 # Pagination
 
-Status: `DONE`
+Status: `DONE` — but the notifiers are **legacy** `ChangeNotifier` (Phase 4
+replaces them with a Bloc/Stream pagination story; do not extend them).
 
 ## Purpose
 

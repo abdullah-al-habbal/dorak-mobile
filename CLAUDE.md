@@ -1,5 +1,28 @@
 # Dorak Monorepo — AI Agent & Developer Guidelines (`CLAUDE.md`)
 
+> **Read [`AGENTS.md`](./AGENTS.md) first.** It is the entry point: current
+> feature inventory, backend contract, testing conventions, and the design
+> decisions that are not visible in the source (the Dart code carries almost no
+> comments). This file is the normative taxonomy and layering contract that
+> `AGENTS.md` summarises.
+>
+> **This file is the parent rulebook.** Every app and package carries its own
+> scoped `CLAUDE.md` that inherits from it and narrows further — dependency
+> ceiling, permitted file roles, unit-specific prohibitions. Read the child for
+> whatever you are editing:
+>
+> | Unit | Scoped rules | Inventory |
+> |---|---|---|
+> | `apps/client_app` | [`CLAUDE`](./apps/client_app/CLAUDE.md) | [`AGENTS`](./apps/client_app/AGENTS.md) |
+> | `apps/business_app` | [`CLAUDE`](./apps/business_app/CLAUDE.md) | [`AGENTS`](./apps/business_app/AGENTS.md) |
+> | `apps/stylist_app` | [`CLAUDE`](./apps/stylist_app/CLAUDE.md) | [`AGENTS`](./apps/stylist_app/AGENTS.md) |
+> | `packages/core` | [`CLAUDE`](./packages/core/CLAUDE.md) | [`AGENTS`](./packages/core/AGENTS.md) |
+> | `packages/design_system` | [`CLAUDE`](./packages/design_system/CLAUDE.md) | [`AGENTS`](./packages/design_system/AGENTS.md) |
+> | `packages/localization` | [`CLAUDE`](./packages/localization/CLAUDE.md) | [`AGENTS`](./packages/localization/AGENTS.md) |
+> | `packages/feature_floor_plan` | [`CLAUDE`](./packages/feature_floor_plan/CLAUDE.md) | [`AGENTS`](./packages/feature_floor_plan/AGENTS.md) |
+>
+> A child never relaxes a parent rule. Where it is silent, the parent applies.
+
 This repository is a deterministic, AI-native Flutter/Dart monorepo architecture for **Dorak**. All AI assistants and human developers must strictly follow the architectural boundaries, file naming taxonomy, and dependency constraints detailed in this document.
 
 ---
@@ -24,6 +47,10 @@ All Dart files in this codebase **MUST** follow the explicit dot-suffix taxonomy
 | `.endpoints.dart` | Domain-split API route declarations. | `packages/core/network/endpoints` |
 | `.repository.dart` | Repository contracts and implementations. | `packages/core`, `apps/*` |
 | `.provider.dart` / `.notifier.dart` | State management and dependency injection providers. | `apps/*`, `packages/feature_*` |
+| `.storage.dart` | Device persistence contracts and implementations (secure storage, preferences, cache). | `packages/core` only |
+| `.navigator.dart` | **DEPRECATED** — legacy route-flow coordinators (removed from `client_app` in Phase 2) | only `business_app`/`stylist_app` stubs |
+| `.router.dart` | Declarative `go_router` route table + redirects. | `apps/*` only |
+| `.bloc.dart` / `.event.dart` / `.state.dart` | Pure Bloc feature state (Phase 3). | `apps/*`, `packages/feature_*` |
 | `.barrel.dart` | Explicit package or feature re-exports. | Anywhere requiring grouped exports |
 
 ### Strict Rules
@@ -76,6 +103,26 @@ To maximize token efficiency and prevent auto-import collisions:
 2. **Navigation Map (`index.md`):** Consult the `index.md` file in subdirectories before performing recursive directory searches.
 3. **No Cross-Layer Imports:** Do not import app-specific logic (`apps/*`) into packages (`packages/*`). Do not import `design_system` directly into `core`.
 
+## 3b. State & Navigation Architecture (locked)
+
+**State — Pure Bloc.** UI emits events; a `Bloc` owns business state; UI
+renders from state. `flutter_bloc` only. No Riverpod, Provider or GetIt.
+**`ChangeNotifier` is not a target pattern** — the only remaining instances are
+transitional Track 12/session infrastructure (`SessionController`,
+`UnauthorizedNotifier`, `SessionNotice`) and the legacy pagination notifiers
+(`page_pagination.notifier.dart`, `scroll_pagination.notifier.dart`). Keep them
+as-is; do not extend them; Phase 4 replaces them with Stream/Bloc. Do not add
+new `ChangeNotifier` state.
+
+**Navigation — go_router only.** Declarative route table, redirects for the
+launch gate and auth guards, `context.push/go/pop` in screens. Navigator 1.0
+and `AppNavigator` are removed from `client_app`; `.navigator.dart` is a
+deprecated taxonomy role tolerated only in the `business_app`/`stylist_app`
+stubs. Bloc never navigates — routing responds to state via redirects and the
+router listener. Local modal dismissal uses `context.pop()`. Routing lives in
+the router (`app.router.dart` + `app_routes.entity.dart`), never in a screen or
+bloc.
+
 ---
 
 ## 4. Development & Build Commands
@@ -127,10 +174,13 @@ melos run verify        # generate → build → analyze → taxonomy → test
 
 ---
 
-## Elicitations / Next Actions
+## Next Actions
 
-Choose one of the following tasks to continue:
+All of the scaffolding this section used to request now exists:
+`analysis_options.yaml`, `.aiignore`, and the root `index.md` are in place, and
+the Melos configuration lives in the root `pubspec.yaml` (there is no separate
+`melos.yaml`). `melos` is not on `PATH` — invoke it as `dart run melos run <script>`.
 
-- Draft `analysis_options.yaml` to enforce file suffixes — Provide an `analysis_options.yaml` rule file that enforces the custom dot-suffix naming convention and architectural imports.
-- Generate root `melos.yaml` file — Generate a complete `melos.yaml` configuration matching the workspace scripts referenced in CLAUDE.md.
-- Create `.aiignore` and root `index.md` navigation template — Draft the `.aiignore` file and the initial root `index.md` navigation map for AI agents.
+For what to work on next, see the **Current Execution Point** in
+[`docs/index.md`](./docs/index.md). For everything else, see
+[`AGENTS.md`](./AGENTS.md).

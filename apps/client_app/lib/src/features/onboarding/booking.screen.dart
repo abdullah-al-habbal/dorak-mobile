@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
@@ -65,7 +66,7 @@ class _BookingScreenState extends State<BookingScreen>
       context,
       onSkipForNow: widget.onSkipForNow,
       onDontShowAgain: widget.onDontShowAgain,
-      onCancel: () => Navigator.pop(context),
+      onCancel: () => context.pop(),
     );
   }
 
@@ -79,7 +80,7 @@ class _BookingScreenState extends State<BookingScreen>
       backgroundColor: colors.background,
       body: SwipeNavigation(
         onSwipeRight: widget.onNext,
-        onSwipeLeft: () => Navigator.pop(context),
+        onSwipeLeft: () => context.pop(),
         child: SafeArea(
           child: Column(
             children: [
@@ -100,7 +101,7 @@ class _BookingScreenState extends State<BookingScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: BookingContent(
                     onNext: widget.onNext,
-                    onPrevious: () => Navigator.pop(context),
+                    onPrevious: () => context.pop(),
                   ),
                 ),
               ),

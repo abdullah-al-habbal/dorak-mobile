@@ -46,9 +46,11 @@ class AiShowcaseContent extends StatelessWidget {
               size: 20,
             ),
             const SizedBox(width: 8),
-            Text(
-              l10n.aiPrivacyNote,
-              style: DorakTypography.bodyMd.copyWith(color: colors.outline),
+            Flexible(
+              child: Text(
+                l10n.aiPrivacyNote,
+                style: DorakTypography.bodyMd.copyWith(color: colors.outline),
+              ),
             ),
           ],
         ),

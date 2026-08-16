@@ -135,4 +135,111 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authGuestHint => 'Explore Dorak without creating an account.';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get loginTitle => 'Welcome Back';
+
+  @override
+  String get loginSubtitle => 'Sign in to your account';
+
+  @override
+  String get loginEmailLabel => 'Email';
+
+  @override
+  String get loginPasswordLabel => 'Password';
+
+  @override
+  String get loginForgotPassword => 'Forgot Password?';
+
+  @override
+  String get loginButton => 'Log In';
+
+  @override
+  String get loginSignUpPrompt => 'Don\'t have an account?';
+
+  @override
+  String get loginCreateAccountLink => 'Create Account';
+
+  @override
+  String get loginErrorInvalidCredentials => 'Invalid email or password';
+
+  @override
+  String get signUpTitle => 'Create your account';
+
+  @override
+  String get signUpSubtitle =>
+      'Join Dorak for personalized grooming and effortless booking.';
+
+  @override
+  String get signUpFullNameLabel => 'Full Name';
+
+  @override
+  String get signUpEmailLabel => 'Email';
+
+  @override
+  String get signUpPasswordLabel => 'Password';
+
+  @override
+  String get signUpConfirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get signUpPasswordHint => 'At least 8 characters';
+
+  @override
+  String get signUpButton => 'Create Account';
+
+  @override
+  String get signUpAlreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get signUpLogInLink => 'Log In';
+
+  @override
+  String get verifyTitle => 'Verify Your Account';
+
+  @override
+  String verifySubtitle(String email) {
+    return 'Enter the 6-digit code we sent to $email';
+  }
+
+  @override
+  String get verifyButton => 'Verify & Continue';
+
+  @override
+  String get verifyDidNotReceive => 'Didn\'t receive the code?';
+
+  @override
+  String get verifyResend => 'Resend Code';
+
+  @override
+  String verifyResendDisabled(int seconds) {
+    return 'Resend Code (${seconds}s)';
+  }
+
+  @override
+  String get verifyErrorInvalid => 'Invalid code. Please try again.';
+
+  @override
+  String get verifySkip => 'Verify later';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get fieldInvalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get fieldPasswordTooShort => 'Password must be at least 8 characters';
+
+  @override
+  String get fieldPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get errorNetwork => 'No connection. Check your network and try again.';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Please try again.';
 }

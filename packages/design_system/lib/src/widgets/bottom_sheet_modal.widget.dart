@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:design_system/src/tokens/tokens.barrel.dart';
+import 'package:go_router/go_router.dart';
 
 class BottomSheetModal extends StatelessWidget {
   final Widget child;
@@ -19,7 +20,7 @@ class BottomSheetModal extends StatelessWidget {
     return Stack(
       children: [
         GestureDetector(
-          onTap: onDismiss ?? () => Navigator.pop(context),
+          onTap: onDismiss ?? () => context.pop(),
           child: Container(
             color: Colors.black.withValues(alpha: 0.4),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
@@ -69,7 +70,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
       context,
       onSkipForNow: widget.onSkipForNow,
       onDontShowAgain: widget.onDontShowAgain,
-      onCancel: () => Navigator.pop(context),
+      onCancel: () => context.pop(),
     );
   }
 
@@ -83,7 +84,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
       backgroundColor: colors.background,
       body: SwipeNavigation(
         onSwipeRight: widget.onNext,
-        onSwipeLeft: () => Navigator.pop(context),
+        onSwipeLeft: () => context.pop(),
         child: Stack(
           children: [
             OnboardingHeroImage(controller: widget.onboardingConfig),
@@ -110,7 +111,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: DiscoveryContent(
                         onNext: widget.onNext,
-                        onPrevious: () => Navigator.pop(context),
+                        onPrevious: () => context.pop(),
                       ),
                     ),
                   ),
