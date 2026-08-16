@@ -71,14 +71,14 @@ here.
 ## 5. State management
 
 Session state lives **in this package as a pure `bloc`** — `SessionBloc`,
-`SessionEvent`, `SessionState`, `SessionNotice` (no Flutter dependency). The
+`SessionEvent`, `SessionState`, `SessionSignal` (no Flutter dependency). The
 unauthorized signal lives on `ApiClient` as a broadcast
 `unauthorizedStream` (fires once per 401/403 burst until reset). The former
 `ChangeNotifier` layer (`SessionController`, `UnauthorizedNotifier`) and the
 pagination notifiers were removed in Phase 4. **Do not add `ChangeNotifier`
 state here.**
 
-Convention: success sets a `SessionNotice` for the router; failures land in
+Convention: success sets a `SessionSignal` for the router; failures land in
 `state.error` — screens map via `AuthError.from` (app layer). No Riverpod,
 Provider or GetIt anywhere.
 

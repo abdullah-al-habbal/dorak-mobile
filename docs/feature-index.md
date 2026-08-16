@@ -37,7 +37,7 @@
 - `onboarding_config.repository.dart` — `OnboardingConfigRepository` + `OnboardingConfigDto` (GET /api/v1/app/onboarding-config).
 - `auth.repository.dart` — `AuthRepository` + `DioAuthRepository`: login, register (sends `password_confirmation`), logout, refreshToken, sendEmailVerification, verifyEmail, forgotPassword, resetPassword. DTOs `AuthResponseDto`, `ClientDto`, `TokenResponseDto`.
 - **Storage** (`src/storage/`) — `TokenStorage` / `SecureTokenStorage` (flutter_secure_storage) and `AppPreferences` / `SharedAppPreferences` (shared_preferences, `dontShowOnboarding`). See `docs/core/storage.md`.
-- **Session** (`src/session/`) — `SessionBloc` (pure `bloc`, `.bloc.dart`/`.event.dart`/`.state.dart` + `SessionNotice`): restore / login / register / verify / logout; one-shot notices consumed by the router's single stream listener. See `docs/core/session.md`.
+- **Session** (`src/session/`) — `SessionBloc` (pure `bloc`, `.bloc.dart`/`.event.dart`/`.state.dart` + `SessionSignal`): restore / login / register / verify / logout; one-shot signals consumed by the router's single stream listener. See `docs/core/session.md`.
 
 ### feature_floor_plan
 - Stub only — `feature_floor_plan.dart` barrel, no implementation yet.

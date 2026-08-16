@@ -11,8 +11,8 @@ dependency** — over `AuthRepository` + `TokenStorage`. UI never calls it
 directly; it dispatches `SessionEvent`s and reads `SessionState`.
 
 Success and failure never rethrow: mutating events emit `isLoading`, land
-failures in `state.error`, and set a one-shot `SessionNotice` on success. The
-app layer maps errors via `AuthError.from` and drives navigation from notices.
+failures in `state.error`, and set a one-shot `SessionSignal` on success. The
+app layer maps errors via `AuthError.from` and drives navigation from signals.
 
 ## State
 
@@ -28,7 +28,7 @@ SessionState {
   bool isAuthenticated;
   bool isLoading;
   Object? error;
-  SessionNotice notice;
+  SessionSignal signal;
 }
 Future<void> get ready;   // completes when restore has resolved status
 ```
@@ -66,7 +66,7 @@ Branch on `isUnauthorized`, never on `code`.
 
 `LoginRequested`, `RegisterRequested`, `VerifyEmailRequested` go through a
 shared `_run` helper: emit `isLoading`, run the action, then emit the success
-state + notice, or emit `error` on failure. Screens observe `state.error` /
+state + signal, or emit `error` on failure. Screens observe `state.error` /
 `state.isLoading` through a `BlocBuilder`.
 
 `LogoutRequested` is the exception: it swallows the network failure, always
@@ -85,9 +85,9 @@ Laravel's `confirmed` rule and rejects the request without it.
 `AuthInterceptor`. The provider reads storage directly rather than the bloc, so
 `SessionBloc -> ApiClient` stays a one-way dependency.
 
-## Global notices
+## Global signals
 
-`SessionNotice` (`none | sessionExpired | authenticationRequired |
+`SessionSignal` (`none | sessionExpired | authenticationRequired |
 loginSucceeded | registrationSucceeded | verificationSucceeded`) is the
 router's one-shot navigation signal.
 
@@ -100,17 +100,17 @@ Unauthorized flow:
   notification.
 * The app layer forwards the signal to `UnauthorizedDetected`. The bloc dedupes
   against an already-raised `sessionExpired`, clears the token, drops to
-  `guest`, and raises the notice.
+  `guest`, and raises the signal.
 * `RequireAuthentication` raises `authenticationRequired` (guest-guarded
   action) without touching the session.
-* `NoticeAcknowledged` clears the notice — the app layer sends it after
+* `SignalAcknowledged` clears the signal — the app layer sends it after
   navigating, re-arming the signal for the next burst.
 
-Any mutating event resets `notice` to `none`, so a fresh auth attempt clears a
+Any mutating event resets `signal` to `none`, so a fresh auth attempt clears a
 stale prompt.
 
 The app layer (`AppRouter`, see `navigation/guards.md`) owns **one** session
-stream listener that re-runs the router redirect and reacts to notices. Core
+stream listener that re-runs the router redirect and reacts to signals. Core
 never imports app code and never navigates.
 
 ## Not yet implemented

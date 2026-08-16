@@ -20,6 +20,7 @@ import 'package:client_app/src/features/splash/splash.screen.dart';
 
 class AppRouter {
   final SessionBloc session;
+  final AuthBloc auth;
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
   final VoidCallback switchLocale;
@@ -27,9 +28,11 @@ class AppRouter {
 
   late final GoRouter router;
   late final StreamSubscription<SessionState> _sessionSubscription;
+  late final StreamSubscription<AuthState> _authSubscription;
 
   AppRouter({
     required this.session,
+    required this.auth,
     required this.preferences,
     required this.onboardingConfig,
     required this.switchLocale,
@@ -41,35 +44,44 @@ class AppRouter {
       routes: _routes(),
     );
     _sessionSubscription = session.stream.listen(_onSessionChanged);
+    _authSubscription = auth.stream.listen(_onAuthChanged);
   }
 
   void dispose() {
     _sessionSubscription.cancel();
+    _authSubscription.cancel();
     router.dispose();
   }
 
   void _onSessionChanged(SessionState state) {
     router.refresh();
-    switch (state.notice) {
-      case SessionNotice.sessionExpired:
+    switch (state.signal) {
+      case SessionSignal.sessionExpired:
         router.go(AppRoutes.authEntry);
-        session.add(NoticeAcknowledged());
+        session.add(SignalAcknowledged());
         apiClient.resetUnauthorizedSignal();
-      case SessionNotice.authenticationRequired:
+      case SessionSignal.authenticationRequired:
         router.push<void>(AppRoutes.authEntry);
-        session.add(NoticeAcknowledged());
+        session.add(SignalAcknowledged());
         apiClient.resetUnauthorizedSignal();
-      case SessionNotice.loginSucceeded:
+      case SessionSignal.none:
+        break;
+    }
+  }
+
+  void _onAuthChanged(AuthState state) {
+    switch (state.signal) {
+      case SessionSignal.loginSucceeded:
         router.go(AppRoutes.home);
-        session.add(NoticeAcknowledged());
-      case SessionNotice.registrationSucceeded:
-        session.add(SendVerificationCodeRequested());
+        auth.add(AuthSignalAcknowledged());
+      case SessionSignal.registrationSucceeded:
+        auth.add(SendVerificationCodeRequested());
         router.push<void>(AppRoutes.authVerify, extra: state.client?.email ?? '');
-        session.add(NoticeAcknowledged());
-      case SessionNotice.verificationSucceeded:
+        auth.add(AuthSignalAcknowledged());
+      case SessionSignal.verificationSucceeded:
         router.go(AppRoutes.home);
-        session.add(NoticeAcknowledged());
-      case SessionNotice.none:
+        auth.add(AuthSignalAcknowledged());
+      case SessionSignal.none:
         break;
     }
   }
@@ -155,7 +167,7 @@ class AppRouter {
           GoRoute(
             path: AppRoutes.loginSegment,
             builder: (context, state) => LoginScreen(
-              session: session,
+              auth: auth,
               onCreateAccount: () => router.push<void>(AppRoutes.authRegister),
               onForgotPassword: null,
             ),
@@ -163,14 +175,14 @@ class AppRouter {
           GoRoute(
             path: AppRoutes.registerSegment,
             builder: (context, state) => SignUpScreen(
-              session: session,
+              auth: auth,
               onLogInLink: () => router.push<void>(AppRoutes.authLogin),
             ),
           ),
           GoRoute(
             path: AppRoutes.verifySegment,
             builder: (context, state) => VerifyAccountScreen(
-              session: session,
+              auth: auth,
               destination: state.extra as String? ?? '',
               onSkip: () => router.go(AppRoutes.home),
             ),

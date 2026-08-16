@@ -28,9 +28,11 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    session = SessionBloc(repository, storage);
+    final pair = sessionPair(repository, storage);
+    session = pair.session;
     final router = buildRouter(
       session: session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(),
       apiClient: fakeApiClient(),
     );

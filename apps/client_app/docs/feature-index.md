@@ -48,7 +48,7 @@
 ### Bootstrap & Navigation
 - `lib/main.dart` — binding init, dotenv, `SharedAppPreferences.create()`, then `DorakApp`.
 - `lib/app.dart` — builds secure storage → `ApiClient` (with `tokenProvider`) → `DioAuthRepository` → `SessionBloc` → `OnboardingConfigBloc` → `LocaleBloc`; starts `session.ready` unawaited so restore overlaps the splash; subscribes the unauthorized stream → `UnauthorizedDetected` and locale → config reload. Test seams: `tokenStorage`, `authRepository`.
-- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); single session-stream listener re-runs the redirect and reacts to `SessionNotice` (auth/home/verify navigation) before acknowledging; `router.go(AppRoutes.home)` clears the stack.
+- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); single session-stream listener re-runs the redirect and reacts to `SessionSignal` (auth/home/verify navigation) before acknowledging; `router.go(AppRoutes.home)` clears the stack.
 - `lib/src/core/navigation/app_routes.entity.dart` — `AppRoutes` path constants.
 - `lib/src/core/navigation/app_gate.entity.dart` — post-splash decision, wired as the router redirect (session first, onboarding flag second).
 

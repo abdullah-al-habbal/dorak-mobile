@@ -11,13 +11,13 @@ import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/verify_account_content.widget.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
-  final SessionBloc session;
+  final AuthBloc auth;
   final String destination;
   final VoidCallback onSkip;
 
   const VerifyAccountScreen({
     super.key,
-    required this.session,
+    required this.auth,
     required this.destination,
     required this.onSkip,
   });
@@ -93,8 +93,8 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen>
                             ),
                           ],
                         ),
-                        child: BlocBuilder<SessionBloc, SessionState>(
-                          bloc: widget.session,
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          bloc: widget.auth,
                           builder: (context, state) {
                             final error = state.error == null
                                 ? null
@@ -105,12 +105,12 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen>
                                   );
                             return VerifyAccountContent(
                               destination: widget.destination,
-                              onVerify: (code) => widget.session
+                              onVerify: (code) => widget.auth
                                   .add(VerifyEmailRequested(code: code)),
-                              onResend: () => widget.session
+                              onResend: () => widget.auth
                                   .add(SendVerificationCodeRequested()),
                               error: error,
-                              isVerifying: state.isLoading,
+                              isVerifying: state.isSubmitting,
                               onSkip: widget.onSkip,
                             );
                           },

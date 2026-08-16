@@ -29,7 +29,7 @@ Key properties:
   currently needs to — Home is a placeholder — but any authenticated feature
   screen will need one. The mechanism to express it exists: a guest-guarded
   action adds `RequireAuthentication` to the session bloc, which raises the
-  `authenticationRequired` notice.
+  `authenticationRequired` signal.
 - **Profile-completion guards** (Track 17).
 - **Deep-link guards.** Deep links are not implemented at all.
 
@@ -44,9 +44,9 @@ to auth:
 401/403 (authenticated, non-lifecycle)
   -> ApiClient.unauthorizedStream fires   (once per burst)
   -> (app) SessionBloc.add(UnauthorizedDetected())
-  -> notice == sessionExpired
+  -> signal == sessionExpired
   -> AppRouter listener -> router.push<void>(/auth)
-  -> NoticeAcknowledged + apiClient.resetUnauthorizedSignal()
+  -> SignalAcknowledged + apiClient.resetUnauthorizedSignal()
 ```
 
 A dead-session screen is never back-navigated into because the redirect runs on

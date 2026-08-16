@@ -1,43 +1,36 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:core/src/network/dto/client.dto.dart';
-import 'package:core/src/session/auth_status.entity.dart';
 import 'package:core/src/session/session_signal.entity.dart';
 
-class SessionState extends Equatable {
-  const SessionState({
-    this.status = AuthStatus.unknown,
+class AuthState extends Equatable {
+  const AuthState({
     this.client,
-    this.isLoading = false,
+    this.isSubmitting = false,
     this.error,
     this.signal = SessionSignal.none,
   });
 
-  final AuthStatus status;
   final ClientDto? client;
-  final bool isLoading;
+  final bool isSubmitting;
   final Object? error;
   final SessionSignal signal;
 
-  bool get isAuthenticated => status.isAuthenticated;
-
-  SessionState copyWith({
-    AuthStatus? status,
+  AuthState copyWith({
     ClientDto? client,
-    bool? isLoading,
+    bool? isSubmitting,
     Object? error,
     bool clearError = false,
     SessionSignal? signal,
   }) {
-    return SessionState(
-      status: status ?? this.status,
+    return AuthState(
       client: client ?? this.client,
-      isLoading: isLoading ?? this.isLoading,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
       error: clearError ? null : error ?? this.error,
       signal: signal ?? this.signal,
     );
   }
 
   @override
-  List<Object?> get props => [status, client, isLoading, error, signal];
+  List<Object?> get props => [client, isSubmitting, error, signal];
 }

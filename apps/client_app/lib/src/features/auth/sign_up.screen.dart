@@ -12,12 +12,12 @@ import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/sign_up_content.widget.dart';
 
 class SignUpScreen extends StatefulWidget {
-  final SessionBloc session;
+  final AuthBloc auth;
   final VoidCallback onLogInLink;
 
   const SignUpScreen({
     super.key,
-    required this.session,
+    required this.auth,
     required this.onLogInLink,
   });
 
@@ -87,8 +87,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 448),
-                        child: BlocBuilder<SessionBloc, SessionState>(
-                          bloc: widget.session,
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          bloc: widget.auth,
                           builder: (context, state) {
                             final error = state.error == null
                                 ? null
@@ -103,14 +103,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 required password,
                                 required passwordConfirmation,
                               }) =>
-                                  widget.session.add(RegisterRequested(
+                                  widget.auth.add(RegisterRequested(
                                     name: name,
                                     email: email,
                                     password: password,
                                     passwordConfirmation: passwordConfirmation,
                                   )),
                               error: error,
-                              isSubmitting: state.isLoading,
+                              isSubmitting: state.isSubmitting,
                               onLogInLink: widget.onLogInLink,
                             );
                           },

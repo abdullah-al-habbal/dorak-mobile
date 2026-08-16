@@ -32,6 +32,7 @@ class DorakApp extends StatefulWidget {
 class _DorakAppState extends State<DorakApp> {
   late final TokenStorage _tokenStorage;
   late final ApiClient _apiClient;
+  late final AuthBloc _authBloc;
   late final SessionBloc _sessionBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
   late final LocaleBloc _localeBloc;
@@ -51,10 +52,9 @@ class _DorakAppState extends State<DorakApp> {
       tokenProvider: _tokenStorage.read,
       enableLogging: kDebugMode,
     );
-    _sessionBloc = SessionBloc(
-      widget.authRepository ?? DioAuthRepository(_apiClient),
-      _tokenStorage,
-    );
+    final repository = widget.authRepository ?? DioAuthRepository(_apiClient);
+    _authBloc = AuthBloc(repository, _tokenStorage);
+    _sessionBloc = SessionBloc(repository, _tokenStorage, _authBloc);
 
     unawaited(_sessionBloc.ready);
 
@@ -77,6 +77,7 @@ class _DorakAppState extends State<DorakApp> {
 
     _router = AppRouter(
       session: _sessionBloc,
+      auth: _authBloc,
       preferences: widget.preferences,
       onboardingConfig: _onboardingConfigBloc,
       switchLocale: _switchLocale,
@@ -89,6 +90,7 @@ class _DorakAppState extends State<DorakApp> {
     _unauthorizedSubscription.cancel();
     _localeSubscription.cancel();
     _router.dispose();
+    _authBloc.close();
     _sessionBloc.close();
     _onboardingConfigBloc.close();
     _localeBloc.close();

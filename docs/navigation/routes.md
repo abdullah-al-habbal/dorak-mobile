@@ -43,7 +43,7 @@ construction — there is no `pushAndRemoveUntil` bookkeeping.
 
 - Launch gate: `AppGate.decide` after the splash (see `flows/app_launch.md`).
 - Session-expired: a 401/403 on an authenticated request → session-expired
-  notice → `router.push<void>(AppRoutes.authEntry)` (see `guards.md`).
+  signal → `router.push<void>(AppRoutes.authEntry)` (see `guards.md`).
 
 ## Taxonomy
 

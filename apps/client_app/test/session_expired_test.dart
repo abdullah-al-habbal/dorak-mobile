@@ -23,10 +23,12 @@ void main() {
 
   void createSession({String? token, bool dontShowOnboarding = false}) {
     storage = InMemoryTokenStorage(token);
-    session = SessionBloc(repository, storage);
+    final pair = sessionPair(repository, storage);
+    session = pair.session;
     apiClient = fakeApiClient();
     router = buildRouter(
       session: session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(dontShowOnboarding: dontShowOnboarding),
       apiClient: apiClient,
     );
@@ -57,7 +59,7 @@ void main() {
     expect(find.byType(HomeScreen), findsNothing);
     expect(storage.token, isNull);
     expect(session.state.status, AuthStatus.guest);
-    expect(session.state.notice, SessionNotice.none);
+    expect(session.state.signal, SessionSignal.none);
   });
 
   testWidgets('a burst of 401s opens auth entry exactly once', (tester) async {
@@ -121,7 +123,7 @@ void main() {
     await pumpHome(tester);
 
     expect(session.state.status, AuthStatus.guest);
-    expect(session.state.notice, SessionNotice.none);
+    expect(session.state.signal, SessionSignal.none);
     expect(storage.token, isNull);
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.byType(AuthEntryScreen), findsNothing);

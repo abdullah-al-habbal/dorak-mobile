@@ -614,7 +614,7 @@ Implement reusable:
 Implementation targets:
 
 ```text
-packages/core     # ApiClient.unauthorizedStream + SessionBloc notices
+packages/core     # ApiClient.unauthorizedStream + SessionBloc signals
 apps/*            # AppRouter listener redirects to /auth on sessionExpired
 packages/design_system
 ```

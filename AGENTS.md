@@ -263,14 +263,14 @@ refreshToken() succeeds  -> persist rotated token, authenticated
 ```
 
 Mutating events (`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested`)
-emit `isLoading` then a notice on success; failures surface in `state.error`
+emit `isLoading` then a signal on success; failures surface in `state.error`
 (typed via `AuthError.from` in the app). `LogoutRequested` swallows the network
 failure and always clears local state. `SendVerificationCodeRequested` errors
-are swallowed — registration already succeeded. `state.notice` carries the
+are swallowed — registration already succeeded. `state.signal` carries the
 one-shot navigation signals consumed by the router's single stream listener
 (`sessionExpired`, `authenticationRequired`, `loginSucceeded`,
 `registrationSucceeded`, `verificationSucceeded`); the router acknowledges each
-via `NoticeAcknowledged`.
+via `SignalAcknowledged`.
 
 Unauthorized: `ApiClient` owns a broadcast `unauthorizedStream` (fires once per
 401/403 burst until `resetUnauthorizedSignal()`). `client_app` forwards it to
@@ -464,7 +464,7 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 | File | Covers |
 |---|---|
 | `core/test/api_client_test.dart` | envelope parse, verbs, pagination, exception mapping |
-| `core/test/session_bloc_test.dart` | all four `restore()` branches, login, register, verify, logout, notices |
+| `core/test/session_bloc_test.dart` | all four `restore()` branches, login, register, verify, logout, signals |
 | `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, 401/422 mapping |
 | `core/test/unauthorized_signal_test.dart` | 401/403 burst emission + reset on the `unauthorizedStream` |
 | `core/test/storage_test.dart` | preference round-trip + defaults |
@@ -472,7 +472,7 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 | `client_app/test/app_gate_test.dart` | all six gate branches |
 | `client_app/test/auth_flow_test.dart` | login, validation, sign-up → verify, OTP, skip, resend cooldown |
 | `client_app/test/onboarding_skip_test.dart` | Skip vs Don't show again vs Cancel, full walk, empty back-stack |
-| `client_app/test/session_expired_test.dart` | 401 mid-session → session-expired notice → auth redirect |
+| `client_app/test/session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
 
 Rules:
 

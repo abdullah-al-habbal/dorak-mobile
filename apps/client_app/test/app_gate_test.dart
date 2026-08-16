@@ -17,6 +17,7 @@ void main() {
   Future<void> runGate(
     WidgetTester tester, {
     required SessionBloc session,
+    required AuthBloc auth,
     required AppPreferences preferences,
   }) async {
     tester.view.physicalSize = const Size(1290, 2796);
@@ -26,6 +27,7 @@ void main() {
     await tester.pumpWidget(
       routerHarness(buildRouter(
         session: session,
+        auth: auth,
         preferences: preferences,
         apiClient: fakeApiClient(),
       )),
@@ -36,14 +38,15 @@ void main() {
   }
 
   testWidgets('returning logged-in user goes straight Home', (tester) async {
-    final session = SessionBloc(
+    final pair = sessionPair(
       repository,
       InMemoryTokenStorage('stored-token'),
     );
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(),
     );
 
@@ -52,11 +55,12 @@ void main() {
   });
 
   testWidgets('new device lands on the auth entry screen', (tester) async {
-    final session = SessionBloc(repository, InMemoryTokenStorage());
+    final pair = sessionPair(repository, InMemoryTokenStorage());
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(),
     );
 
@@ -65,11 +69,12 @@ void main() {
   });
 
   testWidgets('returning guest who already saw the tour goes Home', (tester) async {
-    final session = SessionBloc(repository, InMemoryTokenStorage());
+    final pair = sessionPair(repository, InMemoryTokenStorage());
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(dontShowOnboarding: true),
     );
 
@@ -80,11 +85,12 @@ void main() {
   testWidgets('a revoked token falls through to the onboarding check', (tester) async {
     repository.refreshTokenError = unauthorized();
     final storage = InMemoryTokenStorage('revoked-token');
-    final session = SessionBloc(repository, storage);
+    final pair = sessionPair(repository, storage);
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(),
     );
 
@@ -94,14 +100,15 @@ void main() {
 
   testWidgets('a revoked token on a dismissed-tour device goes Home', (tester) async {
     repository.refreshTokenError = unauthorized();
-    final session = SessionBloc(
+    final pair = sessionPair(
       repository,
       InMemoryTokenStorage('revoked-token'),
     );
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(dontShowOnboarding: true),
     );
 
@@ -111,11 +118,12 @@ void main() {
   testWidgets('offline start keeps the session and goes Home', (tester) async {
     repository.refreshTokenError = offline();
     final storage = InMemoryTokenStorage('stored-token');
-    final session = SessionBloc(repository, storage);
+    final pair = sessionPair(repository, storage);
 
     await runGate(
       tester,
-      session: session,
+      session: pair.session,
+      auth: pair.auth,
       preferences: InMemoryAppPreferences(),
     );
 

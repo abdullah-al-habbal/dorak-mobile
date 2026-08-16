@@ -1,4 +1,4 @@
-enum SessionNotice {
+enum SessionSignal {
   none,
   sessionExpired,
   authenticationRequired,

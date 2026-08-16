@@ -12,14 +12,14 @@ import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/login_content.widget.dart';
 
 class LoginScreen extends StatefulWidget {
-  final SessionBloc session;
+  final AuthBloc auth;
   final VoidCallback onCreateAccount;
 
   final VoidCallback? onForgotPassword;
 
   const LoginScreen({
     super.key,
-    required this.session,
+    required this.auth,
     required this.onCreateAccount,
     this.onForgotPassword,
   });
@@ -90,8 +90,8 @@ class _LoginScreenState extends State<LoginScreen>
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 448),
-                        child: BlocBuilder<SessionBloc, SessionState>(
-                          bloc: widget.session,
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          bloc: widget.auth,
                           builder: (context, state) {
                             final error = state.error == null
                                 ? null
@@ -105,13 +105,13 @@ class _LoginScreenState extends State<LoginScreen>
                               titleAnimation: _staggeredAnimations[0],
                               formAnimation: _staggeredAnimations[1],
                               actionsAnimation: _staggeredAnimations[2],
-                              onSubmit: (email, password) => widget.session
+                              onSubmit: (email, password) => widget.auth
                                   .add(LoginRequested(
                                 email: email,
                                 password: password,
                               )),
                               error: error,
-                              isSubmitting: state.isLoading,
+                              isSubmitting: state.isSubmitting,
                               onForgotPassword: widget.onForgotPassword,
                               onCreateAccount: widget.onCreateAccount,
                             );

@@ -32,7 +32,7 @@ lib/src/
     session.bloc.dart                    SessionBloc
     session.event.dart                   SessionEvent (9 events)
     session.state.dart                   SessionState
-    session_notice.entity.dart           SessionNotice
+    session_signal.entity.dart           SessionSignal
     session.barrel.dart
   storage/
     token.storage.dart                   TokenStorage + SecureTokenStorage
@@ -125,7 +125,7 @@ SessionState {
   bool isAuthenticated;
   bool isLoading;
   Object? error;
-  SessionNotice notice;    // one-shot navigation signals
+  SessionSignal signal;    // one-shot navigation signals
 }
 Future<void> get ready;    // memoised restore pass
 ```
@@ -143,9 +143,9 @@ refreshToken() succeeds  -> persist rotated token, authenticated
 `LogoutRequested` swallows the network failure and always clears local state.
 `SendVerificationCodeRequested` swallows errors (registration already
 succeeded). Login/register/verify failures land in `state.error`; success sets
-the matching `SessionNotice` (`loginSucceeded`, `registrationSucceeded`,
+the matching `SessionSignal` (`loginSucceeded`, `registrationSucceeded`,
 `verificationSucceeded`), which the app's router consumes and acknowledges via
-`NoticeAcknowledged`. `UnauthorizedDetected` dedupes against an already-raised
+`SignalAcknowledged`. `UnauthorizedDetected` dedupes against an already-raised
 `sessionExpired` and drops to `guest`.
 
 Unauthorized is signalled separately: `ApiClient.unauthorizedStream` fires
@@ -199,7 +199,7 @@ declare `shared_preferences` themselves.
   `ApiClient.unauthorizedStream` emits once per burst
   (`reportUnauthorized()` + `resetUnauthorizedSignal()`);
   `client_app` forwards it to `UnauthorizedDetected`, which surfaces the
-  session-expired notice and the router redirects to auth.
+  session-expired signal and the router redirects to auth.
 
 ## 9. Tests
 
@@ -210,7 +210,7 @@ declare `shared_preferences` themselves.
 | `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, 401/422 mapping |
-| `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, login/register/verify/logout, notice emission |
+| `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, login/register/verify/logout, signal emission |
 | `unauthorized_signal_test.dart` | 401/403 burst emission + reset, lifecycle routes, no-bearer, transport, 5xx |
 | `storage_test.dart` | preference defaults + round-trip |
 | `onboarding_config_repository_test.dart` | as named |

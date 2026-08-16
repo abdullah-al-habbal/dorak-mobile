@@ -157,7 +157,7 @@ directories.
 | `app_gate_test.dart` | all six gate branches |
 | `auth_flow_test.dart` | login, validation, sign-up → verify, OTP pass/fail, skip, resend cooldown |
 | `onboarding_skip_test.dart` | Skip vs Don't show again vs Cancel, full four-step walk, empty back-stack |
-| `session_expired_test.dart` | 401 mid-session → session-expired notice → auth redirect |
+| `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
 | `helpers/fakes.dart` | `routerHarness()`, `buildRouter()`, `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `unauthorized()`, `offline()` |
 
 Conventions:

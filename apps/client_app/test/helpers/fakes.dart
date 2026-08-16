@@ -20,17 +20,27 @@ Widget routerHarness(AppRouter appRouter) {
 
 AppRouter buildRouter({
   required SessionBloc session,
+  required AuthBloc auth,
   required AppPreferences preferences,
   required ApiClient apiClient,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
     session: session,
+    auth: auth,
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
     switchLocale: switchLocale,
     apiClient: apiClient,
   );
+}
+
+({AuthBloc auth, SessionBloc session}) sessionPair(
+  AuthRepository repository,
+  TokenStorage storage,
+) {
+  final auth = AuthBloc(repository, storage);
+  return (auth: auth, session: SessionBloc(repository, storage, auth));
 }
 
 void _noSwitchLocale() {}

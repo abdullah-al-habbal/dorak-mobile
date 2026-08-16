@@ -13,7 +13,8 @@ void main() {
     storage = InMemoryTokenStorage();
   });
 
-  SessionBloc bloc() => SessionBloc(repository, storage);
+  SessionBloc bloc() =>
+      SessionBloc(repository, storage, AuthBloc(repository, storage));
 
   group('restore', () {
     blocTest<SessionBloc, SessionState>(
@@ -32,7 +33,7 @@ void main() {
       build: () {
         storage.token = 'stored-token';
         repository.refreshedToken = 'fresh-token';
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(RestoreRequested()),
       expect: () => [
@@ -50,7 +51,7 @@ void main() {
       build: () {
         storage.token = 'revoked-token';
         repository.refreshTokenError = unauthorized();
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(RestoreRequested()),
       expect: () => [
@@ -70,7 +71,7 @@ void main() {
       build: () {
         storage.token = 'stored-token';
         repository.refreshTokenError = offline();
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(RestoreRequested()),
       expect: () => [
@@ -92,7 +93,7 @@ void main() {
           code: 'SERVER_ERROR',
           message: 'boom',
         );
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(RestoreRequested()),
       expect: () => [
@@ -113,7 +114,7 @@ void main() {
       'ready joins the in-flight restore instead of starting another',
       build: () {
         storage.token = 'stored-token';
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) async {
         await Future.wait([bloc.ready, bloc.ready, bloc.ready]);
@@ -126,131 +127,45 @@ void main() {
     );
   });
 
-  group('login', () {
+  group('auth mirror', () {
+    late AuthBloc auth;
+
     blocTest<SessionBloc, SessionState>(
-      'stores the token, exposes the client and signals the router',
-      build: bloc,
-      act: (bloc) => bloc.add(
+      'an auth success is mirrored as an authenticated session',
+      build: () {
+        auth = AuthBloc(repository, storage);
+        return SessionBloc(repository, storage, auth);
+      },
+      act: (bloc) => auth.add(
         LoginRequested(email: 'sara@example.com', password: 'secret123'),
       ),
       expect: () => [
-        const SessionState(isLoading: true),
         const SessionState(
           status: AuthStatus.authenticated,
           client: FakeAuthRepository.defaultClient,
-          notice: SessionNotice.loginSucceeded,
         ),
       ],
       verify: (bloc) {
-        expect(storage.token, 'login-token');
+        expect(bloc.state.isAuthenticated, isTrue);
         expect(bloc.state.client?.email, 'sara@example.com');
+        expect(storage.token, 'login-token');
       },
     );
 
     blocTest<SessionBloc, SessionState>(
-      'a rejection surfaces in state and leaves the session unauthenticated',
+      'a rejected login leaves the session untouched',
       build: () {
         repository.loginError = unauthorized();
-        return SessionBloc(repository, storage);
+        auth = AuthBloc(repository, storage);
+        return SessionBloc(repository, storage, auth);
       },
-      act: (bloc) => bloc.add(
+      act: (bloc) => auth.add(
         LoginRequested(email: 'sara@example.com', password: 'wrong'),
       ),
-      expect: () => [
-        const SessionState(isLoading: true),
-        SessionState(isLoading: false, error: unauthorized()),
-      ],
+      expect: () => <SessionState>[],
       verify: (bloc) {
-        expect(bloc.state.isAuthenticated, isFalse);
+        expect(bloc.state.status, AuthStatus.unknown);
         expect(storage.token, isNull);
-      },
-    );
-  });
-
-  group('register', () {
-    blocTest<SessionBloc, SessionState>(
-      'forwards the confirmation and stores the returned token',
-      build: bloc,
-      act: (bloc) => bloc.add(
-        const RegisterRequested(
-          name: 'Sara',
-          email: 'sara@example.com',
-          password: 'secret123',
-          passwordConfirmation: 'secret123',
-        ),
-      ),
-      expect: () => [
-        const SessionState(isLoading: true),
-        const SessionState(
-          status: AuthStatus.authenticated,
-          client: FakeAuthRepository.defaultClient,
-          notice: SessionNotice.registrationSucceeded,
-        ),
-      ],
-      verify: (bloc) {
-        expect(repository.registeredPayload?['password_confirmation'], 'secret123');
-        expect(storage.token, 'register-token');
-      },
-    );
-  });
-
-  group('verification', () {
-    blocTest<SessionBloc, SessionState>(
-      'verifyEmail forwards the code and signals completion',
-      build: bloc,
-      act: (bloc) => bloc.add(const VerifyEmailRequested(code: '123456')),
-      expect: () => [
-        const SessionState(isLoading: true),
-        const SessionState(notice: SessionNotice.verificationSucceeded),
-      ],
-      verify: (_) => expect(repository.verifiedCode, '123456'),
-    );
-
-    blocTest<SessionBloc, SessionState>(
-      'verifyEmail surfaces a rejected code in state',
-      build: () {
-        repository.verifyEmailError = const ValidationException(
-          statusCode: 422,
-          code: 'VALIDATION_FAILED',
-          message: 'core::messages.invalid_verification_code',
-          errors: {'code': ['invalid']},
-        );
-        return SessionBloc(repository, storage);
-      },
-      act: (bloc) => bloc.add(const VerifyEmailRequested(code: '000000')),
-      expect: () => [
-        const SessionState(isLoading: true),
-        const SessionState(
-          isLoading: false,
-          error: ValidationException(
-            statusCode: 422,
-            code: 'VALIDATION_FAILED',
-            message: 'core::messages.invalid_verification_code',
-            errors: {'code': ['invalid']},
-          ),
-        ),
-      ],
-    );
-
-    blocTest<SessionBloc, SessionState>(
-      'sendVerificationCode calls the dispatch route',
-      build: bloc,
-      act: (bloc) => bloc.add(SendVerificationCodeRequested()),
-      expect: () => <SessionState>[],
-      verify: (_) => expect(repository.sendVerificationCalls, 1),
-    );
-
-    blocTest<SessionBloc, SessionState>(
-      'a failed dispatch is swallowed without touching state',
-      build: () {
-        repository.sendVerificationError = offline();
-        return SessionBloc(repository, storage);
-      },
-      act: (bloc) => bloc.add(SendVerificationCodeRequested()),
-      expect: () => <SessionState>[],
-      verify: (bloc) {
-        expect(repository.sendVerificationCalls, 1);
-        expect(bloc.state.error, isNull);
       },
     );
   });
@@ -260,7 +175,7 @@ void main() {
       'clears the local session',
       build: () {
         storage.token = 'stored-token';
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(LogoutRequested()),
       expect: () => [
@@ -278,7 +193,7 @@ void main() {
       build: () {
         storage.token = 'stored-token';
         repository.logoutError = offline();
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(LogoutRequested()),
       expect: () => [
@@ -291,12 +206,12 @@ void main() {
     );
   });
 
-  group('global notices', () {
+  group('global signals', () {
     blocTest<SessionBloc, SessionState>(
       'UnauthorizedDetected clears the token and broadcasts sessionExpired',
       build: () {
         storage.token = 'stored-token';
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) async {
         await bloc.ready;
@@ -307,9 +222,12 @@ void main() {
         const SessionState(status: AuthStatus.authenticated),
         const SessionState(
           status: AuthStatus.authenticated,
-          notice: SessionNotice.sessionExpired,
+          signal: SessionSignal.sessionExpired,
         ),
-        const SessionState(status: AuthStatus.guest, notice: SessionNotice.sessionExpired),
+        const SessionState(
+          status: AuthStatus.guest,
+          signal: SessionSignal.sessionExpired,
+        ),
       ],
       verify: (_) {
         expect(storage.token, isNull);
@@ -318,10 +236,10 @@ void main() {
     );
 
     blocTest<SessionBloc, SessionState>(
-      'a burst of 401s collapses into one clear and one notice',
+      'a burst of 401s collapses into one clear and one signal',
       build: () {
         storage.token = 'stored-token';
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) async {
         await bloc.ready;
@@ -334,9 +252,12 @@ void main() {
         const SessionState(status: AuthStatus.authenticated),
         const SessionState(
           status: AuthStatus.authenticated,
-          notice: SessionNotice.sessionExpired,
+          signal: SessionSignal.sessionExpired,
         ),
-        const SessionState(status: AuthStatus.guest, notice: SessionNotice.sessionExpired),
+        const SessionState(
+          status: AuthStatus.guest,
+          signal: SessionSignal.sessionExpired,
+        ),
       ],
       verify: (_) {
         expect(storage.clearCount, 1);
@@ -349,20 +270,20 @@ void main() {
       build: bloc,
       act: (bloc) => bloc.add(RequireAuthentication()),
       expect: () => [
-        const SessionState(notice: SessionNotice.authenticationRequired),
+        const SessionState(signal: SessionSignal.authenticationRequired),
       ],
       verify: (bloc) => expect(bloc.state.status, AuthStatus.unknown),
     );
 
     blocTest<SessionBloc, SessionState>(
-      'NoticeAcknowledged clears the current notice',
+      'SignalAcknowledged clears the current signal',
       build: bloc,
       act: (bloc) async {
         bloc.add(RequireAuthentication());
-        bloc.add(NoticeAcknowledged());
+        bloc.add(SignalAcknowledged());
       },
       expect: () => [
-        const SessionState(notice: SessionNotice.authenticationRequired),
+        const SessionState(signal: SessionSignal.authenticationRequired),
         const SessionState(),
       ],
     );
@@ -372,7 +293,7 @@ void main() {
       build: () {
         storage.token = 'revoked-token';
         repository.refreshTokenError = unauthorized();
-        return SessionBloc(repository, storage);
+        return bloc();
       },
       act: (bloc) => bloc.add(RestoreRequested()),
       expect: () => [
@@ -380,30 +301,9 @@ void main() {
         const SessionState(status: AuthStatus.guest),
       ],
       verify: (bloc) {
-        expect(bloc.state.notice, SessionNotice.none);
+        expect(bloc.state.signal, SessionSignal.none);
         expect(storage.token, isNull);
       },
-    );
-
-    blocTest<SessionBloc, SessionState>(
-      'login overrides a pending notice with its success signal',
-      build: bloc,
-      act: (bloc) async {
-        bloc.add(RequireAuthentication());
-        bloc.add(
-          LoginRequested(email: 'sara@example.com', password: 'secret123'),
-        );
-      },
-      expect: () => [
-        const SessionState(notice: SessionNotice.authenticationRequired),
-        const SessionState(isLoading: true),
-        const SessionState(
-          status: AuthStatus.authenticated,
-          client: FakeAuthRepository.defaultClient,
-          notice: SessionNotice.loginSucceeded,
-        ),
-      ],
-      verify: (bloc) => expect(bloc.state.isAuthenticated, isTrue),
     );
   });
 }
