@@ -70,9 +70,9 @@ Do this before any feature work, and copy `client_app` rather than improvising:
 5. **Rewrite `test/widget_test.dart`.** It still asserts the counter increments
    and will fail the moment the scaffolding goes.
 6. **Decide the auth story.** The backend's client session layer
-   (`SessionController`, `/client/*` routes) is customer-specific. A business
+   (`SessionBloc`, `/client/*` routes) is customer-specific. A business
    user is a different guard (`barber` / `branch_api`) — do not reuse
-   `SessionController` without checking the contract.
+   `SessionBloc` without checking the contract.
 
 ## 4. Constraints
 

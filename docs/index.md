@@ -437,12 +437,12 @@ packages/core
 
 Objectives:
 
-* Session restoration. — `DONE` (`SessionController.restore`, probed via
+* Session restoration. — `DONE` (`SessionBloc` `RestoreRequested`, probed via
   `POST /client/refresh-token`; the backend has no `GET /client/me`)
 * Session expiration. — `DONE`. A dead token is detected on cold start, and —
   since Track 12 — mid-session revocation is caught by `AuthInterceptor` and
   redirected to auth (`docs/core/session.md`, `docs/core/interceptors.md`).
-* Logout. — `DONE` (`SessionController.logout`; no UI affordance yet)
+* Logout. — `DONE` (`SessionBloc` `LogoutRequested`; no UI affordance yet)
 * Authentication state. — `DONE` (`AuthStatus`)
 * Token lifecycle. — `DONE` (issue, rotate on restore, clear on 401/logout)
 

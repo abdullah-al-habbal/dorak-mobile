@@ -70,16 +70,23 @@ here.
 
 ## 5. State management
 
-Session state lives **in this package as a pure `bloc`** — `SessionBloc`,
-`SessionEvent`, `SessionState`, `SessionSignal` (no Flutter dependency). The
-unauthorized signal lives on `ApiClient` as a broadcast
-`unauthorizedStream` (fires once per 401/403 burst until reset). The former
-`ChangeNotifier` layer (`SessionController`, `UnauthorizedNotifier`) and the
-pagination notifiers were removed in Phase 4. **Do not add `ChangeNotifier`
-state here.**
+Session state lives **in this package as pure `bloc`s** — `SessionBloc`,
+`SessionEvent`, `SessionState`, `SessionSignal` plus the auth split `AuthBloc`,
+`AuthEvent`, `AuthState`, `AuthSignal` (no Flutter dependency). The session
+aggregate is two independent blocs: `AuthBloc` owns active auth actions
+(login/register/verify/resend) and shares `TokenStorage`; `SessionBloc(AuthRepository, TokenStorage)`
+owns session truth (restore/logout/unauthorized/ack). The two are **decoupled**:
+the app layer forwards an auth success to `SessionBloc` via
+`SessionAuthenticated(client)` — no bloc-to-bloc dependency. `SessionState` uses
+`SessionSignal` (`sessionExpired | authenticationRequired`); `AuthState` uses
+`AuthSignal` (`loginSucceeded | registrationSucceeded | verificationSucceeded`).
+The unauthorized signal lives on `ApiClient` as a broadcast `unauthorizedStream`
+(fires once per 401/403 burst until reset). The former `ChangeNotifier` layer
+(`SessionController`, `UnauthorizedNotifier`) and the pagination notifiers were
+removed in Phase 4. **Do not add `ChangeNotifier` state here.**
 
-Convention: success sets a `SessionSignal` for the router; failures land in
-`state.error` — screens map via `AuthError.from` (app layer). No Riverpod,
+Convention: success sets the owning bloc's signal for the router; failures land
+in `state.error` — screens map via `AuthError.from` (app layer). No Riverpod,
 Provider or GetIt anywhere.
 
 ## 6. Verification

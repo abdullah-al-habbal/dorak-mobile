@@ -37,7 +37,7 @@
 - `onboarding_config.repository.dart` — `OnboardingConfigRepository` + `OnboardingConfigDto` (GET /api/v1/app/onboarding-config).
 - `auth.repository.dart` — `AuthRepository` + `DioAuthRepository`: login, register (sends `password_confirmation`), logout, refreshToken, sendEmailVerification, verifyEmail, forgotPassword, resetPassword. DTOs `AuthResponseDto`, `ClientDto`, `TokenResponseDto`.
 - **Storage** (`src/storage/`) — `TokenStorage` / `SecureTokenStorage` (flutter_secure_storage) and `AppPreferences` / `SharedAppPreferences` (shared_preferences, `dontShowOnboarding`). See `docs/core/storage.md`.
-- **Session** (`src/session/`) — `SessionBloc` (pure `bloc`, `.bloc.dart`/`.event.dart`/`.state.dart` + `SessionSignal`): restore / login / register / verify / logout; one-shot signals consumed by the router's single stream listener. See `docs/core/session.md`.
+- **Session** (`src/session/`) — two independent pure `bloc`s over `AuthRepository` + `TokenStorage`: `AuthBloc` (`.bloc.dart`/`.event.dart`/`.state.dart`) for active auth actions (login/register/verify/resend), `SessionBloc` for session truth (restore/logout/unauthorized/ack). Decoupled: the app layer forwards auth successes as `SessionAuthenticated`. Type-safe one-shot signals — `SessionSignal` on `SessionState`, `AuthSignal` on `AuthState` — consumed by the router's two stream listeners. See `docs/core/session.md`.
 
 ### feature_floor_plan
 - Stub only — `feature_floor_plan.dart` barrel, no implementation yet.
@@ -150,7 +150,7 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-11 | Home placeholder | client_app | ✅ Complete | — |
 | FE-12 | Floor Plan package | feature_floor_plan | ⏸ Stub | Track pending |
 | FE-13 | Storage (secure token + preferences) | core | ✅ Complete | Track 05 |
-| FE-14 | Session management (`SessionController`) | core | ✅ Complete | Track 06 |
+| FE-14 | Session management (`SessionBloc`) | core | ✅ Complete | Track 06 |
 | FE-15 | Auth repository (full endpoint surface) | core | ✅ Complete | Track 06 |
 | FE-16 | Launch gate + navigation coordinators | client_app | ✅ Complete | Tracks 10–11 |
 | FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |

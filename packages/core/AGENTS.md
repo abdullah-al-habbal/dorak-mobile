@@ -29,8 +29,12 @@ lib/src/
     repositories/                        auth · onboarding_config
   session/
     auth_status.entity.dart              AuthStatus enum
-    session.bloc.dart                    SessionBloc
-    session.event.dart                   SessionEvent (9 events)
+    auth.bloc.dart                       AuthBloc — login / register / verify / resend
+    auth.event.dart                      AuthEvent (Login/Register/Verify/Resend/Ack)
+    auth.state.dart                      AuthState
+    auth_signal.entity.dart              AuthSignal
+    session.bloc.dart                    SessionBloc — restore / logout / signals
+    session.event.dart                   SessionEvent (restore / logout / 401 / guard / ack / authenticated)
     session.state.dart                   SessionState
     session_signal.entity.dart           SessionSignal
     session.barrel.dart
@@ -115,8 +119,22 @@ Non-envelope payload → `ApiException(status, 'INVALID_RESPONSE')`.
 
 ## 5. Session
 
-`SessionBloc` (pure `bloc` — no Flutter dependency) over `AuthRepository` +
-`TokenStorage`. Drive it with `SessionEvent`s; read `SessionState`.
+The session layer is split into two pure `bloc`s — **no Flutter dependency**:
+
+* `AuthBloc` (`auth.bloc.dart` + `auth.event.dart` + `auth.state.dart`) owns the
+  **active auth actions**: `LoginRequested`, `RegisterRequested`,
+  `SendVerificationCodeRequested`, `VerifyEmailRequested`. It takes `AuthRepository`
+  + `TokenStorage` (the same storage `SessionBloc` shares), writes the returned
+  token, exposes the signed-in `client`, and raises `loginSucceeded` /
+  `registrationSucceeded` / `verificationSucceeded`. Failures land in `state.error`
+  (typed via `AuthError.from` in the app). `AuthState` uses `isSubmitting`, not
+  `isLoading`.
+* `SessionBloc` (`session.bloc.dart` + `session.event.dart` + `session.state.dart`)
+  owns the **session truth**: `SessionBloc(AuthRepository, TokenStorage)`. It
+  drives `RestoreRequested` / `LogoutRequested` / `UnauthorizedDetected` /
+  `RequireAuthentication` / `SignalAcknowledged`, plus `SessionAuthenticated`
+  (dispatched by the app layer when `AuthBloc` succeeds). The two blocs are
+  **decoupled** — `SessionBloc` has no `AuthBloc` dependency.
 
 ```dart
 SessionState {
@@ -125,7 +143,7 @@ SessionState {
   bool isAuthenticated;
   bool isLoading;
   Object? error;
-  SessionSignal signal;    // one-shot navigation signals
+  SessionSignal signal;    // none | sessionExpired | authenticationRequired
 }
 Future<void> get ready;    // memoised restore pass
 ```
@@ -141,12 +159,17 @@ refreshToken() succeeds  -> persist rotated token, authenticated
 ```
 
 `LogoutRequested` swallows the network failure and always clears local state.
-`SendVerificationCodeRequested` swallows errors (registration already
-succeeded). Login/register/verify failures land in `state.error`; success sets
-the matching `SessionSignal` (`loginSucceeded`, `registrationSucceeded`,
-`verificationSucceeded`), which the app's router consumes and acknowledges via
-`SignalAcknowledged`. `UnauthorizedDetected` dedupes against an already-raised
+`SendVerificationCodeRequested` (on `AuthBloc`) swallows errors (registration
+already succeeded). Auth-action failures land in `state.error`; success sets the
+matching `AuthSignal`, which the app's router consumes and acknowledges via
+`AuthSignalAcknowledged`. `UnauthorizedDetected` dedupes against an already-raised
 `sessionExpired` and drops to `guest`.
+
+The router subscribes to **both** blocs: session signals (`sessionExpired`,
+`authenticationRequired`) route from `SessionBloc`, auth signals
+(`loginSucceeded`, `registrationSucceeded`, `verificationSucceeded`) route from
+`AuthBloc`. Session-only signals are acknowledged with `SignalAcknowledged`;
+auth-only signals with `AuthSignalAcknowledged`.
 
 Unauthorized is signalled separately: `ApiClient.unauthorizedStream` fires
 **once per burst** of 401/403 on authenticated, non-lifecycle requests, then
@@ -203,14 +226,15 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 57 tests.
+`packages/core/test/` — 59 tests.
 
 | File | Covers |
 |---|---|
 | `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, 401/422 mapping |
-| `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, login/register/verify/logout, signal emission |
+| `auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, `AuthSignalAcknowledged` |
+| `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, `SessionAuthenticated`, logout, global signal emission |
 | `unauthorized_signal_test.dart` | 401/403 burst emission + reset, lifecycle routes, no-bearer, transport, 5xx |
 | `storage_test.dart` | preference defaults + round-trip |
 | `onboarding_config_repository_test.dart` | as named |

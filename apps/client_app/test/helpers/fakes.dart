@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:dio/dio.dart';
@@ -35,12 +37,19 @@ AppRouter buildRouter({
   );
 }
 
-({AuthBloc auth, SessionBloc session}) sessionPair(
+({AuthBloc auth, SessionBloc session, StreamSubscription<AuthState> coordinator})
+    sessionPair(
   AuthRepository repository,
   TokenStorage storage,
 ) {
   final auth = AuthBloc(repository, storage);
-  return (auth: auth, session: SessionBloc(repository, storage, auth));
+  final session = SessionBloc(repository, storage);
+  final coordinator = auth.stream.listen((authState) {
+    final client = authState.client;
+    if (client == null) return;
+    session.add(SessionAuthenticated(client));
+  });
+  return (auth: auth, session: session, coordinator: coordinator);
 }
 
 void _noSwitchLocale() {}

@@ -40,9 +40,10 @@ Files at `lib/` root are exempt from the taxonomy checker; everything under
    must not call a repository, touch storage, or decide where to navigate next.
 2. **Flow logic lives in `AppRouter`** (`app.router.dart`), never inside a
    screen or a bloc. Screens receive callbacks wired by the router. The router
-   owns the session stream listener: it re-runs the redirect on every state
-   change and reacts to `SessionSignal` (auth/home/verify navigation), then
-   acknowledges each signal via `SignalAcknowledged`.
+   owns the two stream listeners (session + auth): it re-runs the redirect on
+   every state change and reacts to `SessionSignal` (auth/home/verify
+   navigation), then acknowledges each signal — session signals via
+   `SignalAcknowledged`, auth signals via `AuthSignalAcknowledged`.
 3. **Navigation is go_router through `AppRouter`** — `router.push/go`, or
    `context.push/pop/go` inside screens. A local `context.pop()` to dismiss the
    current route or sheet is the established idiom. Bloc never navigates.

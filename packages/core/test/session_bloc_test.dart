@@ -13,8 +13,7 @@ void main() {
     storage = InMemoryTokenStorage();
   });
 
-  SessionBloc bloc() =>
-      SessionBloc(repository, storage, AuthBloc(repository, storage));
+  SessionBloc bloc() => SessionBloc(repository, storage);
 
   group('restore', () {
     blocTest<SessionBloc, SessionState>(
@@ -125,18 +124,11 @@ void main() {
     );
   });
 
-  group('auth mirror', () {
-    late AuthBloc auth;
-
+  group('SessionAuthenticated', () {
     blocTest<SessionBloc, SessionState>(
-      'an auth success is mirrored as an authenticated session',
-      build: () {
-        auth = AuthBloc(repository, storage);
-        return SessionBloc(repository, storage, auth);
-      },
-      act: (bloc) => auth.add(
-        LoginRequested(email: 'sara@example.com', password: 'secret123'),
-      ),
+      'marks the session authenticated with the given client',
+      build: bloc,
+      act: (bloc) => bloc.add(SessionAuthenticated(FakeAuthRepository.defaultClient)),
       expect: () => [
         const SessionState(
           status: AuthStatus.authenticated,
@@ -146,24 +138,25 @@ void main() {
       verify: (bloc) {
         expect(bloc.state.isAuthenticated, isTrue);
         expect(bloc.state.client?.email, 'sara@example.com');
-        expect(storage.token, 'login-token');
       },
     );
 
     blocTest<SessionBloc, SessionState>(
-      'a rejected login leaves the session untouched',
-      build: () {
-        repository.loginError = unauthorized();
-        auth = AuthBloc(repository, storage);
-        return SessionBloc(repository, storage, auth);
+      'duplicate SessionAuthenticated for the same client is a no-op',
+      build: bloc,
+      act: (bloc) async {
+        bloc.add(SessionAuthenticated(FakeAuthRepository.defaultClient));
+        bloc.add(SessionAuthenticated(FakeAuthRepository.defaultClient));
       },
-      act: (bloc) => auth.add(
-        LoginRequested(email: 'sara@example.com', password: 'wrong'),
-      ),
-      expect: () => <SessionState>[],
+      expect: () => [
+        const SessionState(
+          status: AuthStatus.authenticated,
+          client: FakeAuthRepository.defaultClient,
+        ),
+      ],
       verify: (bloc) {
-        expect(bloc.state.status, AuthStatus.unknown);
-        expect(storage.token, isNull);
+        expect(bloc.state.status, AuthStatus.authenticated);
+        expect(bloc.state.client, FakeAuthRepository.defaultClient);
       },
     );
   });

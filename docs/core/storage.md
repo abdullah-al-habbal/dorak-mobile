@@ -47,7 +47,7 @@ ApiClient(
 ```
 
 Reading storage rather than the session layer keeps construction acyclic —
-`SessionController` depends on `ApiClient`, not the other way round.
+`SessionBloc` depends on `ApiClient`, not the other way round.
 
 ## AppPreferences
 

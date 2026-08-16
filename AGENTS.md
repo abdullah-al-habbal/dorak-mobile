@@ -248,9 +248,27 @@ declare `shared_preferences` themselves.
 
 ### Session — `packages/core/lib/src/session/`
 
-`SessionBloc` (pure `bloc`, no Flutter dependency). `AuthStatus` is
-`unknown | authenticated | guest`; `unknown` is pre-restore and must never be
-branched on — `await session.ready` first.
+The session aggregate is two pure `bloc`s (no Flutter dependency), both over
+`AuthRepository` + `TokenStorage`:
+
+* `AuthBloc` — active auth actions (`LoginRequested`, `RegisterRequested`,
+  `SendVerificationCodeRequested`, `VerifyEmailRequested`). Emits `isSubmitting`,
+  writes the returned token, exposes the `client`, raises the auth signals.
+* `SessionBloc(AuthRepository, TokenStorage)` — session truth
+  (`RestoreRequested`, `LogoutRequested`, `UnauthorizedDetected`,
+  `RequireAuthentication`, `SignalAcknowledged`, `SessionAuthenticated`).
+  `AuthStatus` is `unknown | authenticated | guest`; `unknown` is pre-restore and
+  must never be branched on — `await session.ready` first.
+
+The two blocs are **decoupled** — no bloc-to-bloc dependency. The app layer
+coordinates them: it forwards every `AuthBloc` success into
+`SessionBloc.add(SessionAuthenticated(client))` (the same wiring pattern as the
+`unauthorizedStream` forward). `SessionState.signal` carries the one-shot
+`SessionSignal` (`sessionExpired | authenticationRequired`);
+`AuthState.signal` carries the one-shot `AuthSignal` (`loginSucceeded |
+registrationSucceeded | verificationSucceeded`). The router subscribes to both
+streams and acknowledges session signals via `SignalAcknowledged` and auth
+signals via `AuthSignalAcknowledged`.
 
 `RestoreRequested`:
 
@@ -262,15 +280,14 @@ refreshToken() succeeds  -> persist rotated token, authenticated
   other ApiException     -> authenticated, token kept
 ```
 
-Mutating events (`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested`)
-emit `isLoading` then a signal on success; failures surface in `state.error`
-(typed via `AuthError.from` in the app). `LogoutRequested` swallows the network
-failure and always clears local state. `SendVerificationCodeRequested` errors
-are swallowed — registration already succeeded. `state.signal` carries the
-one-shot navigation signals consumed by the router's single stream listener
-(`sessionExpired`, `authenticationRequired`, `loginSucceeded`,
-`registrationSucceeded`, `verificationSucceeded`); the router acknowledges each
-via `SignalAcknowledged`.
+Auth-action failures surface in `state.error` (typed via `AuthError.from` in
+the app). `LogoutRequested` swallows the network failure and always clears local
+state. `SendVerificationCodeRequested` errors are swallowed — registration
+already succeeded. `SessionBloc` raises `sessionExpired` /
+`authenticationRequired`, `AuthBloc` raises `loginSucceeded` /
+`registrationSucceeded` / `verificationSucceeded`. The router subscribes to both
+streams and acknowledges session signals via `SignalAcknowledged` and auth
+signals via `AuthSignalAcknowledged`.
 
 Unauthorized: `ApiClient` owns a broadcast `unauthorizedStream` (fires once per
 401/403 burst until `resetUnauthorizedSignal()`). `client_app` forwards it to
@@ -464,7 +481,8 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 | File | Covers |
 |---|---|
 | `core/test/api_client_test.dart` | envelope parse, verbs, pagination, exception mapping |
-| `core/test/session_bloc_test.dart` | all four `restore()` branches, login, register, verify, logout, signals |
+| `core/test/auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, auth signal ack |
+| `core/test/session_bloc_test.dart` | all four `restore()` branches, `SessionAuthenticated`, logout, signals |
 | `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, 401/422 mapping |
 | `core/test/unauthorized_signal_test.dart` | 401/403 burst emission + reset on the `unauthorizedStream` |
 | `core/test/storage_test.dart` | preference round-trip + defaults |

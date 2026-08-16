@@ -19,8 +19,8 @@ class RequireAuthentication extends SessionEvent {}
 
 class SignalAcknowledged extends SessionEvent {}
 
-class AuthSessionMirror extends SessionEvent {
-  const AuthSessionMirror(this.client);
+class SessionAuthenticated extends SessionEvent {
+  const SessionAuthenticated(this.client);
 
   final ClientDto client;
 

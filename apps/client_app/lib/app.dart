@@ -39,6 +39,7 @@ class _DorakAppState extends State<DorakApp> {
   late final AppRouter _router;
   late final StreamSubscription<void> _unauthorizedSubscription;
   late final StreamSubscription<Locale> _localeSubscription;
+  late final StreamSubscription<AuthState> _authCoordinatorSubscription;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _DorakAppState extends State<DorakApp> {
     );
     final repository = widget.authRepository ?? DioAuthRepository(_apiClient);
     _authBloc = AuthBloc(repository, _tokenStorage);
-    _sessionBloc = SessionBloc(repository, _tokenStorage, _authBloc);
+    _sessionBloc = SessionBloc(repository, _tokenStorage);
 
     unawaited(_sessionBloc.ready);
 
@@ -64,6 +65,12 @@ class _DorakAppState extends State<DorakApp> {
     _onboardingConfigBloc.add(
       OnboardingConfigLoadRequested(localeCode: _localeBloc.state.languageCode),
     );
+
+    _authCoordinatorSubscription = _authBloc.stream.listen((authState) {
+      final client = authState.client;
+      if (client == null) return;
+      _sessionBloc.add(SessionAuthenticated(client));
+    });
 
     _unauthorizedSubscription = _apiClient.unauthorizedStream.listen((_) {
       _sessionBloc.add(UnauthorizedDetected());
@@ -87,6 +94,7 @@ class _DorakAppState extends State<DorakApp> {
 
   @override
   void dispose() {
+    _authCoordinatorSubscription.cancel();
     _unauthorizedSubscription.cancel();
     _localeSubscription.cancel();
     _router.dispose();

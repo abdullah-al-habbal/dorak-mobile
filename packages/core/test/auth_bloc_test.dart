@@ -26,7 +26,7 @@ void main() {
         const AuthState(isSubmitting: true),
         const AuthState(
           client: FakeAuthRepository.defaultClient,
-          signal: SessionSignal.loginSucceeded,
+          signal: AuthSignal.loginSucceeded,
         ),
       ],
       verify: (bloc) {
@@ -71,7 +71,7 @@ void main() {
         const AuthState(isSubmitting: true),
         const AuthState(
           client: FakeAuthRepository.defaultClient,
-          signal: SessionSignal.registrationSucceeded,
+          signal: AuthSignal.registrationSucceeded,
         ),
       ],
       verify: (bloc) {
@@ -91,7 +91,7 @@ void main() {
       act: (bloc) => bloc.add(const VerifyEmailRequested(code: '123456')),
       expect: () => [
         const AuthState(isSubmitting: true),
-        const AuthState(signal: SessionSignal.verificationSucceeded),
+        const AuthState(signal: AuthSignal.verificationSucceeded),
       ],
       verify: (_) => expect(repository.verifiedCode, '123456'),
     );
@@ -156,17 +156,18 @@ void main() {
           password: 'secret123',
           passwordConfirmation: 'secret123',
         ));
+        await pumpEventQueue();
         bloc.add(AuthSignalAcknowledged());
       },
       expect: () => [
         const AuthState(isSubmitting: true),
         const AuthState(
           client: FakeAuthRepository.defaultClient,
-          signal: SessionSignal.registrationSucceeded,
+          signal: AuthSignal.registrationSucceeded,
         ),
         const AuthState(client: FakeAuthRepository.defaultClient),
       ],
-      verify: (bloc) => expect(bloc.state.signal, SessionSignal.none),
+      verify: (bloc) => expect(bloc.state.signal, AuthSignal.none),
     );
   });
 }

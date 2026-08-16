@@ -5,7 +5,7 @@ import 'package:core/src/network/dto/client.dto.dart';
 import 'package:core/src/network/repositories/auth.repository.dart';
 import 'package:core/src/session/auth.event.dart';
 import 'package:core/src/session/auth.state.dart';
-import 'package:core/src/session/session_signal.entity.dart';
+import 'package:core/src/session/auth_signal.entity.dart';
 import 'package:core/src/storage/token.storage.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -35,7 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         client = await _acceptSession(response);
       },
       (state) => state.copyWith(client: client),
-      signal: SessionSignal.loginSucceeded,
+      signal: AuthSignal.loginSucceeded,
     );
   }
 
@@ -57,7 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         client = await _acceptSession(response);
       },
       (state) => state.copyWith(client: client),
-      signal: SessionSignal.registrationSucceeded,
+      signal: AuthSignal.registrationSucceeded,
     );
   }
 
@@ -79,7 +79,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit,
       () => _repository.verifyEmail(event.code),
       (state) => state,
-      signal: SessionSignal.verificationSucceeded,
+      signal: AuthSignal.verificationSucceeded,
     );
   }
 
@@ -87,7 +87,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSignalAcknowledged event,
     Emitter<AuthState> emit,
   ) {
-    emit(state.copyWith(signal: SessionSignal.none));
+    emit(state.copyWith(signal: AuthSignal.none));
   }
 
   Future<ClientDto> _acceptSession(AuthResponseDto response) async {
@@ -101,12 +101,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
     Future<void> Function() action,
     AuthState Function(AuthState) onSuccess, {
-    SessionSignal signal = SessionSignal.none,
+    AuthSignal signal = AuthSignal.none,
   }) async {
     emit(state.copyWith(
       isSubmitting: true,
       clearError: true,
-      signal: SessionSignal.none,
+      signal: AuthSignal.none,
     ));
     try {
       await action();
@@ -115,7 +115,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(state.copyWith(
         isSubmitting: false,
         error: e,
-        signal: SessionSignal.none,
+        signal: AuthSignal.none,
       ));
     }
   }

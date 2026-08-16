@@ -4,14 +4,26 @@ Status: `DONE`
 
 ## Purpose
 
-`SessionBloc` (`packages/core/lib/src/session/session.bloc.dart` + `.event.dart`
-+ `.state.dart`) owns the authenticated-session lifecycle: restoration, login,
-registration, email verification, logout. It is a pure `bloc` — **no Flutter
-dependency** — over `AuthRepository` + `TokenStorage`. UI never calls it
-directly; it dispatches `SessionEvent`s and reads `SessionState`.
+The session layer (`packages/core/lib/src/session/`) is split into two pure
+`bloc`s — **no Flutter dependency**, both over `AuthRepository` +
+`TokenStorage`:
 
-Success and failure never rethrow: mutating events emit `isLoading`, land
-failures in `state.error`, and set a one-shot `SessionSignal` on success. The
+* `AuthBloc` (`auth.bloc.dart` + `auth.event.dart` + `auth.state.dart`) owns the
+  **active auth actions**: `LoginRequested`, `RegisterRequested`,
+  `SendVerificationCodeRequested`, `VerifyEmailRequested`. It writes the returned
+  token, exposes the signed-in `client`, and raises the matching `AuthSignal`.
+* `SessionBloc` (`session.bloc.dart` + `session.event.dart` + `session.state.dart`)
+  owns the **session truth**: `SessionBloc(AuthRepository, TokenStorage)`. It
+  drives restore, logout, the unauthorized flow and signal acknowledgement. It
+  has **no dependency on `AuthBloc`**: an `AuthBloc` success is coordinated by
+  the app layer, which forwards it as `SessionAuthenticated(client)`
+  (`session.event.dart`).
+
+UI never calls either bloc directly; screens dispatch events and read state
+through a `BlocBuilder`.
+
+Success and failure never rethrow: auth actions emit `isSubmitting`, land
+failures in `state.error`, and set a one-shot signal on success. The
 app layer maps errors via `AuthError.from` and drives navigation from signals.
 
 ## State
@@ -22,7 +34,7 @@ app layer maps errors via `AuthError.from` and drives navigation from signals.
 `ready` first.
 
 ```dart
-SessionState {
+SessionState {                 // SessionBloc — the session truth
   AuthStatus status;
   ClientDto? client;
   bool isAuthenticated;
@@ -31,11 +43,24 @@ SessionState {
   SessionSignal signal;
 }
 Future<void> get ready;   // completes when restore has resolved status
+
+AuthState {                    // AuthBloc — active auth actions
+  ClientDto? client;
+  bool isSubmitting;
+  Object? error;
+  AuthSignal signal;
+}
 ```
 
 `ready` memoises the restore pass (`_restoration ??=`), so concurrent awaiters
 join the in-flight restore instead of firing a second one. Re-adding
 `RestoreRequested` after `ready` would run the probe again — don't.
+
+`SessionBloc` and `AuthBloc` are **independent**. The app layer coordinates
+them: it listens to the auth stream and dispatches `SessionAuthenticated`
+(`status: authenticated`, same `client`) when an auth action succeeds. A
+duplicate `SessionAuthenticated` for an already-authenticated client is a
+no-op.
 
 ## Restoration
 
@@ -64,17 +89,17 @@ Branch on `isUnauthorized`, never on `code`.
 
 ## Mutations
 
-`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested` go through a
-shared `_run` helper: emit `isLoading`, run the action, then emit the success
-state + signal, or emit `error` on failure. Screens observe `state.error` /
-`state.isLoading` through a `BlocBuilder`.
+`LoginRequested`, `RegisterRequested`, `VerifyEmailRequested` (on `AuthBloc`)
+go through a shared `_run` helper: emit `isSubmitting`, run the action, then
+emit the success state + signal, or emit `error` on failure. Screens observe
+`state.error` / `state.isSubmitting` through a `BlocBuilder`.
 
-`LogoutRequested` is the exception: it swallows the network failure, always
-clears local storage, and emits a fresh `guest` state.
+`LogoutRequested` (on `SessionBloc`) is the exception: it swallows the network
+failure, always clears local storage, and emits a fresh `guest` state.
 
-`SendVerificationCodeRequested` swallows errors — registration already
-succeeded and the token is stored; a failed dispatch must not block the verify
-screen, which has Resend.
+`SendVerificationCodeRequested` (on `AuthBloc`) swallows errors — registration
+already succeeded and the token is stored; a failed dispatch must not block the
+verify screen, which has Resend.
 
 `RegisterRequested` requires `passwordConfirmation` — the backend applies
 Laravel's `confirmed` rule and rejects the request without it.
@@ -87,9 +112,20 @@ Laravel's `confirmed` rule and rejects the request without it.
 
 ## Global signals
 
-`SessionSignal` (`none | sessionExpired | authenticationRequired |
-loginSucceeded | registrationSucceeded | verificationSucceeded`) is the
-router's one-shot navigation signal.
+Signals are split by owner, so each bloc's state is type-safe:
+
+* `SessionSignal` (`none | sessionExpired | authenticationRequired`) lives on
+  `SessionState`. `SessionBloc` raises `sessionExpired` (`UnauthorizedDetected`)
+  and `authenticationRequired` (`RequireAuthentication`).
+* `AuthSignal` (`none | loginSucceeded | registrationSucceeded |
+  verificationSucceeded`) lives on `AuthState`. `AuthBloc` raises the matching
+  value on auth success.
+
+The router subscribes to **both** streams and switches each state's own signal
+type, so a stale signal on one side never steers the other.
+`registrationSucceeded` is the only signal that carries follow-up work: the
+router dispatches `SendVerificationCodeRequested` and pushes the verify screen
+with the client's email as `extra`.
 
 Unauthorized flow:
 
@@ -98,20 +134,21 @@ Unauthorized flow:
   request; the client fires **once per burst** and stays silent until
   `resetUnauthorizedSignal()`, so a burst of concurrent 401s collapses into one
   notification.
-* The app layer forwards the signal to `UnauthorizedDetected`. The bloc dedupes
-  against an already-raised `sessionExpired`, clears the token, drops to
+* The app layer forwards the signal to `UnauthorizedDetected`. The session bloc
+  dedupes against an already-raised `sessionExpired`, clears the token, drops to
   `guest`, and raises the signal.
 * `RequireAuthentication` raises `authenticationRequired` (guest-guarded
   action) without touching the session.
-* `SignalAcknowledged` clears the signal — the app layer sends it after
-  navigating, re-arming the signal for the next burst.
+* `SignalAcknowledged` clears a **session** signal; `AuthSignalAcknowledged`
+  clears an **auth** signal — the app layer sends each after navigating,
+  re-arming the signal channel for the next burst.
 
-Any mutating event resets `signal` to `none`, so a fresh auth attempt clears a
-stale prompt.
+Any auth mutating event resets `signal` to `none`, so a fresh auth attempt
+clears a stale prompt.
 
-The app layer (`AppRouter`, see `navigation/guards.md`) owns **one** session
-stream listener that re-runs the router redirect and reacts to signals. Core
-never imports app code and never navigates.
+The app layer (`AppRouter`, see `navigation/guards.md`) owns the two stream
+listeners that re-run the router redirect and react to signals. Core never
+imports app code and never navigates.
 
 ## Not yet implemented
 
@@ -123,5 +160,5 @@ endpoints. Logout has a bloc handler but no UI affordance.
 
 ```bash
 dart run melos run analyze
-dart run melos run test   # packages/core/test/session_bloc_test.dart
+dart run melos run test   # packages/core/test/{session_bloc,auth_bloc}_test.dart
 ```

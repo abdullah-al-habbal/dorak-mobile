@@ -40,11 +40,15 @@ runApp(DorakApp(preferences: preferences));
 ```
 
 `DorakApp.initState` builds, in order: `SecureTokenStorage` → `ApiClient`
-(with `tokenProvider`) → `DioAuthRepository` → `SessionBloc` →
-`OnboardingConfigBloc` → `LocaleBloc`, then starts `session.ready` **unawaited**
-and constructs `AppRouter` (go_router, handed to `MaterialApp.router`). The
-router and the api client subscribe to their streams; all are closed in
-`dispose()`.
+(with `tokenProvider`) → `DioAuthRepository` → `AuthBloc` →
+`SessionBloc(repository, storage)` → `OnboardingConfigBloc` →
+`LocaleBloc`, then starts `session.ready` **unawaited**
+and constructs `AppRouter` (go_router, handed to `MaterialApp.router`). The app
+layer coordinates the two session blocs: it forwards every `AuthBloc` success
+(`state.client != null`) into `SessionBloc.add(SessionAuthenticated(...))`,
+alongside the `unauthorizedStream` → `UnauthorizedDetected` forward and the
+locale → config reload. The router (two stream listeners) and the api client
+subscribe to their streams; all are closed in `dispose()`.
 
 The splash is the router's initial route — it renders from the first frame.
 No post-frame push.
@@ -158,7 +162,7 @@ directories.
 | `auth_flow_test.dart` | login, validation, sign-up → verify, OTP pass/fail, skip, resend cooldown |
 | `onboarding_skip_test.dart` | Skip vs Don't show again vs Cancel, full four-step walk, empty back-stack |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()`, `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `unauthorized()`, `offline()` |
 
 Conventions:
 

@@ -1,27 +1,27 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:core/src/network/dto/client.dto.dart';
-import 'package:core/src/session/session_signal.entity.dart';
+import 'package:core/src/session/auth_signal.entity.dart';
 
 class AuthState extends Equatable {
   const AuthState({
     this.client,
     this.isSubmitting = false,
     this.error,
-    this.signal = SessionSignal.none,
+    this.signal = AuthSignal.none,
   });
 
   final ClientDto? client;
   final bool isSubmitting;
   final Object? error;
-  final SessionSignal signal;
+  final AuthSignal signal;
 
   AuthState copyWith({
     ClientDto? client,
     bool? isSubmitting,
     Object? error,
     bool clearError = false,
-    SessionSignal? signal,
+    AuthSignal? signal,
   }) {
     return AuthState(
       client: client ?? this.client,

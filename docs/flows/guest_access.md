@@ -4,7 +4,7 @@ Status: `DONE`
 
 ## What a guest is
 
-A guest is a device with **no stored token**: `SessionController.status ==
+A guest is a device with **no stored token**: `SessionBloc.state.status ==
 AuthStatus.guest`. There is no guest account, no anonymous token, and no
 server-side guest session — the client simply sends no `Authorization` header
 (`AuthInterceptor` omits it when `tokenProvider` returns null).
@@ -29,7 +29,7 @@ Home is currently a placeholder, so there is nothing yet that a guest is denied.
 
 - **Guest guards.** No screen currently gates itself on authentication, and
   there is no guest guard on any screen. The mechanism exists though: a
-  guest-guarded action calls `SessionController.requireAuthentication()`, which
+  guest-guarded action calls `SessionBloc.add(RequireAuthentication())`, which
   raises the `authenticationRequired` global state and pushes the auth entry
   screen on top of the current screen (back returns to it). Per-route guest
   guards are Track 11.

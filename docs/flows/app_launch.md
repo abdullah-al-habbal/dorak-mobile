@@ -15,8 +15,11 @@ runApp(DorakApp(preferences: preferences));
 
 `DorakApp.initState` builds, in order: `SecureTokenStorage` → `ApiClient` (with
 `tokenProvider`, which activates `AuthInterceptor`) → `DioAuthRepository` →
-`SessionController` → `OnboardingConfigController`, then constructs `AppRouter`
-(go_router) and hands `_router.router` to `MaterialApp.router`.
+`AuthBloc` → `SessionBloc` → `OnboardingConfigBloc`, then constructs `AppRouter`
+(go_router) and hands `_router.router` to `MaterialApp.router`. The app layer
+coordinates the two session blocs: it forwards every `AuthBloc` success
+(`state.client != null`) into `SessionBloc.add(SessionAuthenticated(...))`,
+mirroring the same wiring used for `ApiClient.unauthorizedStream`.
 
 It then kicks off `session.ready` **without awaiting it**, so restoration runs
 concurrently with the splash animation and adds no wait of its own.

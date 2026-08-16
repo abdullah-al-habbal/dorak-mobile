@@ -5,8 +5,6 @@ import 'package:bloc/bloc.dart';
 import 'package:core/src/network/exceptions/api.exception.dart';
 import 'package:core/src/network/exceptions/network.exception.dart';
 import 'package:core/src/network/repositories/auth.repository.dart';
-import 'package:core/src/session/auth.bloc.dart';
-import 'package:core/src/session/auth.state.dart';
 import 'package:core/src/session/auth_status.entity.dart';
 import 'package:core/src/session/session.event.dart';
 import 'package:core/src/session/session.state.dart';
@@ -14,45 +12,30 @@ import 'package:core/src/session/session_signal.entity.dart';
 import 'package:core/src/storage/token.storage.dart';
 
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
-  SessionBloc(this._repository, this._tokenStorage, this._authBloc)
-      : super(const SessionState()) {
+  SessionBloc(this._repository, this._tokenStorage) : super(const SessionState()) {
     on<RestoreRequested>(_onRestore);
     on<LogoutRequested>(_onLogout);
     on<UnauthorizedDetected>(_onUnauthorizedDetected);
     on<RequireAuthentication>(_onRequireAuthentication);
     on<SignalAcknowledged>(_onSignalAcknowledged);
-    on<AuthSessionMirror>(_onAuthSessionMirror);
-    _authSubscription = _authBloc.stream.listen(_onAuthChanged);
+    on<SessionAuthenticated>(_onSessionAuthenticated);
   }
 
   final AuthRepository _repository;
   final TokenStorage _tokenStorage;
-  final AuthBloc _authBloc;
-  late final StreamSubscription<AuthState> _authSubscription;
 
   Future<void>? _restoration;
 
   Future<void> get ready => _restoration ??= _restoreUntilResolved();
 
-  @override
-  Future<void> close() {
-    _authSubscription.cancel();
-    return super.close();
-  }
-
-  void _onAuthChanged(AuthState authState) {
-    if (authState.client == null) return;
-    if (state.status == AuthStatus.authenticated &&
-        state.client == authState.client) {
-      return;
-    }
-    add(AuthSessionMirror(authState.client!));
-  }
-
-  void _onAuthSessionMirror(
-    AuthSessionMirror event,
+  void _onSessionAuthenticated(
+    SessionAuthenticated event,
     Emitter<SessionState> emit,
   ) {
+    if (state.status == AuthStatus.authenticated &&
+        state.client == event.client) {
+      return;
+    }
     emit(state.copyWith(
       status: AuthStatus.authenticated,
       client: event.client,

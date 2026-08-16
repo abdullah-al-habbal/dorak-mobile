@@ -67,7 +67,7 @@ Do this before any feature work, and copy `client_app` rather than improvising:
    pair; add stylist keys there.
 5. **Rewrite `test/widget_test.dart`.** It still asserts the counter increments
    and will fail the moment the scaffolding goes.
-6. **Decide the auth story.** `SessionController` and the `/client/*` routes are
+6. **Decide the auth story.** `SessionBloc` and the `/client/*` routes are
    customer-specific. A barber authenticates against a different guard — do not
    reuse the client session layer without checking the contract.
 
