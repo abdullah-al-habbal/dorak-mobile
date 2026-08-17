@@ -107,6 +107,27 @@ void main() {
       verify: (_) => expect(storage.token, 'stored-token'),
     );
 
+    test(
+      'unreadable token storage resolves to guest and never hangs ready',
+      () async {
+        storage.readError = StateError('keystore unavailable');
+        final session = bloc();
+        addTearDown(session.close);
+
+        await session.ready.timeout(
+          const Duration(seconds: 2),
+          onTimeout: () => fail(
+            'ready never completed: a throwing read() used to leave the '
+            'session in AuthStatus.unknown, hanging the splash forever',
+          ),
+        );
+
+        expect(session.state.status, AuthStatus.guest);
+        expect(session.state.error, isA<StateError>());
+        expect(repository.refreshTokenCalls, 0);
+      },
+    );
+
     blocTest<SessionBloc, SessionState>(
       'ready joins the in-flight restore instead of starting another',
       build: () {
@@ -212,10 +233,6 @@ void main() {
         const SessionState(isLoading: true),
         const SessionState(status: AuthStatus.authenticated),
         const SessionState(
-          status: AuthStatus.authenticated,
-          signal: SessionSignal.sessionExpired,
-        ),
-        const SessionState(
           status: AuthStatus.guest,
           signal: SessionSignal.sessionExpired,
         ),
@@ -241,10 +258,6 @@ void main() {
       expect: () => [
         const SessionState(isLoading: true),
         const SessionState(status: AuthStatus.authenticated),
-        const SessionState(
-          status: AuthStatus.authenticated,
-          signal: SessionSignal.sessionExpired,
-        ),
         const SessionState(
           status: AuthStatus.guest,
           signal: SessionSignal.sessionExpired,
@@ -277,6 +290,49 @@ void main() {
         const SessionState(signal: SessionSignal.authenticationRequired),
         const SessionState(),
       ],
+    );
+
+    blocTest<SessionBloc, SessionState>(
+      'expiring an authenticated session discards the cached client',
+      build: () {
+        storage.token = 'stored-token';
+        return bloc();
+      },
+      act: (bloc) async {
+        await bloc.ready;
+        bloc.add(const SessionAuthenticated(FakeAuthRepository.defaultClient));
+        await pumpEventQueue();
+        bloc.add(UnauthorizedDetected());
+      },
+      verify: (bloc) {
+        expect(
+          bloc.state.client,
+          isNull,
+          reason: 'copyWith(client: null) used to be a silent no-op, leaving '
+              'the expired user cached in state',
+        );
+        expect(bloc.state.status, AuthStatus.guest);
+        expect(bloc.state.signal, SessionSignal.sessionExpired);
+      },
+    );
+
+    blocTest<SessionBloc, SessionState>(
+      'SessionAuthenticated cannot resurrect a session that just expired',
+      build: () {
+        storage.token = 'stored-token';
+        return bloc();
+      },
+      act: (bloc) async {
+        await bloc.ready;
+        bloc.add(UnauthorizedDetected());
+        await pumpEventQueue();
+        bloc.add(const SessionAuthenticated(FakeAuthRepository.defaultClient));
+        await pumpEventQueue();
+      },
+      verify: (bloc) {
+        expect(bloc.state.status, AuthStatus.guest);
+        expect(bloc.state.client, isNull);
+      },
     );
 
     blocTest<SessionBloc, SessionState>(

@@ -5,17 +5,20 @@ import 'package:localization/localization.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_background.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_content.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_header.widget.dart';
+import 'package:client_app/src/features/auth/widgets/auth_shell.widget.dart';
 
 class AuthEntryScreen extends StatefulWidget {
   final VoidCallback onLogin;
   final VoidCallback onSignup;
   final VoidCallback onGuest;
+  final VoidCallback? onLocaleToggle;
 
   const AuthEntryScreen({
     super.key,
     required this.onLogin,
     required this.onSignup,
     required this.onGuest,
+    this.onLocaleToggle,
   });
 
   @override
@@ -67,50 +70,40 @@ class _AuthEntryScreenState extends State<AuthEntryScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: colors.background,
       body: Stack(
         children: [
           const Positioned.fill(child: AuthEntryBackground()),
+          AuthShell(
+            header: FadeTransition(
+              opacity: _staggeredAnimations[0],
+              child: AuthEntryHeader(
+                brandLabel: l10n.splashTitle,
+                title: l10n.authWelcomeTitle,
+                subtitle: l10n.authSubtitle,
+              ),
+            ),
+            headerSpacing: 48,
+            child: AuthEntryContent(
+              staggeredAnimations: _staggeredAnimations,
+              onLogin: widget.onLogin,
+              onSignup: widget.onSignup,
+              onGuest: widget.onGuest,
+            ),
+          ),
           SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 480),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              FadeTransition(
-                                opacity: _staggeredAnimations[0],
-                                child: AuthEntryHeader(
-                                  brandLabel: l10n.splashTitle,
-                                  title: l10n.authWelcomeTitle,
-                                  subtitle: l10n.authSubtitle,
-                                ),
-                              ),
-                              const SizedBox(height: 48),
-                              AuthEntryContent(
-                                staggeredAnimations: _staggeredAnimations,
-                                onLogin: widget.onLogin,
-                                onSignup: widget.onSignup,
-                                onGuest: widget.onGuest,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+            child: Align(
+              alignment: AlignmentDirectional.topEnd,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: LocaleSwitcher(
+                  label: isArabic ? l10n.localeEnglish : l10n.localeArabic,
+                  onPressed: widget.onLocaleToggle ?? () {},
+                ),
+              ),
             ),
           ),
         ],

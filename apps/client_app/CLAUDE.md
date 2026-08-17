@@ -54,15 +54,22 @@ Files at `lib/` root are exempt from the taxonomy checker; everything under
 6. **No second HTTP, state or routing stack.** `ApiClient` from `core`;
    **Bloc** state (`flutter_bloc` at the app layer, pure `bloc` in core);
    **go_router** routing. No Riverpod, Provider or GetIt. `ChangeNotifier` is
-   not used — do not add it.
+   not used — do not add it. The canonical state contract is
+   [`docs/state_management/conventions.md`](../../docs/state_management/conventions.md).
+   `LocaleBloc` uses `Locale` directly as its state and has no `.state.dart` —
+   that is a sanctioned exemption (§1a there), not an oversight.
+   `bloc_concurrency` is deliberately **not** a dependency yet; it is added with
+   the first feature that needs `restartable()` cancellation.
 7. **DI is constructor wiring in `DorakApp.initState`.** There is no container.
    Add a field there and thread it down; do not introduce a service locator.
 8. **Test seams stay optional.** `DorakApp`'s `tokenStorage` and
    `authRepository` parameters exist for tests and must default to null in
    production.
-9. **Feature-local widgets stay local.** Promote to `design_system` only when a
-   second app genuinely needs it (Track 15). Do not pre-emptively hoist
-   `AuthTextField` or `OtpInputField`.
+9. **Feature-local widgets stay local.** Promote to `design_system` when a
+   widget has a genuine shared consumer across apps, **or** when it is a
+   Track 12 global UI-state component (loading, empty, error, offline, retry,
+   session states) that other features render. Do not pre-emptively hoist
+   feature inputs like `AuthTextField` or `OtpInputField`.
 10. **Never render a backend `message`.** The API returns untranslated keys
     (`core::messages.*`). Map exceptions to local ARB strings — see
     `auth_error.entity.dart`.
@@ -82,7 +89,7 @@ cd dorak-mobile
 dart run melos run verify          # the gate — must exit 0
 
 cd apps/client_app
-flutter test                       # 26 tests
+flutter test                       # 35 tests
 ```
 
 Widget tests must use the fakes in `test/helpers/fakes.dart` and set a phone

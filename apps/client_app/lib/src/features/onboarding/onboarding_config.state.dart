@@ -18,13 +18,14 @@ class OnboardingConfigState extends Equatable {
 
   OnboardingConfigState copyWith({
     OnboardingConfigDto? config,
+    bool clearConfig = false,
     String? localeCode,
     bool? isLoading,
     Object? error,
     bool clearError = false,
   }) {
     return OnboardingConfigState(
-      config: config ?? this.config,
+      config: clearConfig ? null : config ?? this.config,
       localeCode: localeCode ?? this.localeCode,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : error ?? this.error,

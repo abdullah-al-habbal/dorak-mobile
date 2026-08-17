@@ -75,7 +75,6 @@ class AppRouter {
         router.go(AppRoutes.home);
         auth.add(AuthSignalAcknowledged());
       case AuthSignal.registrationSucceeded:
-        auth.add(SendVerificationCodeRequested());
         router.push<void>(AppRoutes.authVerify, extra: state.client?.email ?? '');
         auth.add(AuthSignalAcknowledged());
       case AuthSignal.verificationSucceeded:
@@ -162,6 +161,7 @@ class AppRouter {
           onLogin: () => router.push<void>(AppRoutes.authLogin),
           onSignup: () => router.push<void>(AppRoutes.authRegister),
           onGuest: () => router.go(AppRoutes.onboardingWelcome),
+          onLocaleToggle: switchLocale,
         ),
         routes: [
           GoRoute(
@@ -170,6 +170,7 @@ class AppRouter {
               auth: auth,
               onCreateAccount: () => router.push<void>(AppRoutes.authRegister),
               onForgotPassword: null,
+              onLocaleToggle: switchLocale,
             ),
           ),
           GoRoute(
@@ -177,6 +178,7 @@ class AppRouter {
             builder: (context, state) => SignUpScreen(
               auth: auth,
               onLogInLink: () => router.push<void>(AppRoutes.authLogin),
+              onLocaleToggle: switchLocale,
             ),
           ),
           GoRoute(
@@ -185,6 +187,7 @@ class AppRouter {
               auth: auth,
               destination: state.extra as String? ?? '',
               onSkip: () => router.go(AppRoutes.home),
+              onLocaleToggle: switchLocale,
             ),
           ),
         ],

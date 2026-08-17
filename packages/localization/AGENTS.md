@@ -48,12 +48,15 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 75 keys
+## 3. The 80 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
 **Errors / validation** — `errorNetwork` `errorGeneric` `fieldRequired`
 `fieldInvalidEmail` `fieldPasswordTooShort` `fieldPasswordMismatch`
+
+**Global states (Track 12)** — `actionRetry` `errorTitleGeneric`
+`errorTitleOffline` `emptyTitleGeneric` `emptyMessageGeneric`
 
 **Locale toggle** — `localeArabic` `localeEnglish`
 

@@ -27,8 +27,14 @@ Rules:
 
 ## State Contracts
 
+**`docs/state_management/conventions.md` is the canonical state contract.** This
+page covers only the transport-to-application error boundary; everything about
+how a bloc represents loading, success, empty, error, retry, refresh and
+pagination lives there.
+
 * Async UI state is expressed with explicit loading/error/data (see
-  `state_management/pagination.md` for the paging story).
+  `state_management/async_state.md`, and `state_management/pagination.md` for
+  the paging story).
 * `OnboardingConfigBloc` (`apps/client_app/.../onboarding_config.bloc.dart`,
   pure `bloc` over an `OnboardingConfigRepository`) holds config + `isLoading`
   + `error` with silent fallback to bundled assets, and reloads on locale

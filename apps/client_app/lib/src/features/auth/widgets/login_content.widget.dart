@@ -5,7 +5,6 @@ import 'package:localization/localization.dart';
 
 import 'package:client_app/src/features/auth/auth_error.entity.dart';
 import 'package:client_app/src/features/auth/auth_validators.entity.dart';
-import 'package:client_app/src/features/auth/widgets/auth_error_banner.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_text_field.widget.dart';
 
 class LoginContent extends StatefulWidget {
@@ -143,7 +142,7 @@ class _LoginContentState extends State<LoginContent> {
                   ),
                 if (error != null) ...[
                   const SizedBox(height: 8),
-                  AuthErrorBanner(message: error.message),
+                  StatusBanner(message: error.message),
                 ],
                 const SizedBox(height: 16),
                 PrimaryButton(

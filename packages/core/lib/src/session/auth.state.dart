@@ -18,13 +18,14 @@ class AuthState extends Equatable {
 
   AuthState copyWith({
     ClientDto? client,
+    bool clearClient = false,
     bool? isSubmitting,
     Object? error,
     bool clearError = false,
     AuthSignal? signal,
   }) {
     return AuthState(
-      client: client ?? this.client,
+      client: clearClient ? null : client ?? this.client,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       error: clearError ? null : error ?? this.error,
       signal: signal ?? this.signal,

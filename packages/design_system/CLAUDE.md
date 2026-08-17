@@ -14,6 +14,13 @@ It is the **only** place raw colour, type and dimension values may exist.
 
 ## 2. Dependency ceiling
 
+> **`go_router` exception.** `BottomSheetModal` calls `context.pop()`, so this
+> package depends on `go_router` by
+> [ADR 0002](../../docs/architecture/decisions/0002-design-system-go-router.md).
+> **Any consumer must provide a `GoRouter` ancestor**, or pass an explicit
+> `onDismiss`. This covers `go_router` and nothing else — any further
+> application-layer dependency needs a new ADR.
+
 Permitted: `flutter` and third-party packages only. Currently: `go_router`
 (routing-only — used solely for `context.pop()` in `BottomSheetModal`).
 
@@ -55,9 +62,10 @@ all rejected here.
 7. **No unbounded text in a `Row`.** Wrap in `Flexible` or use `Wrap`. Arabic
    and large text scales are wider than the English mock.
 8. **Promotion is deliberate.** A widget belongs here only when it is genuinely
-   used by more than one app, or is specified by Track 15. Feature-local
-   widgets stay in `apps/*/lib/src/features/<feature>/widgets/`. Do not
-   pre-emptively hoist.
+   used by more than one app, or is specified by Track 15, or is a Track 12
+   global UI-state component (loading, empty, error, offline, retry, session
+   states). Feature-local widgets stay in
+   `apps/*/lib/src/features/<feature>/widgets/`. Do not pre-emptively hoist.
 9. **Fonts are bundled here.** `IBM Plex Sans` and `IBM Plex Sans Arabic` ship
    in `fonts/` and are declared in this package's `pubspec.yaml`. Apps must not
    re-declare them.
@@ -71,4 +79,6 @@ dart run melos run test
 ```
 
 Rendering changes should be checked in `client_app` — this package has no
-example app and its test file is a placeholder.
+example app. `test/` holds real widget tests for the state components
+(`status_banner`, `status_view`, `app_loader`, `shimmer_box`); the original
+placeholder is still in `test/design_system_test.dart`.

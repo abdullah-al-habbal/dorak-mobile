@@ -6,12 +6,16 @@ class AuthHeader extends StatelessWidget {
   final String brandLabel;
   final String backTooltip;
   final VoidCallback onBack;
+  final String? localeLabel;
+  final VoidCallback? onLocaleToggle;
 
   const AuthHeader({
     super.key,
     required this.brandLabel,
     required this.backTooltip,
     required this.onBack,
+    this.localeLabel,
+    this.onLocaleToggle,
   });
 
   @override
@@ -21,12 +25,18 @@ class AuthHeader extends StatelessWidget {
 
     return Row(
       children: [
-        IconButton(
-          onPressed: onBack,
-          tooltip: backTooltip,
-          icon: Icon(
-            isRtl ? Icons.arrow_forward : Icons.arrow_back,
-            color: colors.onSurface,
+        SizedBox(
+          width: 64,
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: IconButton(
+              onPressed: onBack,
+              tooltip: backTooltip,
+              icon: Icon(
+                isRtl ? Icons.arrow_forward : Icons.arrow_back,
+                color: colors.onSurface,
+              ),
+            ),
           ),
         ),
         Expanded(
@@ -42,7 +52,21 @@ class AuthHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 48),
+        SizedBox(
+          width: 64,
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: (localeLabel != null && onLocaleToggle != null)
+                ? FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: LocaleSwitcher(
+                      label: localeLabel!,
+                      onPressed: onLocaleToggle!,
+                    ),
+                  )
+                : null,
+          ),
+        ),
       ],
     );
   }

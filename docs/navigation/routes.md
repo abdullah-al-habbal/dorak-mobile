@@ -11,9 +11,9 @@ no `AppNavigator`, no named-route strings. Navigation lives in
 
 | File | Owns |
 | --- | --- |
-| `app.router.dart` | `AppRouter` — constructs the `GoRouter`, owns the redirect (`AppGate.decide` + session-expired) and all flow wiring (`router.push/go` passed into screens as callbacks) |
+| `app.router.dart` | `AppRouter` — constructs the `GoRouter`, owns the redirect, the launch gate (`AppGate.resolve`) and the session/auth signal listeners, plus all flow wiring (`router.push/go` passed into screens as callbacks) |
 | `app_routes.entity.dart` | `AppRoutes` — path constants (`/splash`, `/auth`, `/auth/login`, `/auth/register`, `/auth/verify`, `/onboarding/welcome|discovery|booking|ai-style`, `/home`) |
-| `app_gate.entity.dart` | `AppGate.decide` — the post-splash branch, invoked from the router redirect |
+| `app_gate.entity.dart` | `AppGate.resolve` — the post-splash branch, a pure function called from `AppRouter._leaveSplash` (**not** from the redirect) |
 
 Screens receive callbacks only and know nothing about their neighbours. Bloc
 never navigates — routing responds to state through the router's redirect and
@@ -37,13 +37,29 @@ Flow wiring lives in `AppRouter._routes()`: each `GoRoute` receives callbacks
 `router.push`/`router.go`. `context.go('/home')` clears the stack by
 construction — there is no `pushAndRemoveUntil` bookkeeping.
 
-## The redirect
+## The redirect and the two listeners
 
-`AppRouter._redirect` is the single entry point for guard logic:
+Guard logic is split across three places, deliberately:
 
-- Launch gate: `AppGate.decide` after the splash (see `flows/app_launch.md`).
-- Session-expired: a 401/403 on an authenticated request → session-expired
-  signal → `router.push<void>(AppRoutes.authEntry)` (see `guards.md`).
+| Mechanism | Owns |
+| --- | --- |
+| `AppRouter._redirect` | holds the app on `/splash` while `SessionState.status` is `unknown`, and nothing else |
+| `AppRouter._leaveSplash` | awaits `session.ready`, then `router.go(AppGate.resolve(...))` — the launch gate (see `flows/app_launch.md`) |
+| `AppRouter._onSessionChanged` / `_onAuthChanged` | `router.refresh()` on every session change, then react to `SessionSignal` / `AuthSignal` |
+
+The launch gate is **not** in `_redirect`: the splash must hold for its 2500 ms
+animation, which a redirect cannot express. `AppGate.resolve` is a pure function
+(`app_gate.entity.dart`) and is unit-testable without pumping a widget.
+
+**`go` vs `push` is a contract, not a detail:**
+
+| Signal | Call | Why |
+| --- | --- | --- |
+| `SessionSignal.sessionExpired` | `router.go(/auth)` | **replaces** — no dead-session screen survives to be back-navigated into |
+| `SessionSignal.authenticationRequired` | `router.push(/auth)` | **pushes** — back returns to the guest destination the user was on |
+
+Each is acknowledged immediately after (`SignalAcknowledged` /
+`AuthSignalAcknowledged`) together with `apiClient.resetUnauthorizedSignal()`.
 
 ## Taxonomy
 

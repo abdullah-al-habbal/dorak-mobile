@@ -4,12 +4,15 @@ Status: `IN_PROGRESS` — the launch gate exists; per-route guards do not.
 
 ## What exists: the launch gate
 
-`AppGate.decide` is the only guard in the app. It runs once, after the splash,
+`AppGate.resolve` is the only guard in the app. It runs once, after the splash,
 and picks the first real screen from two checks in strict order — session first,
 onboarding flag second. Full table in `flows/app_launch.md`.
 
-It is installed as the **router redirect** (`AppRouter._redirect`), not an
-imperative post-frame push.
+`AppGate.resolve` is a **pure function** (`app_gate.entity.dart`) called from
+`AppRouter._leaveSplash` once `session.ready` completes. It is deliberately not
+inside `_redirect` — the splash has to hold for its animation, which a redirect
+cannot express. `_redirect` does one thing only: hold on `/splash` while
+`SessionState.status` is `unknown`.
 
 It guards **entry into the app**, not individual routes.
 
@@ -44,15 +47,27 @@ to auth:
 401/403 (authenticated, non-lifecycle)
   -> ApiClient.unauthorizedStream fires   (once per burst)
   -> (app) SessionBloc.add(UnauthorizedDetected())
-  -> signal == sessionExpired
-  -> AppRouter listener -> router.push<void>(/auth)
+  -> token cleared, then ONE emission:
+       status: guest, client: null, signal: sessionExpired
+  -> AppRouter listener -> router.go(/auth)          <- replaces the stack
   -> SignalAcknowledged + apiClient.resetUnauthorizedSignal()
 ```
 
-A dead-session screen is never back-navigated into because the redirect runs on
-the next location change. A guest-guarded action instead raises
-`authenticationRequired`, which pushes the auth entry **on top** so back
-returns to the previous screen. Full wiring: `app.router.dart`.
+`_onUnauthorizedDetected` clears the token **before** it emits, so a burst of
+401s produces exactly one expiration and one redirect. A synchronous `_expiring`
+latch closes the window during the `await` — the emitted-signal guard alone
+cannot, because the signal is not set until after the clear completes.
+
+`go` versus `push` is the contract:
+
+- **`sessionExpired` → `router.go`** replaces the stack, so a dead-session
+  screen can never be back-navigated into.
+- **`authenticationRequired` → `router.push`** puts the auth entry **on top**,
+  so back returns to the guest destination the user was on.
+
+While a `sessionExpired` signal is unacknowledged, `SessionAuthenticated` is
+ignored — a stale auth success cannot resurrect a session that just died.
+Full wiring: `app.router.dart`, `auth_coordination.entity.dart`.
 
 ## Verification
 

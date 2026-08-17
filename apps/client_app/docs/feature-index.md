@@ -86,6 +86,7 @@
 | CL-06 | Onboarding Infrastructure (config, skip sheet, flow) | ✅ Complete | — |
 | CL-07 | Home placeholder | ✅ Complete | — |
 | CL-08 | Auth flow — entry / login / register / verify | ✅ Complete | Stitch 006–009 |
+| CL-08c | Locale switcher on all pre-Home screens (onboarding header + auth entry/login/register/verify via shared `LocaleSwitcher`) | ✅ Complete | — |
 | CL-08b | Password recovery | ⏳ Not started | Stitch 011–014 |
 | CL-14 | Launch gate + go_router route table | ✅ Complete | Tracks 10–11 |
 | CL-09 | Discovery Feed | ⏳ Not started | Stitch 016 |

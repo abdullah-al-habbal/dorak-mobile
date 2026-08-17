@@ -134,6 +134,7 @@ class ApiClient {
     final response =
         await _guard(() => dio.get<dynamic>(path, queryParameters: queryParameters));
     final body = _bodyOf(response);
+    _throwIfFailure(body, response.statusCode ?? 200);
     final rawData = body['data'];
     final items = (rawData is List ? rawData : const <dynamic>[])
         .map(itemParser)

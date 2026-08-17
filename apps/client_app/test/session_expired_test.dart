@@ -115,6 +115,47 @@ void main() {
     expect(session.state.isAuthenticated, isTrue);
   });
 
+  testWidgets(
+      'a failed sign-in after expiry leaves the session guest, not authenticated',
+      (tester) async {
+    createSession();
+    await pumpHome(tester);
+    expect(find.byType(AuthEntryScreen), findsOneWidget);
+
+    await tester.tap(find.text('Log In'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(AuthTextField).at(0), 'sara@example.com');
+    await tester.enterText(find.byType(AuthTextField).at(1), 'secret123');
+    await tester.tap(find.text('Log In'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeScreen), findsOneWidget);
+
+    session.add(UnauthorizedDetected());
+    await tester.pumpAndSettle();
+    expect(find.byType(AuthEntryScreen), findsOneWidget);
+
+    repository.loginError = unauthorized();
+
+    await tester.tap(find.text('Log In'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(AuthTextField).at(0), 'sara@example.com');
+    await tester.enterText(find.byType(AuthTextField).at(1), 'wrongpass');
+    await tester.tap(find.text('Log In'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(HomeScreen), findsNothing);
+    expect(
+      session.state.status,
+      AuthStatus.guest,
+      reason: 'the coordinator used to fire on any state carrying a stale '
+          'client, re-authenticating the session before the request resolved',
+    );
+    expect(session.state.client, isNull);
+    expect(storage.token, isNull);
+  });
+
   testWidgets('a revoked token at restore does not raise sessionExpired',
       (tester) async {
     repository.refreshTokenError = unauthorized();

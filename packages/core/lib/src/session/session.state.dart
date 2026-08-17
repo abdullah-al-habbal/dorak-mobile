@@ -24,6 +24,7 @@ class SessionState extends Equatable {
   SessionState copyWith({
     AuthStatus? status,
     ClientDto? client,
+    bool clearClient = false,
     bool? isLoading,
     Object? error,
     bool clearError = false,
@@ -31,7 +32,7 @@ class SessionState extends Equatable {
   }) {
     return SessionState(
       status: status ?? this.status,
-      client: client ?? this.client,
+      client: clearClient ? null : client ?? this.client,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : error ?? this.error,
       signal: signal ?? this.signal,

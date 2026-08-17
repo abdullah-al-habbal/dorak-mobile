@@ -6,7 +6,6 @@ import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
 import 'package:client_app/src/features/auth/auth_error.entity.dart';
-import 'package:client_app/src/features/auth/widgets/auth_error_banner.widget.dart';
 import 'package:client_app/src/features/auth/widgets/otp_input_field.widget.dart';
 
 class VerifyAccountContent extends StatefulWidget {
@@ -188,7 +187,7 @@ class _VerifyAccountContentState extends State<VerifyAccountContent> {
         const SizedBox(height: 16),
         SizedBox(
           height: 24,
-          child: error == null ? null : AuthErrorBanner(message: error.message),
+          child: error == null ? null : StatusBanner(message: error.message),
         ),
         const SizedBox(height: 8),
         PrimaryButton(

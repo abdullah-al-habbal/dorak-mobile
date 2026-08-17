@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
+import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
 Widget routerHarness(AppRouter appRouter) {
@@ -44,11 +45,9 @@ AppRouter buildRouter({
 ) {
   final auth = AuthBloc(repository, storage);
   final session = SessionBloc(repository, storage);
-  final coordinator = auth.stream.listen((authState) {
-    final client = authState.client;
-    if (client == null) return;
-    session.add(SessionAuthenticated(client));
-  });
+  final coordinator = auth.stream.listen(
+    (authState) => coordinateAuthSuccess(authState, session),
+  );
   return (auth: auth, session: session, coordinator: coordinator);
 }
 

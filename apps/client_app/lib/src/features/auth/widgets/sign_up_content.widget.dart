@@ -5,7 +5,6 @@ import 'package:localization/localization.dart';
 
 import 'package:client_app/src/features/auth/auth_error.entity.dart';
 import 'package:client_app/src/features/auth/auth_validators.entity.dart';
-import 'package:client_app/src/features/auth/widgets/auth_error_banner.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_text_field.widget.dart';
 
 class SignUpContent extends StatefulWidget {
@@ -165,7 +164,7 @@ class _SignUpContentState extends State<SignUpContent> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (error != null) ...[
-                  AuthErrorBanner(message: error.message),
+                  StatusBanner(message: error.message),
                   const SizedBox(height: 12),
                 ],
                 PrimaryButton(

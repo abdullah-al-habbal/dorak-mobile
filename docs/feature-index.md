@@ -22,6 +22,11 @@
   - `gradient_overlay.widget.dart`
   - `hero_image.widget.dart` — local-asset-first image with remote override + `errorBuilder`
   - `swipe_navigation.widget.dart` — swipe-left/right gesture routing
+  - `status_view.widget.dart` — Track 12: empty / error / offline / retry (centred icon + title + message? + action?)
+  - `app_loader.widget.dart` — Track 12: `AppLoader.page()` full-page / `AppLoader.inline()` footer spinner
+  - `shimmer_box.widget.dart` — Track 12: animated skeleton primitive (hand-rolled, no package)
+  - `status_banner.widget.dart` — Track 12: compact inline message row (promoted from auth's `AuthErrorBanner`, used by login/sign-up/verify)
+  - `locale_switcher.widget.dart` — shrink-wrap `TextButton`, `label` + `onPressed` (the shared EN/AR toggle button; rendered identically by `OnboardingHeader` and auth's `AuthHeader`/entry)
 
 ### localization
 - Source of truth: `l10n/app_en.arb` (template) + `app_ar.arb` (Arabic). Every key exists in BOTH locales.
@@ -79,7 +84,7 @@
 ### Navigation & Launch Gate
 - `src/core/navigation/app.router.dart` — `AppRouter` (go_router): route table + redirects; success paths use `router.go('/home')`, which clears the stack.
 - `src/core/navigation/app_routes.entity.dart` — `AppRoutes` path constants.
-- `src/core/navigation/app_gate.entity.dart` — post-splash decision (`AppGate.decide`, wired as the router redirect): session first, onboarding flag second. See `docs/flows/app_launch.md`.
+- `src/core/navigation/app_gate.entity.dart` — post-splash decision (`AppGate.resolve`, a pure function called from `AppRouter._leaveSplash`): session first, onboarding flag second. See `docs/flows/app_launch.md`.
 
 ### Home
 - `home.screen.dart` — placeholder landing (`homeTitle`), real dashboard TBD. No logout affordance yet.
@@ -158,3 +163,20 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 ### Not Started
 - Password recovery (Stitch 010–014), Discovery Feed (016), Branch Floor Plan & Booking (017), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020).
 - `business_app` and `stylist_app` features — both apps are skeletons.
+
+### Backend routes for unbuilt features
+
+Recorded so nobody re-derives them from the Stitch HTML or invents a route.
+
+| Feature | Endpoint | Notes |
+|---|---|---|
+| Discovery Feed (016) | `GET /explore/branches` | **There is no `/client/discovery-feed`.** Requires `latitude`, `longitude`, `radius`, `universe`; accepts `per_page` (max 100), `catalog_item_ids[]`, `available_now`, `price_range{min,max}`, `rating_min`, `face_shape_compatible`. `clientId` is nullable — **guest-accessible**. Location permission is a prerequisite. |
+| Discovery preferences | `GET`/`PATCH /client/discovery-preferences` | A separate preferences resource, **not** the feed |
+| Stylist Profile (019) | `GET /explore/barbers`, `GET /explore/barbers/{barber}` | |
+| Branch detail (017) | `GET /explore/branches/{branch}`, `GET /branches/{branch}/floor-plan`, `GET /branches/{branch}/chairs` | |
+| Review & Rating (020) | `GET /branches/{branch}/reviews` | |
+
+Paginated collections all return the same envelope
+(`meta.pagination.{total,count,per_page,current_page,total_pages}`) and are
+consumed through `ApiClient.getPaginated` → `PaginatedData<T>` → `Paged<T>`.
+See `docs/state_management/pagination.md`.

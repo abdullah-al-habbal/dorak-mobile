@@ -547,6 +547,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get errorGeneric;
+
+  /// Retry action label for failed states
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get actionRetry;
+
+  /// Fallback error state title
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorTitleGeneric;
+
+  /// Offline state title
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline'**
+  String get errorTitleOffline;
+
+  /// Fallback empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get emptyTitleGeneric;
+
+  /// Fallback empty state message
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s nothing to show right now.'**
+  String get emptyMessageGeneric;
 }
 
 class _AppLocalizationsDelegate

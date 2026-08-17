@@ -309,5 +309,25 @@
   "errorGeneric": "Something went wrong. Please try again.",
   "@errorGeneric": {
     "description": "Fallback error message"
+  },
+  "actionRetry": "Try again",
+  "@actionRetry": {
+    "description": "Retry action label for failed states"
+  },
+  "errorTitleGeneric": "Something went wrong",
+  "@errorTitleGeneric": {
+    "description": "Fallback error state title"
+  },
+  "errorTitleOffline": "You're offline",
+  "@errorTitleOffline": {
+    "description": "Offline state title"
+  },
+  "emptyTitleGeneric": "Nothing here yet",
+  "@emptyTitleGeneric": {
+    "description": "Fallback empty state title"
+  },
+  "emptyMessageGeneric": "There's nothing to show right now.",
+  "@emptyMessageGeneric": {
+    "description": "Fallback empty state message"
   }
 }

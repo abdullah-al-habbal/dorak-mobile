@@ -26,9 +26,14 @@ Forbidden, without exception:
 - **Any `apps/*` import.** If core needs something from an app, the design is
   wrong: invert it with a callback or an abstract contract.
 
-Current third-party set: `dio`, `flutter_dotenv`, `json_annotation`,
-`flutter_secure_storage`, `shared_preferences`. Adding another needs a reason
-recorded in this file or in `docs/`.
+Current third-party set: `bloc`, `dio`, `equatable`, `flutter_dotenv`,
+`json_annotation`, `flutter_secure_storage`, `shared_preferences`. Adding
+another needs a reason recorded in this file or in `docs/`.
+
+`bloc` is **pure Dart** and is permitted here by
+[ADR 0001](../../docs/architecture/decisions/0001-bloc-in-core.md).
+`flutter_bloc` and `go_router` are **not** — the Flutter bindings and all
+routing stay in the app layer.
 
 ## 3. Allowed file roles here
 
@@ -88,6 +93,17 @@ removed in Phase 4. **Do not add `ChangeNotifier` state here.**
 Convention: success sets the owning bloc's signal for the router; failures land
 in `state.error` — screens map via `AuthError.from` (app layer). No Riverpod,
 Provider or GetIt anywhere.
+
+**The canonical contract is
+[`docs/state_management/conventions.md`](../../docs/state_management/conventions.md)** —
+Bloc/Event/State shape, `clearX` flags on every nullable field, loading vs
+submitting, retry, refresh, concurrency latches, and testing. Read it before
+adding or changing a bloc here.
+
+Pagination state uses `Paged<T>`
+(`lib/src/network/paged.entity.dart`) — an immutable value object with named
+transitions and **no public `copyWith`**. There is no generic `PaginationBloc`.
+See [`docs/state_management/pagination.md`](../../docs/state_management/pagination.md).
 
 ## 6. Verification
 

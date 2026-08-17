@@ -9,11 +9,13 @@ import 'package:localization/localization.dart';
 import 'package:client_app/src/features/auth/auth_error.entity.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_background.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
+import 'package:client_app/src/features/auth/widgets/auth_shell.widget.dart';
 import 'package:client_app/src/features/auth/widgets/login_content.widget.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthBloc auth;
   final VoidCallback onCreateAccount;
+  final VoidCallback? onLocaleToggle;
 
   final VoidCallback? onForgotPassword;
 
@@ -21,6 +23,7 @@ class LoginScreen extends StatefulWidget {
     super.key,
     required this.auth,
     required this.onCreateAccount,
+    this.onLocaleToggle,
     this.onForgotPassword,
   });
 
@@ -67,61 +70,47 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = DorakColors.of(context);
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: colors.background,
       body: Stack(
         children: [
           const Positioned.fill(child: AuthEntryBackground()),
-          SafeArea(
-            child: Column(
-              children: [
-                AuthHeader(
-                  brandLabel: l10n.splashTitle,
-                  backTooltip: l10n.back,
-                  onBack: () => context.pop(),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 24,
-                    ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 448),
-                        child: BlocBuilder<AuthBloc, AuthState>(
-                          bloc: widget.auth,
-                          builder: (context, state) {
-                            final error = state.error == null
-                                ? null
-                                : AuthError.from(
-                                    state.error!,
-                                    l10n,
-                                    unauthorizedMessage:
-                                        l10n.loginErrorInvalidCredentials,
-                                  );
-                            return LoginContent(
-                              titleAnimation: _staggeredAnimations[0],
-                              formAnimation: _staggeredAnimations[1],
-                              actionsAnimation: _staggeredAnimations[2],
-                              onSubmit: (email, password) => widget.auth
-                                  .add(LoginRequested(
-                                email: email,
-                                password: password,
-                              )),
-                              error: error,
-                              isSubmitting: state.isSubmitting,
-                              onForgotPassword: widget.onForgotPassword,
-                              onCreateAccount: widget.onCreateAccount,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          AuthShell(
+            header: AuthHeader(
+              brandLabel: l10n.splashTitle,
+              backTooltip: l10n.back,
+              onBack: () => context.pop(),
+              localeLabel:
+                  isArabic ? l10n.localeEnglish : l10n.localeArabic,
+              onLocaleToggle: widget.onLocaleToggle,
+            ),
+            child: BlocBuilder<AuthBloc, AuthState>(
+              bloc: widget.auth,
+              builder: (context, state) {
+                final error = state.error == null
+                    ? null
+                    : AuthError.from(
+                        state.error!,
+                        l10n,
+                        unauthorizedMessage:
+                            l10n.loginErrorInvalidCredentials,
+                      );
+                return LoginContent(
+                  titleAnimation: _staggeredAnimations[0],
+                  formAnimation: _staggeredAnimations[1],
+                  actionsAnimation: _staggeredAnimations[2],
+                  onSubmit: (email, password) => widget.auth.add(LoginRequested(
+                    email: email,
+                    password: password,
+                  )),
+                  error: error,
+                  isSubmitting: state.isSubmitting,
+                  onForgotPassword: widget.onForgotPassword,
+                  onCreateAccount: widget.onCreateAccount,
+                );
+              },
             ),
           ),
         ],

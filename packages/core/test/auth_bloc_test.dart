@@ -123,31 +123,63 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
-      'sendVerificationCode calls the dispatch route',
+      'a user-initiated resend reports progress and success',
       build: bloc,
       act: (bloc) => bloc.add(SendVerificationCodeRequested()),
-      expect: () => <AuthState>[],
+      expect: () => [
+        const AuthState(isSubmitting: true),
+        const AuthState(),
+      ],
       verify: (_) => expect(repository.sendVerificationCalls, 1),
     );
 
     blocTest<AuthBloc, AuthState>(
-      'a failed dispatch is swallowed without touching state',
+      'a failed resend surfaces the error instead of failing silently',
       build: () {
         repository.sendVerificationError = offline();
         return AuthBloc(repository, storage);
       },
       act: (bloc) => bloc.add(SendVerificationCodeRequested()),
-      expect: () => <AuthState>[],
+      expect: () => [
+        const AuthState(isSubmitting: true),
+        AuthState(error: offline()),
+      ],
+      verify: (bloc) {
+        expect(repository.sendVerificationCalls, 1);
+        expect(bloc.state.error, isNotNull);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'registration dispatches the code itself and stays non-blocking when it fails',
+      build: () {
+        repository.sendVerificationError = offline();
+        return AuthBloc(repository, storage);
+      },
+      act: (bloc) => bloc.add(const RegisterRequested(
+        name: 'Sara',
+        email: 'sara@example.com',
+        password: 'secret123',
+        passwordConfirmation: 'secret123',
+      )),
+      expect: () => [
+        const AuthState(isSubmitting: true),
+        const AuthState(
+          client: FakeAuthRepository.defaultClient,
+          signal: AuthSignal.registrationSucceeded,
+        ),
+      ],
       verify: (bloc) {
         expect(repository.sendVerificationCalls, 1);
         expect(bloc.state.error, isNull);
+        expect(storage.token, 'register-token');
       },
     );
   });
 
   group('signals', () {
     blocTest<AuthBloc, AuthState>(
-      'AuthSignalAcknowledged clears the current signal but keeps the client',
+      'AuthSignalAcknowledged clears both the signal and the client',
       build: bloc,
       act: (bloc) async {
         bloc.add(const RegisterRequested(
@@ -165,9 +197,17 @@ void main() {
           client: FakeAuthRepository.defaultClient,
           signal: AuthSignal.registrationSucceeded,
         ),
-        const AuthState(client: FakeAuthRepository.defaultClient),
+        const AuthState(),
       ],
-      verify: (bloc) => expect(bloc.state.signal, AuthSignal.none),
+      verify: (bloc) {
+        expect(bloc.state.signal, AuthSignal.none);
+        expect(
+          bloc.state.client,
+          isNull,
+          reason: 'a stale client must not survive to re-authenticate a '
+              'session that has since expired or been logged out',
+        );
+      },
     );
   });
 }

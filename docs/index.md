@@ -433,20 +433,31 @@ packages/core
 
 ## Track 06 — Session Management
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
 Objectives:
 
 * Session restoration. — `DONE` (`SessionBloc` `RestoreRequested`, probed via
-  `POST /client/refresh-token`; the backend has no `GET /client/me`)
-* Session expiration. — `DONE`. A dead token is detected on cold start, and —
-  since Track 12 — mid-session revocation is caught by `AuthInterceptor` and
-  redirected to auth (`docs/core/session.md`, `docs/core/interceptors.md`).
+  `POST /client/refresh-token`; the backend has no `GET /client/me`).
+  A storage read failure fails safe to `guest` and always resolves `ready`, so
+  the splash cannot hang.
+* Session expiration. — `DONE`. A dead token is detected on cold start;
+  mid-session revocation is caught by `AuthInterceptor` and redirected to auth
+  (`docs/core/session.md`, `docs/core/interceptors.md`). One 401 burst produces
+  exactly one expiration and one redirect, and clears the cached client.
 * Logout. — `DONE` (`SessionBloc` `LogoutRequested`; no UI affordance yet)
-* Authentication state. — `DONE` (`AuthStatus`)
+* Authentication state. — `DONE` (`AuthStatus` + `SessionSignal`)
 * Token lifecycle. — `DONE` (issue, rotate on restore, clear on 401/logout)
 
-Documentation: `docs/core/session.md`.
+**Evidence.** 63 tests in `packages/core` and 27 in `apps/client_app`;
+`session_bloc_test.dart` covers the full restore matrix (no token / valid /
+401 / 403 / offline / server error / unreadable storage), the expiry and burst
+paths, client discard, and the anti-resurrection guard.
+`session_expired_test.dart` covers the end-to-end replace-vs-push contract and
+that a failed sign-in after expiry leaves the session `guest`.
+`dart run melos run verify` exits 0.
+
+Documentation: `docs/core/session.md`, `docs/navigation/guards.md`.
 
 Implementation target:
 
@@ -513,15 +524,39 @@ packages/core/network
 
 Objectives:
 
-* Establish one canonical state-management architecture.
-* Async state conventions.
-* Loading.
-* Success.
-* Empty.
-* Error.
-* Refresh.
-* Pagination.
-* Background operations.
+* Establish one canonical state-management architecture. — `DONE` (Pure Bloc;
+  `packages/core` uses pure `bloc` by ADR 0001, `apps/*` use `flutter_bloc`)
+* Async state conventions. — `DONE` (`docs/state_management/conventions.md`,
+  `async_state.md`)
+* Loading. — `DONE` (`isLoading` = reading, `isSubmitting` = user-initiated
+  write; initial ≠ loading ≠ empty)
+* Success. — `DONE` (absence of `error` plus data; no separate flag)
+* Empty. — `DONE` (`success && data.isEmpty`, never rendered as an error)
+* Error. — `DONE`. Failures land in `state.error`; blocs never rethrow; the app
+  localizes via `AuthError.from` — a backend `message` is never rendered.
+* Refresh. — `DONE` (`docs/state_management/refresh.md`; first-load vs
+  load-more vs refresh, and refresh vs filter change)
+* Pagination. — `IN_PROGRESS`. The `Paged<T>` contract exists in
+  `packages/core/lib/src/network/` and is covered by `paged_test.dart`, but
+  **no feature consumes it yet**. It stays `IN_PROGRESS` until Discovery (016)
+  validates it. If 016 finds it does not fit, change `Paged<T>` rather than
+  working around it.
+* Background operations. — `PENDING`, deliberately undocumented. Nothing in
+  Dorak performs background work; writing a contract for it would be fiction.
+  `docs/state_management/background_operations.md` stays empty until Track 13
+  creates something real.
+
+Also carried by this track:
+
+* `ApiClient.getPaginated` now validates the envelope like every other verb — a
+  `success: false` body no longer returns a successful empty page.
+* `OnboardingConfigBloc` retry guard fixed: a failed config load can be retried
+  for the same locale.
+* `LocaleBloc` keeps `Bloc<LocaleEvent, Locale>` under the documented
+  single-value-state exemption (`conventions.md` §1a), now covered by tests.
+* `bloc_concurrency` is **deliberately not a dependency** — the concurrency
+  convention is written down; the package arrives with its first real consumer
+  (`restartable()` for Discovery's search field).
 
 Implementation targets:
 
@@ -565,7 +600,7 @@ Objectives:
   `app.router.dart` (`AppRouter`) + `app_routes.entity.dart`. Navigator 1.0
   and `.navigator.dart` coordinators were **removed in Phase 2**.
 * Nested navigation. — `PENDING`
-* Authentication guards. — `PARTIAL`. The launch gate (`AppGate.decide`,
+* Authentication guards. — `PARTIAL`. The launch gate (`AppGate.resolve`,
   installed as the router redirect) guards entry into the app; there are no
   per-route guards.
 * Guest guards. — `PENDING`
@@ -585,31 +620,36 @@ apps/*/src/core/navigation/
 
 ## Track 12 — Global UI States
 
-**Status:** `IN_PROGRESS`
-
-This track's current task — the `session_expired` and `authentication_required`
-states plus the 401 wiring — is `DONE` (see `docs/core/interceptors.md`,
-`docs/core/session.md`, `docs/navigation/guards.md`). The remaining states below
-are still pending.
+**Status:** `IN_PROGRESS` — the state components exist and are tested
+(`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner`), but only
+`StatusBanner` has production consumers today. The track stays `IN_PROGRESS`
+until Discovery 016 consumes the other three; if 016 finds a component does
+not fit, change the component, do not work around it.
 
 Objectives:
 
 Implement reusable:
 
-* Full-page loading. — `PENDING`
-* Inline loading. — `PENDING`
-* Button loading. — `PENDING`
-* Shimmer. — `PENDING`
-* Empty. — `PENDING`
-* Error. — `PENDING`
-* Offline. — `PENDING`
-* Retry. — `PENDING`
+* Full-page loading. — `DONE` (`AppLoader.page()` — `docs/design_system/components/loading/fullscreen.md`)
+* Inline loading. — `DONE` (`AppLoader.inline()` — `docs/design_system/components/loading/inline.md`)
+* Button loading. — `DONE` (`PrimaryButton.isLoading` — was already implemented and used by every auth form; the earlier `PENDING` status was a recording error. `SecondaryButton` deliberately has no `isLoading` — no consumer needs it)
+* Shimmer. — `DONE` (`ShimmerBox`, hand-rolled, no package — `docs/design_system/components/shimmer/text.md`)
+* Empty. — `DONE` (`StatusView` — `docs/design_system/states/empty.md`)
+* Error. — `DONE` (`StatusView` full-page, `StatusBanner` inline; `AuthError.from` stays in the app — `docs/design_system/states/network_error.md`)
+* Offline. — `DONE` (presentation variant of error; no connectivity package — `docs/design_system/states/offline.md`)
+* Retry. — `DONE` (an action on `StatusView`/`StatusBanner`, not a widget — `docs/design_system/states/retry.md`)
 * Session expired. — `DONE` (401/403 on an authenticated request →
   `ApiClient.unauthorizedStream` → `SessionBloc.add(UnauthorizedDetected())` →
   auth entry)
 * Authentication required. — `DONE` (guest action adds `RequireAuthentication`
-  → auth entry pushed on top)
-* Permission required. — `PENDING`
+  → auth entry pushed on top; mechanism tested, **nothing in production
+  dispatches it yet** — first producer will be Discovery 016)
+* Permission required. — `PENDING` **deferred deliberately**: no permission
+  mechanism exists in the workspace (no `permission_handler`, `geolocator`, or
+  `connectivity_plus`) and there is no consumer. Ownership is open between
+  Tracks 13/14 (see `docs/stitch/exports/016_discovery_feed/plan.md` §22);
+  016's location-permission needs will trigger it. Do not build a permission
+  visual without a mechanism.
 
 Implementation targets:
 
@@ -618,6 +658,8 @@ packages/core     # ApiClient.unauthorizedStream + SessionBloc signals
 apps/*            # AppRouter listener redirects to /auth on sessionExpired
 packages/design_system
 ```
+
+Order change: Track 12 runs before Tracks 05 and 10 — [ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
 
 ---
 
@@ -841,19 +883,76 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** `Track 12 — Global UI States`
+**Current Track:** `Track 12 — Global UI States` — components built and tested
+(`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner`), track stays
+`IN_PROGRESS` until Discovery 016 validates them. Order change vs Tracks 05/10:
+[ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
 
-**Current Task:** Done. The `session_expired` and `authentication_required`
-global states are implemented and the 401 interceptor wiring redirects a
-revoked token to auth instead of throwing at the call site — closing the open
-item on Track 06. See `docs/core/interceptors.md`, `docs/core/session.md`,
-`docs/navigation/guards.md`, and `app.router.dart`.
+**Current Task:** Locale switcher standardization — complete. A shared
+`LocaleSwitcher` widget now lives in `design_system` (14th widget,
+string-parameterised), `OnboardingHeader` delegates to it, and the auth flow
+auth entry / login / register / verify screens gained the same switcher via
+`AuthHeader` (balanced 64 px slots) and a top-end overlay. Wired through the
+existing `LocaleBloc`/`LocaleToggled` — no new keys, no architecture change.
+4 new `client_app` tests + 2 `design_system` tests; full suite 129 green.
 
-Tracks 05, 06, 10, 11 and 16 are `IN_PROGRESS` with their remaining objectives
-listed inline above. The auth + onboarding launch flow is delivered end to end:
-see `docs/flows/app_launch.md`.
+**Current Task:** Choose the next track. Track 12 delivered the state
+components Track 09's `Paged<T>` contract needed:
 
-The agent MUST NOT skip directly to feature implementation.
+* `StatusBanner` — promoted from `AuthErrorBanner` (login / sign-up / verify
+  are the live consumers; string-parameterised, zero localization/core imports)
+* `AppLoader.page()` / `AppLoader.inline()` — full-page and inline loading
+* `StatusView` — the single empty / error / offline / retry layout
+* `ShimmerBox` — hand-rolled shimmer primitive (no package)
+* 5 ARB fallback keys × 2 locales (`actionRetry`, `errorTitleGeneric`,
+  `errorTitleOffline`, `emptyTitleGeneric`, `emptyMessageGeneric`)
+* First real `design_system` widget tests (11 new; total 12 in the package)
+* Permission-required deferred with its reason recorded (owner Tracks 13/14,
+  trigger 016)
+
+**Candidates, in dependency order.** Discovery (016) needs *both* of the first
+two, so neither can be skipped by starting the feature:
+
+* `Track 05 — Storage` — cache strategy, the last unblocked objective.
+* `Track 10 — Dependency Injection & Bootstrap` — application lifecycle, the
+  last objective.
+* `Track 16 — Authentication` — password recovery (Stitch 011–014), the only
+  remaining auth work.
+
+Track 18 / Discovery 016 additionally needs location-permission plumbing and
+feed DTOs, neither of which exists.
+
+**Just completed — post-migration hardening.** The Pure Bloc + go_router
+migration was verified end to end and three defects were fixed that the green
+suite did not catch:
+
+1. **Session resurrection.** The app-layer coordinator fired on
+   `authState.client != null`, and `AuthState.client` was never cleared. A
+   failing sign-in *after* an expiry re-authenticated the session on its
+   `isSubmitting` emission. Coordination now keys on
+   `AuthSignal.loginSucceeded | registrationSucceeded` via
+   `auth_coordination.entity.dart`, acknowledgement clears the client, and
+   `SessionAuthenticated` is refused while `sessionExpired` is in flight.
+2. **Splash hang.** A throwing `TokenStorage.read()` left the status `unknown`,
+   so `ready` never completed and the splash never ended. Restore now fails safe
+   to `guest`.
+3. **`copyWith(client: null)` was a silent no-op** on `SessionState`,
+   `AuthState` and `OnboardingConfigState`. All three now take explicit
+   `clearClient` / `clearConfig` flags.
+
+Also: a user-initiated resend now surfaces its error instead of failing
+silently (registration's own dispatch stays non-blocking), the
+`registrationSucceeded → resend → acknowledge` event-order race is gone, and
+one 401 burst now produces exactly one expiration and one redirect.
+
+Tracks 05, 09, 10, 11, 12 and 16 remain `IN_PROGRESS` with their remaining
+objectives listed inline above. Architecture deviations are recorded as
+[ADR 0001](./architecture/decisions/0001-bloc-in-core.md),
+[ADR 0002](./architecture/decisions/0002-design-system-go-router.md) and
+[ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
+
+The agent MUST NOT skip directly to feature implementation, and MUST NOT begin
+Stitch 010–020 — those `plan.md` files stay untouched until their Track opens.
 
 ---
 

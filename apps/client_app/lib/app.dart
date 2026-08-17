@@ -10,6 +10,7 @@ import 'package:localization/localization.dart';
 import 'package:client_app/src/core/locale/locale.bloc.dart';
 import 'package:client_app/src/core/locale/locale.event.dart';
 import 'package:client_app/src/core/navigation/app.router.dart';
+import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
 
@@ -66,11 +67,9 @@ class _DorakAppState extends State<DorakApp> {
       OnboardingConfigLoadRequested(localeCode: _localeBloc.state.languageCode),
     );
 
-    _authCoordinatorSubscription = _authBloc.stream.listen((authState) {
-      final client = authState.client;
-      if (client == null) return;
-      _sessionBloc.add(SessionAuthenticated(client));
-    });
+    _authCoordinatorSubscription = _authBloc.stream.listen(
+      (authState) => coordinateAuthSuccess(authState, _sessionBloc),
+    );
 
     _unauthorizedSubscription = _apiClient.unauthorizedStream.listen((_) {
       _sessionBloc.add(UnauthorizedDetected());

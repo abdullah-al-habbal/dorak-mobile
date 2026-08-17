@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:design_system/src/tokens/tokens.barrel.dart';
+import 'package:design_system/src/widgets/locale_switcher.widget.dart';
 import 'package:design_system/src/widgets/skip_button.widget.dart';
 
 class OnboardingHeader extends StatelessWidget {
@@ -54,16 +55,9 @@ class OnboardingHeader extends StatelessWidget {
           Row(
             children: [
               if (localeLabel != null && onLocaleToggle != null)
-                TextButton(
-                  onPressed: onLocaleToggle,
-                  style: TextButton.styleFrom(
-                    foregroundColor: colors.primary,
-                    textStyle: DorakTypography.labelLg,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(localeLabel!),
+                LocaleSwitcher(
+                  label: localeLabel!,
+                  onPressed: onLocaleToggle!,
                 ),
               SkipButton(
                 label: skipLabel,

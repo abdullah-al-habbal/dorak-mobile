@@ -6,10 +6,16 @@ class InMemoryTokenStorage implements TokenStorage {
   int writeCount = 0;
   int clearCount = 0;
 
+  Object? readError;
+
   InMemoryTokenStorage([this.token]);
 
   @override
-  Future<String?> read() async => token;
+  Future<String?> read() async {
+    final error = readError;
+    if (error != null) throw error;
+    return token;
+  }
 
   @override
   Future<void> write(String value) async {

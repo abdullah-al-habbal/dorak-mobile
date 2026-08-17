@@ -309,5 +309,25 @@
   "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   "@errorGeneric": {
     "description": "Fallback error message"
+  },
+  "actionRetry": "حاول مرة أخرى",
+  "@actionRetry": {
+    "description": "Retry action label for failed states"
+  },
+  "errorTitleGeneric": "حدث خطأ ما",
+  "@errorTitleGeneric": {
+    "description": "Fallback error state title"
+  },
+  "errorTitleOffline": "أنت غير متصل بالإنترنت",
+  "@errorTitleOffline": {
+    "description": "Offline state title"
+  },
+  "emptyTitleGeneric": "لا يوجد شيء هنا بعد",
+  "@emptyTitleGeneric": {
+    "description": "Fallback empty state title"
+  },
+  "emptyMessageGeneric": "لا يوجد شيء لعرضه حالياً.",
+  "@emptyMessageGeneric": {
+    "description": "Fallback empty state message"
   }
 }

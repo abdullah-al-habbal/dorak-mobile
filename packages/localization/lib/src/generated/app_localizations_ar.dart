@@ -244,4 +244,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get actionRetry => 'حاول مرة أخرى';
+
+  @override
+  String get errorTitleGeneric => 'حدث خطأ ما';
+
+  @override
+  String get errorTitleOffline => 'أنت غير متصل بالإنترنت';
+
+  @override
+  String get emptyTitleGeneric => 'لا يوجد شيء هنا بعد';
+
+  @override
+  String get emptyMessageGeneric => 'لا يوجد شيء لعرضه حالياً.';
 }

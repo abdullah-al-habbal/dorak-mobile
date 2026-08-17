@@ -9,7 +9,7 @@ Parent: [`../../AGENTS.md`](../../AGENTS.md) · Rules: [`CLAUDE.md`](./CLAUDE.md
 ## 1. Layout
 
 ```
-lib/design_system.dart              root barrel — tokens + theme + 9 widgets
+lib/design_system.dart              root barrel — tokens + theme + 14 widgets
 lib/src/tokens/
   colors.token.dart                 DorakColors
   typography.token.dart             DorakTypography
@@ -17,7 +17,7 @@ lib/src/tokens/
   tokens.barrel.dart
 lib/src/theme/
   dorak_theme.theme.dart            DorakTheme
-lib/src/widgets/                    9 widgets, one class each
+lib/src/widgets/                    14 widgets, one class each
 fonts/                              IBM Plex Sans + Arabic, 4 weights each
 ```
 
@@ -94,11 +94,16 @@ forces `radiusFull` on `elevatedButtonTheme`.
 | `HeroImage` | `image`, `opacity`, `errorBuilder?` |
 | `GradientOverlay` | — |
 | `SwipeNavigation` | `child`, `onSwipeRight?`, `onSwipeLeft?`, `velocityThreshold` |
+| `StatusView` | `icon`, `title`, `message?`, `actionLabel?`, `onAction?`, `iconColor?` |
+| `AppLoader` | `.page()` 32px centred and expanding · `.inline({size = 20})` shrink-wrapped |
+| `ShimmerBox` | `width`, `height`, `borderRadius?` — animated skeleton primitive |
+| `StatusBanner` | `message`, `color?` (defaults to `colors.error`), `actionLabel?`, `onAction?` |
 
 Notes:
 
 - `PrimaryButton` is the **only** button with `isLoading` (20 px spinner
-  replacing the label). `SecondaryButton` has none — wrap it yourself if needed.
+  replacing the label). `SecondaryButton` deliberately has none — no consumer
+  has a loading secondary action yet; wrap it if that ever changes.
 - Buttons are full-width pills with `radiusFull` and 16 px vertical padding.
   Label only — no trailing icons by default.
 - `SkipButton` is a borderless shrink-wrapped `TextButton`
@@ -111,13 +116,27 @@ Notes:
   the caller does, then renders this as the sheet body.
 - `HeroImage` takes an `ImageProvider`, not a URL. Asset-vs-network selection is
   the caller's job.
+- `StatusView` is the single layout for empty / error / offline / retry — a
+  centered icon, title, optional message and optional full-width action
+  (`PrimaryButton`). Feature copy is the caller's ARB strings; no strings live
+  here.
+- `AppLoader.page()` fills and centres — full-page loading; `AppLoader.inline()`
+  shrink-wraps — list footers.
+- `ShimmerBox` is a hand-rolled `AnimationController` + `LinearGradient` +
+  `ShaderMask` sweep (~40 lines, no `shimmer` package). It is the only animated
+  state primitive; skeleton compositions are future compositions of it.
+- `StatusBanner` is the promoted `AuthErrorBanner` (client_app §9 note). It is
+  the compact inline message row under form actions, with an optional trailing
+  text action.
 
 ## 5. Missing — do not assume these exist
 
 No text field, password field, OTP input, checkbox, radio, switch, select,
 search, phone or email input. No app bar, dialog, snackbar, toast, chip, card,
-list item, avatar, tab, shimmer. No empty/error/offline/retry/session-expired/
-authentication-required state widgets. No loading overlay.
+list item, avatar, tab. No permission-required state widget — there is no
+permission mechanism in the workspace and Track 12 defers it (owner: Tracks
+13/14, triggered by 016). No precision skeleton compositions for card/list/
+profile shimmer — those are compositions of `ShimmerBox`.
 
 `docs/design_system/components/**` contains ~125 markdown specs for these —
 **all 0 bytes**. They are Track 15 placeholders, not designs.
@@ -151,6 +170,8 @@ authentication-required state widgets. No loading overlay.
 
 ## 8. Tests
 
-`test/design_system_test.dart` is a placeholder (`expect(true, isTrue)`).
-There are no golden tests. Real coverage of these widgets comes from
-`client_app`'s widget tests.
+`test/` holds 14 widget tests: `locale_switcher_test.dart` (2),
+`status_banner_test.dart` (3), `status_view_test.dart`
+(4), `app_loader_test.dart` (2), `shimmer_box_test.dart` (2), plus the original
+`design_system_test.dart` placeholder. There are no golden tests. Real usage
+coverage of the button/header widgets comes from `client_app`'s widget tests.

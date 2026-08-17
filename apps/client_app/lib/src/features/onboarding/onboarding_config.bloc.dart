@@ -16,7 +16,10 @@ class OnboardingConfigBloc extends Bloc<OnboardingConfigEvent, OnboardingConfigS
     OnboardingConfigLoadRequested event,
     Emitter<OnboardingConfigState> emit,
   ) async {
-    if (state.localeCode == event.localeCode) return;
+    final sameLocale = state.localeCode == event.localeCode;
+    final alreadyLoaded = state.config != null && state.error == null;
+    if (sameLocale && (state.isLoading || alreadyLoaded)) return;
+
     emit(state.copyWith(
       localeCode: event.localeCode,
       isLoading: true,

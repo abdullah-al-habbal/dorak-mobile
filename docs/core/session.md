@@ -56,11 +56,30 @@ AuthState {                    // AuthBloc — active auth actions
 join the in-flight restore instead of firing a second one. Re-adding
 `RestoreRequested` after `ready` would run the probe again — don't.
 
-`SessionBloc` and `AuthBloc` are **independent**. The app layer coordinates
-them: it listens to the auth stream and dispatches `SessionAuthenticated`
-(`status: authenticated`, same `client`) when an auth action succeeds. A
-duplicate `SessionAuthenticated` for an already-authenticated client is a
+`SessionBloc` and `AuthBloc` are **independent**. The app layer coordinates them
+through `coordinateAuthSuccess`
+(`apps/client_app/lib/src/core/session/auth_coordination.entity.dart`), used by
+both `DorakApp` and the test harness so the two cannot drift.
+
+It fires on **`AuthSignal.loginSucceeded` / `registrationSucceeded` only** —
+never on "the state happens to carry a client". That distinction is the fix for
+a real defect: `AuthState.client` persists across emissions, so a trigger of
+`client != null` re-authenticated the session on the `isSubmitting: true`
+emission of a *later, failing* login attempt. Two guards now make that
+impossible:
+
+- `AuthSignalAcknowledged` clears the client as well as the signal, so no stale
+  client survives the navigation that consumed the signal;
+- `SessionAuthenticated` is ignored while a `sessionExpired` signal is
+  in flight or unacknowledged.
+
+A duplicate `SessionAuthenticated` for an already-authenticated client is a
 no-op.
+
+**Listener order matters.** `DorakApp.initState` subscribes the coordinator
+*before* constructing `AppRouter`. Broadcast listeners run in subscription
+order, so the session is updated before the router navigates and acknowledges.
+`test/helpers/fakes.dart` (`sessionPair`) preserves the same order.
 
 ## Restoration
 
@@ -71,12 +90,20 @@ Validity is checked by rotating the token through
 ```text
 token = await tokenStorage.read()
 
+read() throws            -> guest  (error recorded)   <- fail-safe
 token == null            -> guest
 refreshToken() succeeds  -> persist rotated token, authenticated
   ApiException 401/403   -> clear token, guest
   NetworkException       -> authenticated  (token kept)
   other ApiException     -> authenticated  (token kept)
 ```
+
+**`_onRestore` must always leave `AuthStatus.unknown`.** `ready` completes only
+when the status resolves, and `AppRouter._leaveSplash` awaits `ready` — so a
+handler that exits with the status still `unknown` hangs the splash forever with
+no error shown. `flutter_secure_storage` can throw on Android (keystore
+failures), so the read is guarded and the accumulator is seeded to `guest`
+before any I/O: an unreadable token is not an authenticated session.
 
 The transport-failure branch is deliberate: Sanctum tokens have **no
 server-side expiry** (`SANCTUM_EXPIRATION` is unset), so an unreachable server
@@ -97,9 +124,18 @@ emit the success state + signal, or emit `error` on failure. Screens observe
 `LogoutRequested` (on `SessionBloc`) is the exception: it swallows the network
 failure, always clears local storage, and emits a fresh `guest` state.
 
-`SendVerificationCodeRequested` (on `AuthBloc`) swallows errors — registration
-already succeeded and the token is stored; a failed dispatch must not block the
-verify screen, which has Resend.
+Verification-code dispatch has **two paths with different error semantics**:
+
+- **During registration**, `_onRegister` awaits `sendEmailVerification()` itself
+  and swallows any failure — registration already succeeded and the token is
+  stored, so a failed dispatch must not block the verify screen. This is done
+  inside the handler, not by the router dispatching a second event, because two
+  events of different types are processed concurrently and the ordering against
+  `AuthSignalAcknowledged` would not be guaranteed.
+- **A user-initiated `SendVerificationCodeRequested`** (the Resend button) runs
+  through `_run` like any other action: `isSubmitting` toggles and a failure
+  lands in `state.error` so the screen can show it. A resend that fails
+  silently is a defect.
 
 `RegisterRequested` requires `passwordConfirmation` — the backend applies
 Laravel's `confirmed` rule and rejects the request without it.

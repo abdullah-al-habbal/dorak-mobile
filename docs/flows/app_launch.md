@@ -30,7 +30,7 @@ No post-frame push.
 ## The gate
 
 `SplashScreen` holds for 2500 ms and then advances via the router. The gate
-itself is `AppGate.decide`
+itself is `AppGate.resolve`
 (`apps/client_app/lib/src/core/navigation/app_gate.entity.dart`), invoked from
 `AppRouter._redirect`.
 

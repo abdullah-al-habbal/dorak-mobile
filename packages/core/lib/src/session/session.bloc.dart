@@ -25,6 +25,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final TokenStorage _tokenStorage;
 
   Future<void>? _restoration;
+  bool _expiring = false;
 
   Future<void> get ready => _restoration ??= _restoreUntilResolved();
 
@@ -32,6 +33,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     SessionAuthenticated event,
     Emitter<SessionState> emit,
   ) {
+    if (_expiring || state.signal == SessionSignal.sessionExpired) return;
     if (state.status == AuthStatus.authenticated &&
         state.client == event.client) {
       return;
@@ -65,12 +67,10 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
       clearError: true,
       signal: SessionSignal.none,
     ));
-    var next = state;
+    var next = state.copyWith(status: AuthStatus.guest, clearClient: true);
     try {
       final stored = await _tokenStorage.read();
-      if (stored == null) {
-        next = state.copyWith(status: AuthStatus.guest);
-      } else {
+      if (stored != null) {
         try {
           final rotated = await _repository.refreshToken();
           if (rotated.isNotEmpty) {
@@ -82,12 +82,21 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
         } on ApiException catch (e) {
           if (e.isUnauthorized || e.isForbidden) {
             await _tokenStorage.clear();
-            next = state.copyWith(status: AuthStatus.guest);
+            next = state.copyWith(
+              status: AuthStatus.guest,
+              clearClient: true,
+            );
           } else {
             next = state.copyWith(status: AuthStatus.authenticated, error: e);
           }
         }
       }
+    } catch (e) {
+      next = state.copyWith(
+        status: AuthStatus.guest,
+        clearClient: true,
+        error: e,
+      );
     } finally {
       emit(next.copyWith(isLoading: false));
     }
@@ -126,17 +135,19 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     UnauthorizedDetected event,
     Emitter<SessionState> emit,
   ) async {
-    if (state.signal == SessionSignal.sessionExpired) return;
-    emit(state.copyWith(signal: SessionSignal.sessionExpired));
+    if (_expiring || state.signal == SessionSignal.sessionExpired) return;
+    _expiring = true;
     Object? error;
     try {
       await _tokenStorage.clear();
     } catch (e) {
       error = e;
+    } finally {
+      _expiring = false;
     }
     emit(state.copyWith(
       status: AuthStatus.guest,
-      client: null,
+      clearClient: true,
       isLoading: false,
       error: error,
       signal: SessionSignal.sessionExpired,

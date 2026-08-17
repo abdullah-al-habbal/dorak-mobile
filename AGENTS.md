@@ -35,8 +35,8 @@ child contradicts nothing, the parent still applies.
 | `apps/business_app` | [`AGENTS`](./apps/business_app/AGENTS.md) · [`CLAUDE`](./apps/business_app/CLAUDE.md) | `flutter create` stub |
 | `apps/stylist_app` | [`AGENTS`](./apps/stylist_app/AGENTS.md) · [`CLAUDE`](./apps/stylist_app/CLAUDE.md) | `flutter create` stub |
 | `packages/core` | [`AGENTS`](./packages/core/AGENTS.md) · [`CLAUDE`](./packages/core/CLAUDE.md) | HTTP, config, storage, session, DTOs |
-| `packages/design_system` | [`AGENTS`](./packages/design_system/AGENTS.md) · [`CLAUDE`](./packages/design_system/CLAUDE.md) | tokens, theme, fonts, 9 widgets |
-| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 75 keys, EN + AR |
+| `packages/design_system` | [`AGENTS`](./packages/design_system/AGENTS.md) · [`CLAUDE`](./packages/design_system/CLAUDE.md) | tokens, theme, fonts, 14 widgets |
+| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 80 keys, EN + AR |
 | `packages/feature_floor_plan` | [`AGENTS`](./packages/feature_floor_plan/AGENTS.md) · [`CLAUDE`](./packages/feature_floor_plan/CLAUDE.md) | empty stub |
 
 Read the child for the unit you are touching **before** editing it. If you touch
@@ -52,6 +52,10 @@ These are the only docs with content:
 ```
 docs/index.md                            docs/feature-index.md
 docs/architecture/coding_conventions.md  docs/state_management/pagination.md
+docs/state_management/index.md           docs/state_management/conventions.md
+docs/state_management/async_state.md     docs/state_management/refresh.md
+docs/architecture/decisions/0001-bloc-in-core.md
+docs/architecture/decisions/0002-design-system-go-router.md
 docs/core/networking.md                  docs/core/interceptors.md
 docs/core/exceptions.md                  docs/core/result_state.md
 docs/core/storage.md                     docs/core/session.md
@@ -248,6 +252,29 @@ declare `shared_preferences` themselves.
 
 ### Session — `packages/core/lib/src/session/`
 
+**The canonical state contract is
+[`docs/state_management/conventions.md`](./docs/state_management/conventions.md)** —
+Bloc/Event/State shape, `clearX` on every nullable field, loading vs submitting,
+retry, refresh, pagination, concurrency latches, repository boundaries, and the
+bloc/navigation separation. Read it before adding or changing any bloc.
+
+Two conventions that are easy to get wrong and are already enforced by tests:
+
+* **`copyWith` needs an explicit `clearX` flag for every nullable field.**
+  `field ?? this.field` makes `null` unsettable — that shipped once as a session
+  that resurrected itself after expiry.
+* **Bloc's default event transformer is `concurrent()`.** A handler that can
+  emit before its first `await` guards on state and must emit first; a handler
+  that must await first needs a synchronous bool latch (`SessionBloc._expiring`).
+  Cancellation belongs to `bloc_concurrency.restartable()`, which is
+  **deliberately not a dependency yet** — it arrives with its first consumer.
+
+Pagination state is `Paged<T>` (`packages/core/lib/src/network/paged.entity.dart`):
+an immutable value object with named transitions (`loadingFirst`, `loadingMore`,
+`refreshing`, `succeeded`, `failed`, `reset`) and **no public `copyWith`**, so a
+feature bloc cannot get append-versus-replace wrong. There is no generic
+`PaginationBloc`. It has no consumer yet — Discovery (016) will be the first.
+
 The session aggregate is two pure `bloc`s (no Flutter dependency), both over
 `AuthRepository` + `TokenStorage`:
 
@@ -299,7 +326,7 @@ Unauthorized: `ApiClient` owns a broadcast `unauthorizedStream` (fires once per
 |---|---|
 | `app.router.dart` | `AppRouter` — the `go_router` route table + redirects |
 | `app_routes.entity.dart` | route path constants (`/`, `/auth`, `/onboarding`, `/home`) |
-| `app_gate.entity.dart` | `AppGate.decide` — the post-splash branch, exposed as a router redirect |
+| `app_gate.entity.dart` | `AppGate.resolve` — the post-splash branch, a pure function called from `AppRouter._leaveSplash` |
 
 Screens receive callbacks only. They never know their neighbours. Bloc never
 navigates: navigation happens through the router, driven by state via
@@ -308,7 +335,7 @@ redirects. **Routing lives in the router, never in a screen or a bloc.**
 ### The launch gate
 
 ```
-Splash (2500 ms) -> AppGate.decide (installed as a router redirect)
+Splash (2500 ms) -> AppGate.resolve (called from AppRouter._leaveSplash)
   await session.ready
   A. session.isAuthenticated        -> /home
   B. preferences.dontShowOnboarding -> /home
@@ -334,8 +361,8 @@ Authentication always outranks the onboarding flag.
 
 | Area | Where |
 |---|---|
-| Design tokens, theme, 9 shared widgets | `packages/design_system` |
-| Localization EN + AR, 75 keys, RTL | `packages/localization` |
+| Design tokens, theme, 14 shared widgets | `packages/design_system` |
+| Localization EN + AR, 80 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
 | Session lifecycle | `packages/core/lib/src/session` |
@@ -361,8 +388,11 @@ Authentication always outranks the onboarding flag.
 - Locale persistence. The toggle is in-memory and resets on restart.
 - `business_app` / `stylist_app` features. Both are untouched counter stubs
   with no workspace package dependencies.
-- Design-system inputs, cards, chips, dialogs, app bars, shimmer, empty/error
-  states. Track 15 — **only the 9 widgets in §10 exist**.
+- Design-system inputs, cards, chips, dialogs, app bars. Session-expired and
+  authentication-required flows exist (Track 06/11), and Track 12 added the
+  loading/empty/error/offline/retry state widgets — **consumed only by auth
+  (`StatusBanner`); the rest await Discovery 016**. Track 15 covers inputs,
+  cards, chips, dialogs — **only the 14 widgets in §10 exist**.
 
 ---
 
@@ -430,7 +460,7 @@ before "simplifying" any of them.**
 | `Wrap` instead of `Row` in the auth footers | The prompt + link overflow a narrow screen once Arabic or a large text scale widens them. |
 | `SizedBox(height: 24)` around the verify error banner | Reserved height stops the button jumping when an error appears. |
 | `OtpInputField` drives focus from `onChanged`, with `onKeyEvent` as an extra | Soft-keyboard deletions arrive on the text-input channel, not the key channel, so backspace-on-empty cannot be observed there. |
-| `AuthHeader`'s trailing `SizedBox(width: 48)` | Balances the leading `IconButton` so the brand stays optically centred. |
+| `AuthHeader`'s trailing `SizedBox(width: 64)` + `FittedBox` | Balances the leading `IconButton` so the brand stays optically centred; the right slot hosts the shared `LocaleSwitcher` (scale-down) and mirrors the back button's 64 px width. |
 | `_discardBody` parser on logout/verify | Those endpoints answer 200 with no `data` key; there is nothing to decode. |
 | `restore()` keeps the session on `NetworkException` | Sanctum tokens have no server-side expiry, so an unreachable server is no evidence the session died. |
 | `NetworkException` carries `DioExceptionType` | Which is why `client_app` has a **test-only** `dio` dev dependency. |
@@ -442,8 +472,10 @@ before "simplifying" any of them.**
 `packages/design_system/lib/src/widgets/` — all string-parameterised:
 
 `primary_button` (has `isLoading`) · `secondary_button` · `skip_button` ·
-`progress_dots` · `onboarding_header` · `bottom_sheet_modal` ·
-`gradient_overlay` · `hero_image` · `swipe_navigation`
+`progress_dots` · `onboarding_header` · `locale_switcher` ·
+`bottom_sheet_modal` ·
+`gradient_overlay` · `hero_image` · `swipe_navigation` · `status_view` ·
+`app_loader` · `shimmer_box` · `status_banner`
 
 Tokens: `DorakColors` (49 semantic fields incl. `inputBgSoft` / `inputBgFocus`
 for field states), `DorakTypography` (10 styles), `DorakDimensions`,
@@ -453,14 +485,16 @@ for field states), `DorakTypography` (10 styles), `DorakDimensions`,
 decoration.
 
 Extract a widget into `design_system` only when it is genuinely reused across
-apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
+apps, or when it is a Track 12 global UI-state component (loading / empty /
+error / offline / retry / session states). Otherwise keep it in
+`apps/*/lib/src/features/<feature>/widgets/`.
 
 ---
 
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. 75 keys, identical sets.
+  `app_ar.arb`. 80 keys, identical sets.
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
@@ -476,7 +510,9 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 
 ## 12. Testing conventions
 
-19 test files; 90 tests pass (59 in `core`, 26 in `client_app`, 5 placeholders).
+23 test files; 129 tests pass (72 in `core`, 39 in `client_app`, 14 in
+`design_system` — the Track 12 state-component suite plus the
+`locale_switcher` tests — 4 placeholders).
 
 | File | Covers |
 |---|---|
@@ -490,6 +526,7 @@ apps. Otherwise keep it in `apps/*/lib/src/features/<feature>/widgets/`.
 | `client_app/test/app_gate_test.dart` | all six gate branches |
 | `client_app/test/auth_flow_test.dart` | login, validation, sign-up → verify, OTP, skip, resend cooldown |
 | `client_app/test/onboarding_skip_test.dart` | Skip vs Don't show again vs Cancel, full walk, empty back-stack |
+| `client_app/test/locale_switcher_flow_test.dart` | shared `LocaleSwitcher` on auth entry / login / sign-up / verify: visible, EN↔AR round trip, RTL flip |
 | `client_app/test/session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
 
 Rules:

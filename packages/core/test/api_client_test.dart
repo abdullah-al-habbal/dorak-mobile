@@ -208,5 +208,59 @@ void main() {
       expect(page.meta.totalPages, 2);
       expect(page.meta.currentPage, 1);
     });
+
+    test('a failed envelope throws instead of yielding an empty page', () async {
+      final fake = fakeDio(
+        handler: (options) => jsonResponse(
+          options,
+          data: errorEnvelope(
+            code: 'RESOURCE_NOT_FOUND',
+            statusCode: 404,
+            message: 'core::messages.not_found',
+          ),
+        ),
+      );
+
+      await expectLater(
+        clientWith(fake, maxRetries: 0).getPaginated<String>(
+          '/explore/branches',
+          itemParser: (json) => json.toString(),
+        ),
+        throwsA(
+          isA<ApiException>().having((e) => e.statusCode, 'statusCode', 404),
+        ),
+        reason: 'an API failure must never be indistinguishable from a '
+            'successful empty result',
+      );
+    });
+
+    test('a 422 envelope throws ValidationException with field errors',
+        () async {
+      final fake = fakeDio(
+        handler: (options) => jsonResponse(
+          options,
+          data: errorEnvelope(
+            code: 'VALIDATION_FAILED',
+            statusCode: 422,
+            message: 'core::messages.validation_failed',
+            errors: {
+              'latitude': ['The latitude field is required.'],
+            },
+          ),
+        ),
+      );
+
+      await expectLater(
+        clientWith(fake, maxRetries: 0).getPaginated<String>(
+          '/explore/branches',
+          itemParser: (json) => json.toString(),
+        ),
+        throwsA(
+          isA<ValidationException>()
+              .having((e) => e.errors['latitude'], 'latitude errors',
+                  ['The latitude field is required.']),
+        ),
+      );
+    });
   });
 }

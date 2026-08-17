@@ -242,4 +242,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get actionRetry => 'Try again';
+
+  @override
+  String get errorTitleGeneric => 'Something went wrong';
+
+  @override
+  String get errorTitleOffline => 'You\'re offline';
+
+  @override
+  String get emptyTitleGeneric => 'Nothing here yet';
+
+  @override
+  String get emptyMessageGeneric => 'There\'s nothing to show right now.';
 }

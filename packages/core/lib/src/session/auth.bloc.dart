@@ -55,6 +55,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phone: event.phone,
         );
         client = await _acceptSession(response);
+        try {
+          await _repository.sendEmailVerification();
+        } catch (_) {}
       },
       (state) => state.copyWith(client: client),
       signal: AuthSignal.registrationSucceeded,
@@ -64,11 +67,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onSendVerificationCode(
     SendVerificationCodeRequested event,
     Emitter<AuthState> emit,
-  ) async {
-    try {
-      await _repository.sendEmailVerification();
-    } catch (_) {
-    }
+  ) {
+    return _run(
+      emit,
+      _repository.sendEmailVerification,
+      (state) => state,
+    );
   }
 
   Future<void> _onVerifyEmail(
@@ -87,7 +91,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthSignalAcknowledged event,
     Emitter<AuthState> emit,
   ) {
-    emit(state.copyWith(signal: AuthSignal.none));
+    emit(state.copyWith(signal: AuthSignal.none, clearClient: true));
   }
 
   Future<ClientDto> _acceptSession(AuthResponseDto response) async {
