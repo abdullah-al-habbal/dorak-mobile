@@ -11,6 +11,7 @@ import 'package:client_app/src/core/locale/locale.bloc.dart';
 import 'package:client_app/src/core/locale/locale.event.dart';
 import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
+import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
 
@@ -35,6 +36,7 @@ class _DorakAppState extends State<DorakApp> {
   late final ApiClient _apiClient;
   late final AuthBloc _authBloc;
   late final SessionBloc _sessionBloc;
+  late final PasswordRecoveryBloc _recoveryBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
   late final LocaleBloc _localeBloc;
   late final AppRouter _router;
@@ -57,6 +59,7 @@ class _DorakAppState extends State<DorakApp> {
     final repository = widget.authRepository ?? DioAuthRepository(_apiClient);
     _authBloc = AuthBloc(repository, _tokenStorage);
     _sessionBloc = SessionBloc(repository, _tokenStorage);
+    _recoveryBloc = PasswordRecoveryBloc(repository);
 
     unawaited(_sessionBloc.ready);
 
@@ -84,6 +87,7 @@ class _DorakAppState extends State<DorakApp> {
     _router = AppRouter(
       session: _sessionBloc,
       auth: _authBloc,
+      recovery: _recoveryBloc,
       preferences: widget.preferences,
       onboardingConfig: _onboardingConfigBloc,
       switchLocale: _switchLocale,
@@ -99,6 +103,7 @@ class _DorakAppState extends State<DorakApp> {
     _router.dispose();
     _authBloc.close();
     _sessionBloc.close();
+    _recoveryBloc.close();
     _onboardingConfigBloc.close();
     _localeBloc.close();
     _apiClient.dispose();

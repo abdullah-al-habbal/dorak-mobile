@@ -13,7 +13,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user.dto.g.dart';
 
-/// `{id, email, full_name, is_active}` from `GET /api/v1/users`.
 @JsonSerializable(fieldRename: FieldRename.snake, createToJson: false)
 class UserDto {
   final int id;

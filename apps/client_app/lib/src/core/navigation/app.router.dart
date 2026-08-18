@@ -7,7 +7,15 @@ import 'package:go_router/go_router.dart';
 import 'package:client_app/src/core/navigation/app_gate.entity.dart';
 import 'package:client_app/src/core/navigation/app_routes.entity.dart';
 import 'package:client_app/src/features/auth/auth_entry.screen.dart';
+import 'package:client_app/src/features/auth/create_new_password.screen.dart';
+import 'package:client_app/src/features/auth/forgot_password.screen.dart';
 import 'package:client_app/src/features/auth/login.screen.dart';
+import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
+import 'package:client_app/src/features/auth/password_recovery.event.dart';
+import 'package:client_app/src/features/auth/password_recovery.state.dart';
+import 'package:client_app/src/features/auth/password_reset_success.screen.dart';
+import 'package:client_app/src/features/auth/recovery_otp.screen.dart';
+import 'package:client_app/src/features/auth/recovery_signal.entity.dart';
 import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
 import 'package:client_app/src/features/home/home.screen.dart';
@@ -21,6 +29,7 @@ import 'package:client_app/src/features/splash/splash.screen.dart';
 class AppRouter {
   final SessionBloc session;
   final AuthBloc auth;
+  final PasswordRecoveryBloc recovery;
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
   final VoidCallback switchLocale;
@@ -29,10 +38,12 @@ class AppRouter {
   late final GoRouter router;
   late final StreamSubscription<SessionState> _sessionSubscription;
   late final StreamSubscription<AuthState> _authSubscription;
+  late final StreamSubscription<PasswordRecoveryState> _recoverySubscription;
 
   AppRouter({
     required this.session,
     required this.auth,
+    required this.recovery,
     required this.preferences,
     required this.onboardingConfig,
     required this.switchLocale,
@@ -45,12 +56,30 @@ class AppRouter {
     );
     _sessionSubscription = session.stream.listen(_onSessionChanged);
     _authSubscription = auth.stream.listen(_onAuthChanged);
+    _recoverySubscription = recovery.stream.listen(_onRecoveryChanged);
   }
 
   void dispose() {
     _sessionSubscription.cancel();
     _authSubscription.cancel();
+    _recoverySubscription.cancel();
     router.dispose();
+  }
+
+  void _onRecoveryChanged(PasswordRecoveryState state) {
+    switch (state.signal) {
+      case RecoverySignal.codeSent:
+        router.push<void>(AppRoutes.authRecoveryOtp);
+        recovery.add(RecoverySignalAcknowledged());
+      case RecoverySignal.codeAccepted:
+        router.push<void>(AppRoutes.authResetPassword);
+        recovery.add(RecoverySignalAcknowledged());
+      case RecoverySignal.passwordReset:
+        router.push<void>(AppRoutes.authResetPasswordSuccess);
+        recovery.add(RecoverySignalAcknowledged());
+      case RecoverySignal.none:
+        break;
+    }
   }
 
   void _onSessionChanged(SessionState state) {
@@ -169,7 +198,10 @@ class AppRouter {
             builder: (context, state) => LoginScreen(
               auth: auth,
               onCreateAccount: () => router.push<void>(AppRoutes.authRegister),
-              onForgotPassword: null,
+              onForgotPassword: () {
+                recovery.add(RecoveryRestarted());
+                router.push<void>(AppRoutes.authForgotPassword);
+              },
               onLocaleToggle: switchLocale,
             ),
           ),
@@ -189,6 +221,39 @@ class AppRouter {
               onSkip: () => router.go(AppRoutes.home),
               onLocaleToggle: switchLocale,
             ),
+          ),
+          GoRoute(
+            path: AppRoutes.forgotPasswordSegment,
+            builder: (context, state) => ForgotPasswordScreen(
+              recovery: recovery,
+              onReturnToLogIn: () => router.go(AppRoutes.authLogin),
+              onLocaleToggle: switchLocale,
+            ),
+            routes: [
+              GoRoute(
+                path: AppRoutes.recoveryOtpSegment,
+                builder: (context, state) => RecoveryOtpScreen(
+                  recovery: recovery,
+                  onLocaleToggle: switchLocale,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: AppRoutes.resetPasswordSegment,
+            builder: (context, state) => CreateNewPasswordScreen(
+              recovery: recovery,
+              onReenterCode: () => router.go(AppRoutes.authRecoveryOtp),
+              onLocaleToggle: switchLocale,
+            ),
+            routes: [
+              GoRoute(
+                path: AppRoutes.resetPasswordSuccessSegment,
+                builder: (context, state) => PasswordResetSuccessScreen(
+                  onLogIn: () => router.go(AppRoutes.authLogin),
+                ),
+              ),
+            ],
           ),
         ],
       ),

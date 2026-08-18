@@ -23,9 +23,12 @@ void main() {
     storage = InMemoryTokenStorage();
   });
 
-  Future<AppRouter> pumpEntry(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1290, 2796);
+  Future<AppRouter> pumpEntry(
+    WidgetTester tester, {
+    Size logicalSize = const Size(430, 932),
+  }) async {
     tester.view.devicePixelRatio = 3.0;
+    tester.view.physicalSize = logicalSize * 3.0;
     addTearDown(tester.view.reset);
 
     final pair = sessionPair(repository, storage);
@@ -105,7 +108,7 @@ void main() {
     expect(find.text('This field is required'), findsWidgets);
   });
 
-  testWidgets('sign up dispatches a code and opens verification', (tester) async {
+  testWidgets('sign up opens verification without a client-side dispatch', (tester) async {
     await pumpEntry(tester);
 
     await tester.tap(find.text('Create Account'));
@@ -120,7 +123,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(VerifyAccountScreen), findsOneWidget);
-    expect(repository.sendVerificationCalls, 1);
+    expect(repository.sendVerificationCalls, 0);
     expect(storage.token, 'register-token');
     expect(find.textContaining('s***@example.com'), findsOneWidget);
   });

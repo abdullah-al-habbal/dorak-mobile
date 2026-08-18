@@ -577,6 +577,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'There\'s nothing to show right now.'**
   String get emptyMessageGeneric;
+
+  /// recoveryEmailTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get recoveryEmailTitle;
+
+  /// recoveryEmailSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email on your account and we\'ll send you a 6-digit reset code.'**
+  String get recoveryEmailSubtitle;
+
+  /// recoveryEmailLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get recoveryEmailLabel;
+
+  /// recoverySendCodeButton
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get recoverySendCodeButton;
+
+  /// recoveryReturnToLogIn
+  ///
+  /// In en, this message translates to:
+  /// **'Return to Log In'**
+  String get recoveryReturnToLogIn;
+
+  /// recoveryOtpTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Reset Code'**
+  String get recoveryOtpTitle;
+
+  /// recoveryOtpSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'If {email} is registered, we\'ve sent it a 6-digit code. It expires in 10 minutes.'**
+  String recoveryOtpSubtitle(String email);
+
+  /// recoveryOtpContinueButton
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get recoveryOtpContinueButton;
+
+  /// recoveryOtpIncomplete
+  ///
+  /// In en, this message translates to:
+  /// **'Enter all 6 digits'**
+  String get recoveryOtpIncomplete;
+
+  /// recoveryResend
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get recoveryResend;
+
+  /// recoveryResendDisabled
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code ({seconds}s)'**
+  String recoveryResendDisabled(int seconds);
+
+  /// recoveryDidNotReceive
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive the code?'**
+  String get recoveryDidNotReceive;
+
+  /// recoveryNewPasswordTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Password'**
+  String get recoveryNewPasswordTitle;
+
+  /// recoveryNewPasswordSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password for your account.'**
+  String get recoveryNewPasswordSubtitle;
+
+  /// recoveryNewPasswordLabel
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get recoveryNewPasswordLabel;
+
+  /// recoveryConfirmPasswordLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get recoveryConfirmPasswordLabel;
+
+  /// recoveryResetButton
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get recoveryResetButton;
+
+  /// recoveryCodeRejected
+  ///
+  /// In en, this message translates to:
+  /// **'That code is invalid or has expired.'**
+  String get recoveryCodeRejected;
+
+  /// recoveryReenterCode
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter code'**
+  String get recoveryReenterCode;
+
+  /// passwordResetSuccessTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Password Updated'**
+  String get passwordResetSuccessTitle;
+
+  /// passwordResetSuccessMessage
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed. You can now log in with your new password.'**
+  String get passwordResetSuccessMessage;
+
+  /// onboardingConfigUnavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the latest artwork.'**
+  String get onboardingConfigUnavailable;
 }
 
 class _AppLocalizationsDelegate

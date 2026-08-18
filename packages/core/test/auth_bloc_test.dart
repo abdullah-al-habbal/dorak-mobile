@@ -151,7 +151,7 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
-      'registration dispatches the code itself and stays non-blocking when it fails',
+      'registration does not dispatch the code and stays non-blocking',
       build: () {
         repository.sendVerificationError = offline();
         return AuthBloc(repository, storage);
@@ -170,7 +170,7 @@ void main() {
         ),
       ],
       verify: (bloc) {
-        expect(repository.sendVerificationCalls, 1);
+        expect(repository.sendVerificationCalls, 0);
         expect(bloc.state.error, isNull);
         expect(storage.token, 'register-token');
       },

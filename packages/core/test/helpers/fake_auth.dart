@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:dio/dio.dart';
 
+// todo: move the InMemoryTokenStorage, InMemoryAppPreferences into its own files
 class InMemoryTokenStorage implements TokenStorage {
   String? token;
   int writeCount = 0;

@@ -329,5 +329,103 @@
   "emptyMessageGeneric": "There's nothing to show right now.",
   "@emptyMessageGeneric": {
     "description": "Fallback empty state message"
+  },
+  "recoveryEmailTitle": "Forgot Password?",
+  "@recoveryEmailTitle": {
+    "description": "recoveryEmailTitle"
+  },
+  "recoveryEmailSubtitle": "Enter the email on your account and we'll send you a 6-digit reset code.",
+  "@recoveryEmailSubtitle": {
+    "description": "recoveryEmailSubtitle"
+  },
+  "recoveryEmailLabel": "Email",
+  "@recoveryEmailLabel": {
+    "description": "recoveryEmailLabel"
+  },
+  "recoverySendCodeButton": "Send Code",
+  "@recoverySendCodeButton": {
+    "description": "recoverySendCodeButton"
+  },
+  "recoveryReturnToLogIn": "Return to Log In",
+  "@recoveryReturnToLogIn": {
+    "description": "recoveryReturnToLogIn"
+  },
+  "recoveryOtpTitle": "Enter Reset Code",
+  "@recoveryOtpTitle": {
+    "description": "recoveryOtpTitle"
+  },
+  "recoveryOtpSubtitle": "If {email} is registered, we've sent it a 6-digit code. It expires in 10 minutes.",
+  "@recoveryOtpSubtitle": {
+    "description": "recoveryOtpSubtitle",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryOtpContinueButton": "Continue",
+  "@recoveryOtpContinueButton": {
+    "description": "recoveryOtpContinueButton"
+  },
+  "recoveryOtpIncomplete": "Enter all 6 digits",
+  "@recoveryOtpIncomplete": {
+    "description": "recoveryOtpIncomplete"
+  },
+  "recoveryResend": "Resend Code",
+  "@recoveryResend": {
+    "description": "recoveryResend"
+  },
+  "recoveryResendDisabled": "Resend Code ({seconds}s)",
+  "@recoveryResendDisabled": {
+    "description": "recoveryResendDisabled",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "recoveryDidNotReceive": "Didn't receive the code?",
+  "@recoveryDidNotReceive": {
+    "description": "recoveryDidNotReceive"
+  },
+  "recoveryNewPasswordTitle": "Create New Password",
+  "@recoveryNewPasswordTitle": {
+    "description": "recoveryNewPasswordTitle"
+  },
+  "recoveryNewPasswordSubtitle": "Choose a new password for your account.",
+  "@recoveryNewPasswordSubtitle": {
+    "description": "recoveryNewPasswordSubtitle"
+  },
+  "recoveryNewPasswordLabel": "New Password",
+  "@recoveryNewPasswordLabel": {
+    "description": "recoveryNewPasswordLabel"
+  },
+  "recoveryConfirmPasswordLabel": "Confirm New Password",
+  "@recoveryConfirmPasswordLabel": {
+    "description": "recoveryConfirmPasswordLabel"
+  },
+  "recoveryResetButton": "Reset Password",
+  "@recoveryResetButton": {
+    "description": "recoveryResetButton"
+  },
+  "recoveryCodeRejected": "That code is invalid or has expired.",
+  "@recoveryCodeRejected": {
+    "description": "recoveryCodeRejected"
+  },
+  "recoveryReenterCode": "Re-enter code",
+  "@recoveryReenterCode": {
+    "description": "recoveryReenterCode"
+  },
+  "passwordResetSuccessTitle": "Password Updated",
+  "@passwordResetSuccessTitle": {
+    "description": "passwordResetSuccessTitle"
+  },
+  "passwordResetSuccessMessage": "Your password has been changed. You can now log in with your new password.",
+  "@passwordResetSuccessMessage": {
+    "description": "passwordResetSuccessMessage"
+  },
+  "onboardingConfigUnavailable": "Couldn't load the latest artwork.",
+  "@onboardingConfigUnavailable": {
+    "description": "onboardingConfigUnavailable"
   }
 }

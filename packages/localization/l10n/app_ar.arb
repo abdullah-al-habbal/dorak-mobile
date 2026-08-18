@@ -329,5 +329,27 @@
   "emptyMessageGeneric": "لا يوجد شيء لعرضه حالياً.",
   "@emptyMessageGeneric": {
     "description": "Fallback empty state message"
-  }
+  },
+  "recoveryEmailTitle": "نسيت كلمة المرور؟",
+  "recoveryEmailSubtitle": "أدخل البريد الإلكتروني المرتبط بحسابك وسنرسل لك رمز إعادة تعيين من 6 أرقام.",
+  "recoveryEmailLabel": "البريد الإلكتروني",
+  "recoverySendCodeButton": "إرسال الرمز",
+  "recoveryReturnToLogIn": "العودة إلى تسجيل الدخول",
+  "recoveryOtpTitle": "أدخل رمز إعادة التعيين",
+  "recoveryOtpSubtitle": "إذا كان {email} مسجلاً، فقد أرسلنا إليه رمزاً من 6 أرقام. تنتهي صلاحيته بعد 10 دقائق.",
+  "recoveryOtpContinueButton": "متابعة",
+  "recoveryOtpIncomplete": "أدخل الأرقام الستة كاملة",
+  "recoveryResend": "إعادة إرسال الرمز",
+  "recoveryResendDisabled": "إعادة إرسال الرمز ({seconds} ث)",
+  "recoveryDidNotReceive": "لم تستلم الرمز؟",
+  "recoveryNewPasswordTitle": "إنشاء كلمة مرور جديدة",
+  "recoveryNewPasswordSubtitle": "اختر كلمة مرور جديدة لحسابك.",
+  "recoveryNewPasswordLabel": "كلمة المرور الجديدة",
+  "recoveryConfirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+  "recoveryResetButton": "إعادة تعيين كلمة المرور",
+  "recoveryCodeRejected": "هذا الرمز غير صالح أو انتهت صلاحيته.",
+  "recoveryReenterCode": "إعادة إدخال الرمز",
+  "passwordResetSuccessTitle": "تم تحديث كلمة المرور",
+  "passwordResetSuccessMessage": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+  "onboardingConfigUnavailable": "لم نتمكن من تحميل أحدث صورة."
 }

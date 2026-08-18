@@ -6,6 +6,7 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+// todo: this file must only have the main() method, we must create two spearted files one for the app and one for the homepage
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

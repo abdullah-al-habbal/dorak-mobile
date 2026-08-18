@@ -259,4 +259,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get emptyMessageGeneric => 'لا يوجد شيء لعرضه حالياً.';
+
+  @override
+  String get recoveryEmailTitle => 'نسيت كلمة المرور؟';
+
+  @override
+  String get recoveryEmailSubtitle =>
+      'أدخل البريد الإلكتروني المرتبط بحسابك وسنرسل لك رمز إعادة تعيين من 6 أرقام.';
+
+  @override
+  String get recoveryEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get recoverySendCodeButton => 'إرسال الرمز';
+
+  @override
+  String get recoveryReturnToLogIn => 'العودة إلى تسجيل الدخول';
+
+  @override
+  String get recoveryOtpTitle => 'أدخل رمز إعادة التعيين';
+
+  @override
+  String recoveryOtpSubtitle(String email) {
+    return 'إذا كان $email مسجلاً، فقد أرسلنا إليه رمزاً من 6 أرقام. تنتهي صلاحيته بعد 10 دقائق.';
+  }
+
+  @override
+  String get recoveryOtpContinueButton => 'متابعة';
+
+  @override
+  String get recoveryOtpIncomplete => 'أدخل الأرقام الستة كاملة';
+
+  @override
+  String get recoveryResend => 'إعادة إرسال الرمز';
+
+  @override
+  String recoveryResendDisabled(int seconds) {
+    return 'إعادة إرسال الرمز ($seconds ث)';
+  }
+
+  @override
+  String get recoveryDidNotReceive => 'لم تستلم الرمز؟';
+
+  @override
+  String get recoveryNewPasswordTitle => 'إنشاء كلمة مرور جديدة';
+
+  @override
+  String get recoveryNewPasswordSubtitle => 'اختر كلمة مرور جديدة لحسابك.';
+
+  @override
+  String get recoveryNewPasswordLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get recoveryConfirmPasswordLabel => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get recoveryResetButton => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get recoveryCodeRejected => 'هذا الرمز غير صالح أو انتهت صلاحيته.';
+
+  @override
+  String get recoveryReenterCode => 'إعادة إدخال الرمز';
+
+  @override
+  String get passwordResetSuccessTitle => 'تم تحديث كلمة المرور';
+
+  @override
+  String get passwordResetSuccessMessage =>
+      'تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.';
+
+  @override
+  String get onboardingConfigUnavailable => 'لم نتمكن من تحميل أحدث صورة.';
 }

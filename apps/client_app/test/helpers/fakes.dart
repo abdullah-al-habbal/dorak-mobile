@@ -8,8 +8,10 @@ import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
+import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
+// todo: read this file, and I think is better to make a fakes folder and then move each block/class into a file for better code.
 Widget routerHarness(AppRouter appRouter) {
   return MaterialApp.router(
     routerConfig: appRouter.router,
@@ -26,11 +28,15 @@ AppRouter buildRouter({
   required AuthBloc auth,
   required AppPreferences preferences,
   required ApiClient apiClient,
+  PasswordRecoveryBloc? recovery,
+  AuthRepository? recoveryRepository,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
     session: session,
     auth: auth,
+    recovery: recovery ??
+        PasswordRecoveryBloc(recoveryRepository ?? FakeAuthRepository()),
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
     switchLocale: switchLocale,
@@ -104,6 +110,12 @@ class FakeAuthRepository implements AuthRepository {
   Object? loginError;
   Object? registerError;
   Object? verifyEmailError;
+  Object? forgotPasswordError;
+  Object? resetPasswordError;
+
+  String? forgotPasswordEmail;
+  int forgotPasswordCalls = 0;
+  Map<String, String>? resetPasswordPayload;
 
   int sendVerificationCalls = 0;
   String? verifiedCode;
@@ -154,7 +166,12 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> forgotPassword(String email) async {}
+  Future<void> forgotPassword(String email) async {
+    forgotPasswordEmail = email;
+    forgotPasswordCalls++;
+    final error = forgotPasswordError;
+    if (error != null) throw error;
+  }
 
   @override
   Future<void> resetPassword({
@@ -162,7 +179,16 @@ class FakeAuthRepository implements AuthRepository {
     required String code,
     required String password,
     required String passwordConfirmation,
-  }) async {}
+  }) async {
+    resetPasswordPayload = {
+      'email': email,
+      'code': code,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    };
+    final error = resetPasswordError;
+    if (error != null) throw error;
+  }
 }
 
 class FakeOnboardingConfigRepository implements OnboardingConfigRepository {

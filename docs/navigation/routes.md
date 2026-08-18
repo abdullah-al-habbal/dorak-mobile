@@ -29,15 +29,25 @@ listener. **Routing lives in the router, never in a screen or a bloc.**
 /auth/login  (parent: /auth)     -> context.go('/home') on success
 /auth/register (parent: /auth)   -> push /auth/verify on success
 /auth/verify  (parent: /auth)    -> context.go('/home') on success or skip
+/auth/forgot-password            (parent: /auth)  -> push .../otp on codeSent
+/auth/forgot-password/otp        -> push /auth/reset-password on codeAccepted
+/auth/reset-password             (parent: /auth)  -> push .../success on passwordReset
+/auth/reset-password/success     -> go /auth/login  (go, so the stack is dropped)
 /home                            HomeScreen (placeholder)
 ```
+
+Password recovery (Stitch 011–014) is driven by `RecoverySignal`, a third one-shot
+signal alongside `SessionSignal` and `AuthSignal`. Its wrinkle is worth knowing
+before touching it: the backend has no verify-reset-code endpoint, so the OTP screen
+cannot validate the code and a rejected code surfaces on `/auth/reset-password`. See
+`authentication/password_recovery.md`.
 
 Flow wiring lives in `AppRouter._routes()`: each `GoRoute` receives callbacks
 (`onNext`, `onSkipForNow`, `onLogin`, ...) that the router implements with
 `router.push`/`router.go`. `context.go('/home')` clears the stack by
 construction — there is no `pushAndRemoveUntil` bookkeeping.
 
-## The redirect and the two listeners
+## The redirect and the three listeners
 
 Guard logic is split across three places, deliberately:
 
@@ -45,7 +55,7 @@ Guard logic is split across three places, deliberately:
 | --- | --- |
 | `AppRouter._redirect` | holds the app on `/splash` while `SessionState.status` is `unknown`, and nothing else |
 | `AppRouter._leaveSplash` | awaits `session.ready`, then `router.go(AppGate.resolve(...))` — the launch gate (see `flows/app_launch.md`) |
-| `AppRouter._onSessionChanged` / `_onAuthChanged` | `router.refresh()` on every session change, then react to `SessionSignal` / `AuthSignal` |
+| `AppRouter._onSessionChanged` / `_onAuthChanged` / `_onRecoveryChanged` | `router.refresh()` on every session change, then react to `SessionSignal` / `AuthSignal` / `RecoverySignal` |
 
 The launch gate is **not** in `_redirect`: the splash must hold for its 2500 ms
 animation, which a redirect cannot express. `AppGate.resolve` is a pure function
@@ -57,6 +67,8 @@ animation, which a redirect cannot express. `AppGate.resolve` is a pure function
 | --- | --- | --- |
 | `SessionSignal.sessionExpired` | `router.go(/auth)` | **replaces** — no dead-session screen survives to be back-navigated into |
 | `SessionSignal.authenticationRequired` | `router.push(/auth)` | **pushes** — back returns to the guest destination the user was on |
+| `RecoverySignal.codeSent` / `codeAccepted` / `passwordReset` | `router.push(...)` | **pushes** — each recovery step stays back-navigable while the flow is in progress |
+| 014's "Log In" action | `router.go(/auth/login)` | **replaces** — the code has been consumed, so a completed reset must not be re-enterable |
 
 Each is acknowledged immediately after (`SignalAcknowledged` /
 `AuthSignalAcknowledged`) together with `apiClient.resetUnauthorizedSignal()`.

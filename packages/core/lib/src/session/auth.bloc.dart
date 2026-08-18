@@ -55,9 +55,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phone: event.phone,
         );
         client = await _acceptSession(response);
-        try {
-          await _repository.sendEmailVerification();
-        } catch (_) {}
       },
       (state) => state.copyWith(client: client),
       signal: AuthSignal.registrationSucceeded,

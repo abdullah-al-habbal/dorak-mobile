@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,28 +6,31 @@ import 'package:design_system/design_system.dart';
 import 'package:localization/localization.dart';
 
 import 'package:client_app/src/features/auth/auth_error.entity.dart';
+import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
+import 'package:client_app/src/features/auth/password_recovery.event.dart';
+import 'package:client_app/src/features/auth/password_recovery.state.dart';
 import 'package:client_app/src/features/auth/widgets/auth_entry_background.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_shell.widget.dart';
-import 'package:client_app/src/features/auth/widgets/sign_up_content.widget.dart';
+import 'package:client_app/src/features/auth/widgets/forgot_password_content.widget.dart';
 
-class SignUpScreen extends StatefulWidget {
-  final AuthBloc auth;
-  final VoidCallback onLogInLink;
+class ForgotPasswordScreen extends StatefulWidget {
+  final PasswordRecoveryBloc recovery;
+  final VoidCallback onReturnToLogIn;
   final VoidCallback? onLocaleToggle;
 
-  const SignUpScreen({
+  const ForgotPasswordScreen({
     super.key,
-    required this.auth,
-    required this.onLogInLink,
+    required this.recovery,
+    required this.onReturnToLogIn,
     this.onLocaleToggle,
   });
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen>
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeController;
   late final List<Animation<double>> _staggeredAnimations;
@@ -83,33 +85,21 @@ class _SignUpScreenState extends State<SignUpScreen>
               localeLabel: isArabic ? l10n.localeEnglish : l10n.localeArabic,
               onLocaleToggle: widget.onLocaleToggle,
             ),
-            child: BlocBuilder<AuthBloc, AuthState>(
-              bloc: widget.auth,
+            child: BlocBuilder<PasswordRecoveryBloc, PasswordRecoveryState>(
+              bloc: widget.recovery,
               builder: (context, state) {
                 final error = state.error == null
                     ? null
                     : AuthError.from(state.error!, l10n);
-                return SignUpContent(
+                return ForgotPasswordContent(
                   titleAnimation: _staggeredAnimations[0],
                   formAnimation: _staggeredAnimations[1],
                   actionsAnimation: _staggeredAnimations[2],
-                  onSubmit:
-                      ({
-                        required name,
-                        required email,
-                        required password,
-                        required passwordConfirmation,
-                      }) => widget.auth.add(
-                        RegisterRequested(
-                          name: name,
-                          email: email,
-                          password: password,
-                          passwordConfirmation: passwordConfirmation,
-                        ),
-                      ),
+                  onSubmit: (email) =>
+                      widget.recovery.add(RecoveryCodeRequested(email)),
+                  onReturnToLogIn: widget.onReturnToLogIn,
                   error: error,
                   isSubmitting: state.isSubmitting,
-                  onLogInLink: widget.onLogInLink,
                 );
               },
             ),

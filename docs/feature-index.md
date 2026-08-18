@@ -74,12 +74,19 @@
 - `skip_bottom_sheet.sheet.dart` — shared 3-option skip sheet (Skip / Don't show again / Cancel); dismisses itself before either decision navigates.
 - Flow wiring in `src/core/navigation/app.router.dart` (go_router). `Skip for now` leaves `dontShowOnboarding` untouched; `Don't show again` and completing the tour persist it. See `docs/flows/onboarding.md`.
 
+
 ### Authentication — Stitch 006–009
 - `auth_entry.screen.dart` (006) — now reachable; its three callbacks are bound by `app.router.dart`.
 - `login.screen.dart` + `login_content.widget.dart` (007).
 - `sign_up.screen.dart` + `sign_up_content.widget.dart` (008) — 4 fields; the confirm field feeds `password_confirmation`.
 - `verify_account.screen.dart` + `verify_account_content.widget.dart` + `otp_input_field.widget.dart` (009) — 6-digit code, 60 s resend cooldown, masked destination, non-blocking skip.
 - Shared: `auth_text_field.widget.dart`, `auth_header.widget.dart`, `auth_error_banner.widget.dart`, `auth_validators.entity.dart`, `auth_error.entity.dart` (maps exceptions to local ARB strings — backend `message` values are untranslated keys).
+
+### Password Recovery — Stitch 011–014
+- `password_recovery.bloc.dart` (`.event.dart`/`.state.dart`) + `recovery_signal.entity.dart` — app-layer bloc over the core `AuthRepository`; carries email + code across the flow.
+- `forgot_password.screen.dart` (011), `recovery_otp.screen.dart` (012), `create_new_password.screen.dart` (013), `password_reset_success.screen.dart` (014 — the first `StatusView` consumer).
+- Content widgets: `forgot_password_content`, `recovery_otp_content`, `create_new_password_content`.
+- **Three backend constraints** drive the design: no verify-reset-code endpoint (a bad code surfaces on 013, not 012), a 10-minute cache TTL, and `exists:clients,email` as an enumeration oracle the client deliberately does not surface. Resend calls `forgotPassword`, not `sendEmailVerification`. See `docs/authentication/password_recovery.md`.
 
 ### Navigation & Launch Gate
 - `src/core/navigation/app.router.dart` — `AppRouter` (go_router): route table + redirects; success paths use `router.go('/home')`, which clears the stack.
@@ -122,10 +129,10 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 008 | Create Your Account | CL-08 | ✅ Migrated |
 | 009 | Verify Your Account | CL-08 | ✅ Migrated |
 | 010 | Complete Your Profile | CL-08 | ⏳ Pending |
-| 011 | Forgot Password | CL-08 | ⏳ Pending |
-| 012 | Forgot Password OTP | CL-08 | ⏳ Pending |
-| 013 | Create New Password | CL-08 | ⏳ Pending |
-| 014 | Password Reset Success | CL-08 | ⏳ Pending |
+| 011 | Forgot Password | CL-08 | ✅ Migrated |
+| 012 | Forgot Password OTP | CL-08 | ✅ Migrated |
+| 013 | Create New Password | CL-08 | ✅ Migrated |
+| 014 | Password Reset Success | CL-08 | ✅ Migrated |
 | 016 | Discovery Feed | CL-09 | ⏳ Pending |
 | 017 | Branch Floor Plan & Booking | CL-10 | ⏳ Pending |
 | 018 | Personalised Profile & AI Style | CL-11 | ⏳ Pending |
@@ -161,7 +168,7 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |
 
 ### Not Started
-- Password recovery (Stitch 010–014), Discovery Feed (016), Branch Floor Plan & Booking (017), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020).
+- Profile completion (Stitch 010), Discovery Feed (016), Branch Floor Plan & Booking (017), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020).
 - `business_app` and `stylist_app` features — both apps are skeletons.
 
 ### Backend routes for unbuilt features

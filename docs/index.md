@@ -757,7 +757,7 @@ Every implemented component MUST map to its corresponding Markdown specification
 
 ## Track 16 — Authentication
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
 Implementation order:
 
@@ -774,13 +774,26 @@ Login / Register            DONE  (Stitch 007–008, live backend)
 ↓
 Verification                DONE  (Stitch 009, non-blocking)
 ↓
-Password Recovery           PENDING  (Stitch 011–014)
+Password Recovery           DONE  (Stitch 011–014, live backend)
 ↓
 Session Restoration         DONE  (see Track 06)
 ```
 
-Documentation: `docs/authentication/auth_flow.md`, `docs/flows/app_launch.md`,
-`docs/flows/onboarding.md`, `docs/flows/guest_access.md`.
+Documentation: `docs/authentication/auth_flow.md`,
+`docs/authentication/password_recovery.md`, `docs/flows/app_launch.md`,
+`docs/flows/onboarding.md`, `docs/flows/guest_access.md`,
+`docs/screens/authentication/`.
+
+**Evidence.** 144 tests, `dart run melos run verify` exit 0.
+`password_recovery_bloc_test.dart` (8) and `password_recovery_flow_test.dart` (6)
+cover the flow, the account-enumeration mitigation, and the rejected-code path.
+
+Three backend constraints shaped the recovery flow and are recorded in
+`docs/authentication/password_recovery.md` so they are not re-derived: there is no
+verify-reset-code endpoint (so a bad code surfaces on screen 013, not 012), the code
+lives in the cache for 10 minutes, and `exists:clients,email` is an enumeration
+oracle that the client deliberately does not surface. Recovery resend is
+`forgotPassword`, **not** `sendEmailVerification`.
 
 ---
 
@@ -883,76 +896,58 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** `Track 12 — Global UI States` — components built and tested
-(`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner`), track stays
-`IN_PROGRESS` until Discovery 016 validates them. Order change vs Tracks 05/10:
-[ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
+**Current Track:** none active. Track 16 closed; choose the next one below.
 
-**Current Task:** Locale switcher standardization — complete. A shared
-`LocaleSwitcher` widget now lives in `design_system` (14th widget,
-string-parameterised), `OnboardingHeader` delegates to it, and the auth flow
-auth entry / login / register / verify screens gained the same switcher via
-`AuthHeader` (balanced 64 px slots) and a top-end overlay. Wired through the
-existing `LocaleBloc`/`LocaleToggled` — no new keys, no architecture change.
-4 new `client_app` tests + 2 `design_system` tests; full suite 129 green.
+**Just completed — Track 16, Password Recovery (Stitch 011–014).** Four screens,
+four routes, a feature-scoped `PasswordRecoveryBloc` in `client_app`, 22 ARB keys
+× 2 locales, 15 new tests. **144 tests, gate exit 0.**
 
-**Current Task:** Choose the next track. Track 12 delivered the state
-components Track 09's `Paged<T>` contract needed:
+Screen 014 is `StatusView`'s **first production consumer**, which is what finally
+validates a Track 12 component against real usage rather than only its own tests.
 
-* `StatusBanner` — promoted from `AuthErrorBanner` (login / sign-up / verify
-  are the live consumers; string-parameterised, zero localization/core imports)
-* `AppLoader.page()` / `AppLoader.inline()` — full-page and inline loading
-* `StatusView` — the single empty / error / offline / retry layout
-* `ShimmerBox` — hand-rolled shimmer primitive (no package)
-* 5 ARB fallback keys × 2 locales (`actionRetry`, `errorTitleGeneric`,
-  `errorTitleOffline`, `emptyTitleGeneric`, `emptyMessageGeneric`)
-* First real `design_system` widget tests (11 new; total 12 in the package)
-* Permission-required deferred with its reason recorded (owner Tracks 13/14,
-  trigger 016)
+Three backend constraints shaped the flow and are recorded in
+`docs/authentication/password_recovery.md` so nobody re-derives them:
 
-**Candidates, in dependency order.** Discovery (016) needs *both* of the first
-two, so neither can be skipped by starting the feature:
+1. **No verify-reset-code endpoint.** The code lives in the Laravel cache for 10
+   minutes and is only checked by `reset-password`, so a rejected code surfaces on
+   screen **013**, not 012 — with a "Re-enter code" route back.
+2. **`exists:clients,email` is an account-enumeration oracle.** The client
+   deliberately does **not** surface that 422; the flow advances either way with
+   neutral copy. Transport failures still block.
+3. **Recovery resend is `forgotPassword`**, not `sendEmailVerification` —
+   different endpoints, different throttles.
 
-* `Track 05 — Storage` — cache strategy, the last unblocked objective.
-* `Track 10 — Dependency Injection & Bootstrap` — application lifecycle, the
-  last objective.
-* `Track 16 — Authentication` — password recovery (Stitch 011–014), the only
-  remaining auth work.
+Also in this pass: the onboarding hero now offers a retry when
+`/app/onboarding-config` fails, layered over the bundled-asset fallback rather
+than replacing it (an error view there would be strictly worse than the asset).
 
-Track 18 / Discovery 016 additionally needs location-permission plumbing and
-feed DTOs, neither of which exists.
+**Track statuses.** `DONE`: 00–04, 06, 07, 08, 16. `IN_PROGRESS`: 05 (cache
+strategy), 09 (pagination pending a consumer), 10 (application lifecycle), 11
+(nested nav, guest guards, deep links), 12 (`StatusView` now consumed; `AppLoader`
+and `ShimmerBox` still await Discovery). `PENDING`: 13, 14, 15, 17–21.
 
-**Just completed — post-migration hardening.** The Pure Bloc + go_router
-migration was verified end to end and three defects were fixed that the green
-suite did not catch:
+**Candidates for the next track, in dependency order.** Discovery (016) needs the
+first two before it can start:
 
-1. **Session resurrection.** The app-layer coordinator fired on
-   `authState.client != null`, and `AuthState.client` was never cleared. A
-   failing sign-in *after* an expiry re-authenticated the session on its
-   `isSubmitting` emission. Coordination now keys on
-   `AuthSignal.loginSucceeded | registrationSucceeded` via
-   `auth_coordination.entity.dart`, acknowledgement clears the client, and
-   `SessionAuthenticated` is refused while `sessionExpired` is in flight.
-2. **Splash hang.** A throwing `TokenStorage.read()` left the status `unknown`,
-   so `ready` never completed and the splash never ended. Restore now fails safe
-   to `guest`.
-3. **`copyWith(client: null)` was a silent no-op** on `SessionState`,
-   `AuthState` and `OnboardingConfigState`. All three now take explicit
-   `clearClient` / `clearConfig` flags.
+* `Track 10 — Dependency Injection & Bootstrap` — application lifecycle, its last
+  objective. Small and self-contained; would let the session re-probe on resume.
+* `Track 05 — Storage` — cache strategy, its last unblocked objective. Note it has
+  no consumer yet, which is the condition that got the pagination notifiers
+  deleted; consider whether it should wait for Discovery.
+* `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute`. Blocked in
+  practice: three of Discovery's four tab destinations do not exist.
 
-Also: a user-initiated resend now surfaces its error instead of failing
-silently (registration's own dispatch stays non-blocking), the
-`registrationSucceeded → resend → acknowledge` event-order race is gone, and
-one 401 burst now produces exactly one expiration and one redirect.
+Track 18 / Discovery 016 additionally needs location-permission plumbing and feed
+DTOs, neither of which exists.
 
-Tracks 05, 09, 10, 11, 12 and 16 remain `IN_PROGRESS` with their remaining
-objectives listed inline above. Architecture deviations are recorded as
+Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),
 [ADR 0002](./architecture/decisions/0002-design-system-go-router.md) and
 [ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
 
 The agent MUST NOT skip directly to feature implementation, and MUST NOT begin
-Stitch 010–020 — those `plan.md` files stay untouched until their Track opens.
+Stitch 010 or 015–020 — those `plan.md` files stay untouched until their Track
+opens.
 
 ---
 

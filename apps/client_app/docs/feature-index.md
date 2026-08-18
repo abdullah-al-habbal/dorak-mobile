@@ -5,7 +5,7 @@
 ---
 
 ### Splash — Stitch 001
-- `lib/src/features/splash/splash.screen.dart` — staged fade-in, auto-advance after 2.5s via the injected `onFinished` (now `AppGate.decide`). No early-advance gesture despite earlier notes here.
+- `lib/src/features/splash/splash.screen.dart` — staged fade-in, auto-advance after 2.5s via the injected `onFinished`, which runs `AppRouter._leaveSplash` → `AppGate.resolve`. No early-advance gesture despite earlier notes here.
 - `lib/src/features/splash/widgets/splash_logo.widget.dart` — animated logo.
 - `lib/src/features/splash/widgets/splash_background.widget.dart` — gradient + `noise_overlay.png` (converted from SVG — `Image.asset` cannot decode SVG).
 
@@ -37,20 +37,28 @@
 
 ### Authentication — Stitch 006–009
 - `lib/src/features/auth/auth_entry.screen.dart` (006) + `widgets/auth_entry_{background,content,header}.widget.dart`, `auth_guest_button.widget.dart`.
-- `lib/src/features/auth/login.screen.dart` + `widgets/login_content.widget.dart` (007). Forgot-password link is hidden (`onForgotPassword: null`) until Stitch 011–014 exist.
+- `lib/src/features/auth/login.screen.dart` + `widgets/login_content.widget.dart` (007). The forgot-password link opens 011 (the parameter is still nullable so it *can* be hidden).
 - `lib/src/features/auth/sign_up.screen.dart` + `widgets/sign_up_content.widget.dart` (008) — name / email / password / confirm; the confirm value is sent as `password_confirmation`.
 - `lib/src/features/auth/verify_account.screen.dart` + `widgets/verify_account_content.widget.dart` + `widgets/otp_input_field.widget.dart` (009) — 6 digits, auto-advance, 60 s resend cooldown, masked destination, "Verify later" skip.
 - `lib/src/features/auth/widgets/auth_text_field.widget.dart` — floating label, rounded-top/sharp-bottom underline, focus + error states, password toggle. Local to the app; promotion to `design_system` is Track 15.
-- `lib/src/features/auth/widgets/auth_header.widget.dart`, `widgets/auth_error_banner.widget.dart`.
+- `lib/src/features/auth/widgets/auth_header.widget.dart`, `widgets/auth_shell.widget.dart` (responsive layout shared by all auth screens). The inline error row now comes from `design_system`'s `StatusBanner` — `auth_error_banner.widget.dart` was promoted and removed in Track 12.
 - `lib/src/features/auth/auth_validators.entity.dart` — email / min-8 / confirmation-match, mirroring the backend rules.
 - `lib/src/features/auth/auth_error.entity.dart` — maps exceptions to local ARB strings. The backend's own `message` is an untranslated key and must never be rendered.
+
+### Password Recovery — Stitch 011–014
+- `lib/src/features/auth/password_recovery.bloc.dart` (+ `.event.dart`, `.state.dart`) and `recovery_signal.entity.dart` — app-layer bloc over the core `AuthRepository`; carries `email` and `code` across the four steps.
+- `forgot_password.screen.dart` (011) + `widgets/forgot_password_content.widget.dart` — email field, `AuthValidators.email`, "Send Code".
+- `recovery_otp.screen.dart` (012) + `widgets/recovery_otp_content.widget.dart` — six reused `OtpInputField`s, masked destination, 60 s resend cooldown. **Cannot validate the code** — no such endpoint exists.
+- `create_new_password.screen.dart` (013) + `widgets/create_new_password_content.widget.dart` — new + confirm password. **This is where a rejected code surfaces**, with a "Re-enter code" action back to 012.
+- `password_reset_success.screen.dart` (014) — a thin `StatusView` wrapper; the first production consumer of that Track 12 component. Exits with `router.go`, so the recovery stack is dropped.
+- Constraints and the enumeration mitigation: `docs/authentication/password_recovery.md`.
 
 ### Bootstrap & Navigation
 - `lib/main.dart` — binding init, dotenv, `SharedAppPreferences.create()`, then `DorakApp`.
 - `lib/app.dart` — builds secure storage → `ApiClient` (with `tokenProvider`) → `DioAuthRepository` → `AuthBloc` → `SessionBloc(repository, storage)` → `OnboardingConfigBloc` → `LocaleBloc`; starts `session.ready` unawaited so restore overlaps the splash; subscribes the auth stream → `SessionAuthenticated`, the unauthorized stream → `UnauthorizedDetected`, and locale → config reload. Test seams: `tokenStorage`, `authRepository`.
-- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); two stream listeners (session + auth) re-run the redirect and react to `SessionSignal` (auth/home/verify navigation) before acknowledging; `router.go(AppRoutes.home)` clears the stack.
+- `lib/src/core/navigation/app.router.dart` — `AppRouter` (go_router); three stream listeners (session + auth + recovery) re-run the redirect and react to `SessionSignal` / `AuthSignal` / `RecoverySignal` before acknowledging; `router.go(AppRoutes.home)` clears the stack.
 - `lib/src/core/navigation/app_routes.entity.dart` — `AppRoutes` path constants.
-- `lib/src/core/navigation/app_gate.entity.dart` — post-splash decision, wired as the router redirect (session first, onboarding flag second).
+- `lib/src/core/navigation/app_gate.entity.dart` — `AppGate.resolve`, a pure function called from `AppRouter._leaveSplash` once `session.ready` completes (session first, onboarding flag second). It is deliberately **not** in the redirect — the splash must hold for its animation.
 
 ### Home
 - `lib/src/features/home/home.screen.dart` — placeholder (`homeTitle`). Real dashboard TBD; no logout affordance yet.
@@ -59,6 +67,11 @@
 - `test/widget_test.dart` — real `DorakApp` bootstrap: splash → gate → auth entry.
 - `test/app_gate_test.dart` — all six launch-gate branches.
 - `test/auth_flow_test.dart` — login, validation, sign-up → verify, OTP success/failure, skip, resend cooldown.
+- `test/password_recovery_bloc_test.dart` — recovery transitions, the enumeration mitigation, the carried code, the rejected code.
+- `test/password_recovery_flow_test.dart` — 011→014 route walk; an unregistered email still advances; a rejected code routes back to 012; 014 drops the stack.
+- `test/onboarding_config_bloc_test.dart` — config load, retry after a failure, locale refetch.
+- `test/locale_switcher_flow_test.dart` — shared `LocaleSwitcher` across the auth screens, EN↔AR round trip, RTL flip.
+- `test/session_expired_test.dart` — 401 mid-session → session-expired signal → auth redirect.
 - `test/onboarding_skip_test.dart` — Skip vs Don't show again vs Cancel, full four-step walk, empty back-stack.
 - `test/helpers/fakes.dart` — router harness + in-memory storage/preferences/auth fakes.
 
@@ -87,7 +100,7 @@
 | CL-07 | Home placeholder | ✅ Complete | — |
 | CL-08 | Auth flow — entry / login / register / verify | ✅ Complete | Stitch 006–009 |
 | CL-08c | Locale switcher on all pre-Home screens (onboarding header + auth entry/login/register/verify via shared `LocaleSwitcher`) | ✅ Complete | — |
-| CL-08b | Password recovery | ⏳ Not started | Stitch 011–014 |
+| CL-08b | Password recovery — forgot / code / new password / success | ✅ Complete | Stitch 011–014 |
 | CL-14 | Launch gate + go_router route table | ✅ Complete | Tracks 10–11 |
 | CL-09 | Discovery Feed | ⏳ Not started | Stitch 016 |
 | CL-10 | Branch Floor Plan & Booking | ⏳ Not started | Stitch 017 |

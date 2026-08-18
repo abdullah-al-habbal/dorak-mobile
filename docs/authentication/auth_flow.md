@@ -1,7 +1,7 @@
 # Authentication Flow
 
-Status: `IN_PROGRESS` — login, registration and email verification are wired;
-password recovery (Stitch 011–014) is not.
+Status: `DONE` — login, registration, email verification and password recovery
+(Stitch 011–014) are all wired against the live backend.
 
 ## Backend contract
 
@@ -22,9 +22,18 @@ Endpoint constants live in `packages/core/.../endpoints/auth.endpoints.dart`.
 ```text
 Auth Entry (006)
 ├── Log In        -> Login (007)  --success-->  Home
+│                        └── Forgot Password?
+│                              -> Forgot Password (011)
+│                              -> Recovery Code   (012)
+│                              -> New Password    (013)
+│                              -> Reset Success   (014) --> Login (007)
 ├── Create Account-> Sign Up (008) --success--> Verify (009) --+--> Home
 └── Continue as Guest -> onboarding tour       (skip) ---------+
 ```
+
+Recovery is the one branch that does **not** end at Home — it returns to Login, so
+the user signs in with the new password. Details, and the three backend constraints
+that shape it: `password_recovery.md`.
 
 Wiring lives in `apps/client_app/lib/src/core/navigation/app.router.dart`
 (`AppRouter`). Every success path ends in `router.go(AppRoutes.home)`, which
@@ -70,9 +79,9 @@ round-trip: email format, password `min:8`, confirmation match.
 
 ## Not implemented
 
-Forgot/reset password screens (the repository methods exist, no UI calls them),
-social login (Socialite has no configured drivers server-side), and profile
-completion (Stitch 010). (The 401-triggered session-expired redirect is
+Social login (Socialite has no configured drivers server-side), authenticated
+password change (`/client/password` exists; Track 17), and profile completion
+(Stitch 010). (The 401-triggered session-expired redirect is
 implemented — see `docs/navigation/guards.md`.)
 
 ## Verification

@@ -258,6 +258,7 @@ class _BookingVisualState extends State<BookingVisual>
   }
 }
 
+// todo: we must move the _GlassCard into its own file
 class _GlassCard extends StatelessWidget {
   final Widget child;
 

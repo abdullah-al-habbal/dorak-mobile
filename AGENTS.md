@@ -36,7 +36,7 @@ child contradicts nothing, the parent still applies.
 | `apps/stylist_app` | [`AGENTS`](./apps/stylist_app/AGENTS.md) · [`CLAUDE`](./apps/stylist_app/CLAUDE.md) | `flutter create` stub |
 | `packages/core` | [`AGENTS`](./packages/core/AGENTS.md) · [`CLAUDE`](./packages/core/CLAUDE.md) | HTTP, config, storage, session, DTOs |
 | `packages/design_system` | [`AGENTS`](./packages/design_system/AGENTS.md) · [`CLAUDE`](./packages/design_system/CLAUDE.md) | tokens, theme, fonts, 14 widgets |
-| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 80 keys, EN + AR |
+| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 102 keys, EN + AR |
 | `packages/feature_floor_plan` | [`AGENTS`](./packages/feature_floor_plan/AGENTS.md) · [`CLAUDE`](./packages/feature_floor_plan/CLAUDE.md) | empty stub |
 
 Read the child for the unit you are touching **before** editing it. If you touch
@@ -60,6 +60,9 @@ docs/core/networking.md                  docs/core/interceptors.md
 docs/core/exceptions.md                  docs/core/result_state.md
 docs/core/storage.md                     docs/core/session.md
 docs/authentication/auth_flow.md         docs/flows/app_launch.md
+docs/authentication/password_recovery.md
+docs/screens/authentication/{forgot_password,recovery_otp,
+                             create_new_password,password_reset_success}.md
 docs/flows/onboarding.md                 docs/flows/guest_access.md
 docs/navigation/routes.md                docs/navigation/guards.md
 docs/future-features/perPage/perPage.md
@@ -69,7 +72,7 @@ apps/{client,business,stylist}_app/docs/feature-index.md
 `docs/core/background_tasks.md` is whitespace only — treat it as empty.
 
 `docs/stitch/exports/` holds the remaining unimplemented screen designs
-(010–020): `code.html` is the layout source, `screen.png` the reference, and
+(010, 015–020 — 011–014 were built and their folders removed): `code.html` is the layout source, `screen.png` the reference, and
 `DESIGN.md` is the same global token spec in every folder (already implemented —
 do not regenerate tokens from it). Delete an export folder once its screen is
 built and the gate is green.
@@ -362,7 +365,7 @@ Authentication always outranks the onboarding flag.
 | Area | Where |
 |---|---|
 | Design tokens, theme, 14 shared widgets | `packages/design_system` |
-| Localization EN + AR, 80 keys, RTL | `packages/localization` |
+| Localization EN + AR, 102 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
 | Session lifecycle | `packages/core/lib/src/session` |
@@ -370,15 +373,16 @@ Authentication always outranks the onboarding flag.
 | Splash | `client_app/.../features/splash` (Stitch 001) |
 | Onboarding tour, 4 steps + skip sheet | `client_app/.../features/onboarding` (002–005) |
 | Auth entry / login / sign-up / verify | `client_app/.../features/auth` (006–009) |
+| Password recovery, 4 screens | `client_app/.../features/auth` (011–014) |
 | Launch gate + go_router route table | `client_app/.../core/navigation` |
 | Home placeholder | `client_app/.../features/home` |
 
 ### Not built — do not assume these exist
 
-- Password recovery (Stitch 011–014). Repository methods `forgotPassword` /
-  `resetPassword` exist; **no UI calls them**.
 - Profile completion (Stitch 010), Discovery Feed (016), Booking (017),
   AI Style (018), Stylist Profile (019), Review (020).
+- Authenticated password change. `/client/password` exists as a route constant;
+  nothing calls it (Track 17). Password *recovery* (011–014) **is** built.
 - Social login. The endpoint constant exists; the backend has no configured
   Socialite drivers, so it always 401s.
 - Per-route auth guards (beyond the launch gate + 401 redirect), guest guards,
@@ -403,11 +407,11 @@ Client routes are under `/client`.
 
 | Call | Route | Notes |
 |---|---|---|
-| Register | `POST /client/register` | 201. **Requires `password_confirmation`.** Returns `{token, client}` — authenticated *before* verification |
+| Register | `POST /client/register` | 201. **Requires `password_confirmation`.** Returns `{token, client}` — authenticated *before* verification. Backend dispatches the verification OTP asynchronously (`SendEmailVerificationCodeJob`, after commit); the client does **not** call `/send` on registration |
 | Login | `POST /client/login` | `{email, password}`. Email only — **there is no phone login** |
 | Refresh | `POST /client/refresh-token` | `auth:client`. Revokes and reissues. Used as the session-validity probe |
-| Send code | `POST /client/email/verify/send` | `auth:client`. 6 digits, 10-minute TTL |
-| Verify | `POST /client/email/verify` | `auth:client`, `{code}`, `size:6`. 422 on wrong code |
+| Send code | `POST /client/email/verify/send` | `auth:client`. 6 digits, 10-minute TTL. Regenerates and invalidates any previous code. Rate-limited: `throttle:3,1` (3/min) |
+| Verify | `POST /client/email/verify` | `auth:client`, `{code}`, `size:6`. 422 on wrong code. 5 wrong attempts invalidate the code (forces a resend) |
 | Logout | `POST /client/logout` | `auth:client`. 200 with **no `data` key** |
 
 Also declared and unused: `forgot-password`, `reset-password`, `password`,
@@ -431,9 +435,9 @@ Also declared and unused: `forgot-password`, `reset-password`, `password`,
 5. **Guard 401s bypass the envelope.** An expired token returns a bare
    `{"message":"Unauthenticated."}`, mapped to `ApiException(401, 'UNKNOWN')`.
    Branch on `isUnauthorized`, **never** on `code`.
-6. No rate limiting on any auth route; `forgot-password` leaks account
-   existence; disabled/banned clients can still log in. Server-side issues,
-   logged, not client-fixable.
+6. Rate limiting only on `/email/verify/send`; other auth routes are
+   unthrottled; `forgot-password` leaks account existence; disabled/banned
+   clients can still log in. Server-side issues, logged, not client-fixable.
 
 ---
 
@@ -441,6 +445,18 @@ Also declared and unused: `forgot-password`, `reset-password`, `password`,
 
 The app layer has no comments. These are the non-obvious choices — **check here
 before "simplifying" any of them.**
+
+### Password recovery (Stitch 011–014)
+
+| Choice | Why |
+|---|---|
+| A 422 from forgot-password **does not** surface; the flow advances anyway | The backend validates `exists:clients,email`, so showing "not registered" would make the API an account-enumeration oracle. Neutral copy instead. A `NetworkException` **does** surface — the user genuinely cannot proceed |
+| The OTP screen does not validate the code | There is no verify-reset-code endpoint. The code is carried in state and first checked when `reset-password` is submitted, so a bad code surfaces on screen **013** with a "Re-enter code" route back to 012 |
+| `RecoveryCodeEntered` raises a signal instead of the screen pushing directly | `bloc.add` goes through the event queue, so a direct push could build 013 before the code reached state. Routing on the emitted state makes the ordering correct by construction |
+| Recovery resend calls `forgotPassword`, not `sendEmailVerification` | Different endpoints, different throttles (`email/verify/send` is `throttle:3,1`). Conflating them sends the wrong kind of code |
+| `PasswordRecoveryBloc` lives in `client_app`, not `core` | Session truth is shared infrastructure (ADR 0001); recovery is a client feature flow. Same shape as `OnboardingConfigBloc` — an app bloc over a core repository |
+| 014 exits with `go`, not `push` | The code has been consumed; a completed reset must not be back-navigable |
+| The onboarding hero keeps its asset fallback on a config failure | The bundled asset is always available, so an error view would be strictly worse. The failure is a layered retry, never a replacement |
 
 | Code | Why it is that way |
 |---|---|
@@ -451,7 +467,7 @@ before "simplifying" any of them.**
 | `SkipBottomSheet` pops itself before invoking callbacks | Otherwise navigation fires while the modal route is still on top. It now pops with `context.pop()`. |
 | `_dismissForever` writes in `try`, navigates in `finally` | A failed preference write must not strand the user on the tour. |
 | `onSkipForNow: () => context.go('/home')` — no flag write | Deliberate: `Skip for now` ≠ `Don't show again`. The tour must reappear next cold start. |
-| `catch (_) {}` after `sendVerificationCode()` | Registration already succeeded and the token is stored. A failed dispatch must not block reaching the verify screen, which has Resend. |
+| Register never calls `sendEmailVerification()` | The backend owns the OTP lifecycle — registration dispatches `SendEmailVerificationCodeJob` (after commit, async) and the client moves straight to the verify screen, whose Resend is the only client-side retry. Keeps registration atomic client-side. |
 | `onForgotPassword: null` | Nullable hides the link. Stitch 011–014 do not exist; a visible dead button is worse than none. |
 | `AppNavigator`/`.navigator.dart` removed in Phase 2 | Navigators were imperative and un-testable; go_router's declarative table + redirects replaced the whole `core/navigation/` layer. Legacy claim: `SessionRedirect` (401 → auth) used to live in a navigator; it now hooks the router's listener. |
 | Login/sign-up say **"Email"**, not the design's "Email or Phone" | The backend accepts email only; the design label would guarantee a 422. |

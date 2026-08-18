@@ -78,12 +78,12 @@ class _LoginScreenState extends State<LoginScreen>
         children: [
           const Positioned.fill(child: AuthEntryBackground()),
           AuthShell(
+            pinnedHeader: true,
             header: AuthHeader(
               brandLabel: l10n.splashTitle,
               backTooltip: l10n.back,
               onBack: () => context.pop(),
-              localeLabel:
-                  isArabic ? l10n.localeEnglish : l10n.localeArabic,
+              localeLabel: isArabic ? l10n.localeEnglish : l10n.localeArabic,
               onLocaleToggle: widget.onLocaleToggle,
             ),
             child: BlocBuilder<AuthBloc, AuthState>(
@@ -94,17 +94,15 @@ class _LoginScreenState extends State<LoginScreen>
                     : AuthError.from(
                         state.error!,
                         l10n,
-                        unauthorizedMessage:
-                            l10n.loginErrorInvalidCredentials,
+                        unauthorizedMessage: l10n.loginErrorInvalidCredentials,
                       );
                 return LoginContent(
                   titleAnimation: _staggeredAnimations[0],
                   formAnimation: _staggeredAnimations[1],
                   actionsAnimation: _staggeredAnimations[2],
-                  onSubmit: (email, password) => widget.auth.add(LoginRequested(
-                    email: email,
-                    password: password,
-                  )),
+                  onSubmit: (email, password) => widget.auth.add(
+                    LoginRequested(email: email, password: password),
+                  ),
                   error: error,
                   isSubmitting: state.isSubmitting,
                   onForgotPassword: widget.onForgotPassword,

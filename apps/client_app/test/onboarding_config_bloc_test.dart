@@ -81,6 +81,27 @@ void main() {
   );
 
   blocTest<OnboardingConfigBloc, OnboardingConfigState>(
+    'a failure leaves the retry path open with a locale to retry with',
+    build: bloc,
+    act: (bloc) async {
+      repository.error = Exception('offline');
+      bloc.add(const OnboardingConfigLoadRequested(localeCode: 'en'));
+      await pumpEventQueue();
+    },
+    verify: (bloc) {
+      expect(bloc.state.error, isNotNull);
+      expect(bloc.state.config, isNull);
+      expect(
+        bloc.state.localeCode,
+        'en',
+        reason: 'the hero renders a retry affordance from this state and needs '
+            'the locale to re-dispatch with',
+      );
+      expect(bloc.state.isLoading, isFalse);
+    },
+  );
+
+  blocTest<OnboardingConfigBloc, OnboardingConfigState>(
     'a locale change refetches',
     build: bloc,
     act: (bloc) async {

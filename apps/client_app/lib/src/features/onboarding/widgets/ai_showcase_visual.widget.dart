@@ -164,6 +164,7 @@ class _AiShowcaseVisualState extends State<AiShowcaseVisual>
   }
 }
 
+// todo: we must move the _RecommendationCard into its own file
 class _RecommendationCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

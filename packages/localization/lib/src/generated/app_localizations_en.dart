@@ -257,4 +257,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyMessageGeneric => 'There\'s nothing to show right now.';
+
+  @override
+  String get recoveryEmailTitle => 'Forgot Password?';
+
+  @override
+  String get recoveryEmailSubtitle =>
+      'Enter the email on your account and we\'ll send you a 6-digit reset code.';
+
+  @override
+  String get recoveryEmailLabel => 'Email';
+
+  @override
+  String get recoverySendCodeButton => 'Send Code';
+
+  @override
+  String get recoveryReturnToLogIn => 'Return to Log In';
+
+  @override
+  String get recoveryOtpTitle => 'Enter Reset Code';
+
+  @override
+  String recoveryOtpSubtitle(String email) {
+    return 'If $email is registered, we\'ve sent it a 6-digit code. It expires in 10 minutes.';
+  }
+
+  @override
+  String get recoveryOtpContinueButton => 'Continue';
+
+  @override
+  String get recoveryOtpIncomplete => 'Enter all 6 digits';
+
+  @override
+  String get recoveryResend => 'Resend Code';
+
+  @override
+  String recoveryResendDisabled(int seconds) {
+    return 'Resend Code (${seconds}s)';
+  }
+
+  @override
+  String get recoveryDidNotReceive => 'Didn\'t receive the code?';
+
+  @override
+  String get recoveryNewPasswordTitle => 'Create New Password';
+
+  @override
+  String get recoveryNewPasswordSubtitle =>
+      'Choose a new password for your account.';
+
+  @override
+  String get recoveryNewPasswordLabel => 'New Password';
+
+  @override
+  String get recoveryConfirmPasswordLabel => 'Confirm New Password';
+
+  @override
+  String get recoveryResetButton => 'Reset Password';
+
+  @override
+  String get recoveryCodeRejected => 'That code is invalid or has expired.';
+
+  @override
+  String get recoveryReenterCode => 'Re-enter code';
+
+  @override
+  String get passwordResetSuccessTitle => 'Password Updated';
+
+  @override
+  String get passwordResetSuccessMessage =>
+      'Your password has been changed. You can now log in with your new password.';
+
+  @override
+  String get onboardingConfigUnavailable =>
+      'Couldn\'t load the latest artwork.';
 }

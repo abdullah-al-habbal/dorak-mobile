@@ -75,6 +75,7 @@ class _ShimmerBoxState extends State<ShimmerBox>
   }
 }
 
+// todo: move the _SlideGradientTransform into its own file and update all its referances 
 class _SlideGradientTransform extends GradientTransform {
   final double dx;
 
