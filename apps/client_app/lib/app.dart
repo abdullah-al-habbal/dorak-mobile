@@ -43,6 +43,7 @@ class _DorakAppState extends State<DorakApp> {
   late final StreamSubscription<void> _unauthorizedSubscription;
   late final StreamSubscription<Locale> _localeSubscription;
   late final StreamSubscription<AuthState> _authCoordinatorSubscription;
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
@@ -78,6 +79,8 @@ class _DorakAppState extends State<DorakApp> {
       _sessionBloc.add(UnauthorizedDetected());
     });
 
+    _lifecycleListener = AppLifecycleListener(onResume: _probeSessionOnResume);
+
     _localeSubscription = _localeBloc.stream.listen((locale) {
       _onboardingConfigBloc.add(
         OnboardingConfigLoadRequested(localeCode: locale.languageCode),
@@ -97,6 +100,7 @@ class _DorakAppState extends State<DorakApp> {
 
   @override
   void dispose() {
+    _lifecycleListener.dispose();
     _authCoordinatorSubscription.cancel();
     _unauthorizedSubscription.cancel();
     _localeSubscription.cancel();
@@ -112,6 +116,28 @@ class _DorakAppState extends State<DorakApp> {
 
   void _switchLocale() {
     _localeBloc.add(LocaleToggled());
+  }
+
+  /// Re-probes the stored token whenever the app returns to the foreground.
+  ///
+  /// A session can die while the app is backgrounded — the token expires or is
+  /// revoked server-side and nothing tells the client. Without this probe the
+  /// app keeps rendering authenticated UI until some later request happens to
+  /// return 401.
+  ///
+  /// See `docs/runtime/app_lifecycle.md`.
+  void _probeSessionOnResume() {
+    final session = _sessionBloc.state;
+
+    // The startup restore owns the `unknown` status. Racing it would resolve
+    // the session twice behind the splash's `session.ready` completer.
+    if (session.status == AuthStatus.unknown) return;
+
+    // A restore or logout is already running. `RestoreRequested` uses Bloc's
+    // default concurrent transformer, so a second one would overlap the first.
+    if (session.isLoading) return;
+
+    _sessionBloc.add(RestoreRequested());
   }
 
   @override

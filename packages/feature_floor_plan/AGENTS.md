@@ -46,7 +46,7 @@ and `business_app` (laying a branch out) are expected to need it.
    — `code.html` is the layout source, `screen.png` the reference. `DESIGN.md`
    in that folder is the global token spec, already implemented in
    `design_system`; do not regenerate tokens from it.
-3. **Read `cursor/skills/stitch-flutter-converter.md`** for the export →
+3. **Read `cursor/skills/stitch-flutter-converter/SKILL.md`** for the export →
    Flutter conversion protocol.
 4. **Fix `analysis_options.yaml`** — it points at `package:flutter_lints/flutter.yaml`
    instead of `../../analysis_options.yaml`, so this package misses the

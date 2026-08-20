@@ -117,11 +117,24 @@ class FakeAuthRepository implements AuthRepository {
   int forgotPasswordCalls = 0;
   Map<String, String>? resetPasswordPayload;
 
+  /// Counts session re-probes. One `RestoreRequested` with a stored token calls
+  /// `refreshToken` exactly once, so this is how a test observes a restore
+  /// without depending on frame timing.
+  int refreshTokenCalls = 0;
+
+  /// When set, `refreshToken` blocks on it. Lets a test hold the session in
+  /// `AuthStatus.unknown` / `isLoading`. Null by default, so every other test
+  /// keeps resolving in a microtask.
+  Completer<void>? refreshTokenGate;
+
   int sendVerificationCalls = 0;
   String? verifiedCode;
 
   @override
   Future<String> refreshToken() async {
+    refreshTokenCalls++;
+    final gate = refreshTokenGate;
+    if (gate != null) await gate.future;
     final error = refreshTokenError;
     if (error != null) throw error;
     return 'rotated-token';

@@ -143,7 +143,7 @@ profile shimmer — those are compositions of `ShimmerBox`.
 
 ## 6. Gotchas
 
-- **Fonts are bundled and declared here.** The `cursor/skills/stitch-flutter-converter.md`
+- **Fonts are bundled and declared here.** The `cursor/skills/stitch-flutter-converter/SKILL.md`
   note that IBM Plex is "deferred, no `.ttf` in the repo" is stale — the files
   are in `fonts/` and wired into `pubspec.yaml`.
 - **Never `Image.asset` an SVG.** Flutter cannot decode it and throws at

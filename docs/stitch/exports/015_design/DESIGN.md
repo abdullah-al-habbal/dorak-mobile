@@ -115,7 +115,6 @@ This design system utilizes a dynamic color token strategy to support multi-tena
 1.  **Men’s Universe:** Features "Charcoal Slate" as the primary base with "Antique Gold" accents. The palette is deep, grounded, and masculine, suggesting stability and precision.
 2.  **Women’s Universe:** Utilizes "Deep Burgundy" paired with "Champagne Gold." This evokes luxury, elegance, and a premium spa-like atmosphere.
 3.  **Functional Status:** Universal colors are reserved for operational status. **Emerald Green** denotes available chairs or confirmed slots; **Crimson Red** denotes occupied or unavailable status.
-4.  **Neutral Palette:** A shared set of cool greys is used for borders, inactive states, and secondary metadata to ensure cross-universe consistency.
 
 ## Typography
 
