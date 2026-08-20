@@ -7,6 +7,10 @@ import 'package:client_app/src/core/navigation/app_routes.entity.dart';
 import 'package:client_app/src/features/auth/login.screen.dart';
 import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
+import 'package:client_app/src/features/auth/widgets/auth_header.widget.dart';
+import 'package:client_app/src/features/auth/widgets/auth_shell.widget.dart';
+import 'package:client_app/src/features/auth/widgets/login_content.widget.dart';
+import 'package:client_app/src/features/auth/widgets/sign_up_content.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_text_field.widget.dart';
 import 'package:client_app/src/features/auth/widgets/otp_input_field.widget.dart';
 import 'package:client_app/src/features/home/home.screen.dart';
@@ -204,5 +208,207 @@ void main() {
     await tester.tap(find.text('Resend Code'));
     await tester.pumpAndSettle();
     expect(repository.sendVerificationCalls, 1);
+  });
+
+  group('AuthShell responsive layout', () {
+    const compactPhone = Size(375, 667);
+    const standardPhone = Size(430, 932);
+    const wideTablet = Size(900, 1200);
+
+    ScrollableState shellScrollable(WidgetTester tester) {
+      return tester.state<ScrollableState>(
+        find
+            .descendant(
+              of: find.byType(AuthShell),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+    }
+
+    Rect viewportRect(WidgetTester tester) => tester.getRect(
+          find
+              .descendant(
+                of: find.byType(AuthShell),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+
+    Future<void> openLogin(WidgetTester tester, AppRouter router) async {
+      router.router.go(AppRoutes.authLogin);
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> openSignUp(WidgetTester tester, AppRouter router) async {
+      router.router.go(AppRoutes.authRegister);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('centres the form when the viewport has room to spare',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: wideTablet);
+      await openLogin(tester, router);
+
+      final scroll = shellScrollable(tester);
+      expect(
+        scroll.position.maxScrollExtent,
+        0,
+        reason: 'the login form fits in a 1200pt viewport, so nothing should scroll',
+      );
+
+      final viewport = viewportRect(tester);
+      final content = tester.getRect(find.byType(LoginContent));
+      final gapAbove = content.top - viewport.top;
+      final gapBelow = viewport.bottom - content.bottom;
+
+      expect(gapAbove, greaterThan(AuthShell.verticalMargin));
+      expect(
+        (gapAbove - gapBelow).abs(),
+        lessThan(2),
+        reason: 'equal space above and below is what "centred" means; this must '
+            'hold from the constraints alone, with no viewport-height breakpoint',
+      );
+    });
+
+    testWidgets('centres on a standard phone too — no device-height threshold',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: standardPhone);
+      await openLogin(tester, router);
+
+      final viewport = viewportRect(tester);
+      final content = tester.getRect(find.byType(LoginContent));
+      expect(
+        (content.top - viewport.top - (viewport.bottom - content.bottom)).abs(),
+        lessThan(2),
+      );
+      expect(shellScrollable(tester).position.maxScrollExtent, 0);
+    });
+
+    testWidgets('a short viewport still centres content that fits in it',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: compactPhone);
+      await openLogin(tester, router);
+
+      final scroll = shellScrollable(tester);
+      expect(
+        scroll.position.maxScrollExtent,
+        0,
+        reason: 'the login form fits inside 667pt, so it must not scroll',
+      );
+
+      final viewport = viewportRect(tester);
+      final content = tester.getRect(find.byType(LoginContent));
+      final gapAbove = content.top - viewport.top;
+      final gapBelow = viewport.bottom - content.bottom;
+
+      expect(
+        gapAbove,
+        greaterThan(AuthShell.verticalMargin),
+        reason: 'a 667pt device used to top-align purely because it fell under a '
+            '840pt breakpoint — centring must follow the content, not the device',
+      );
+      expect((gapAbove - gapBelow).abs(), lessThan(2));
+    });
+
+    testWidgets('keeps compact content reachable from the top and scrollable',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: compactPhone);
+      await openSignUp(tester, router);
+
+      final scroll = shellScrollable(tester);
+      final viewport = viewportRect(tester);
+      final content = tester.getRect(find.byType(SignUpContent));
+
+      if (scroll.position.maxScrollExtent > 0) {
+        expect(
+          content.top - viewport.top,
+          closeTo(AuthShell.verticalMargin, 1),
+          reason: 'content taller than the viewport must start at the top so the '
+              'first field is reachable, not centred off-screen',
+        );
+      } else {
+        expect(
+          content.top - viewport.top,
+          greaterThanOrEqualTo(AuthShell.verticalMargin),
+        );
+      }
+
+      expect(tester.takeException(), isNull, reason: 'no overflow');
+    });
+
+    testWidgets('a shrunken viewport scrolls instead of clipping, CTA reachable',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: compactPhone);
+      await openSignUp(tester, router);
+
+      tester.view.viewInsets = const FakeViewPadding(bottom: 320 * 3.0);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: 'no clipping or overflow');
+
+      final scroll = shellScrollable(tester);
+      expect(
+        scroll.position.maxScrollExtent,
+        greaterThan(0),
+        reason: 'the form cannot fit beside a keyboard, so it must scroll',
+      );
+
+      await tester.ensureVisible(find.text('Create Account').last);
+      await tester.pumpAndSettle();
+
+      final cta = tester.getRect(find.text('Create Account').last);
+      final viewport = viewportRect(tester);
+      expect(cta.bottom, lessThanOrEqualTo(viewport.bottom + 1));
+      expect(cta.top, greaterThanOrEqualTo(viewport.top - 1));
+    });
+
+    testWidgets('the transactional header survives a shrunken viewport',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: compactPhone);
+      await openLogin(tester, router);
+
+      tester.view.viewInsets = const FakeViewPadding(bottom: 320 * 3.0);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AuthHeader), findsOneWidget);
+
+      final header = tester.getRect(find.byType(AuthHeader));
+      final shell = tester.getRect(find.byType(AuthShell));
+      expect(
+        header.bottom,
+        lessThanOrEqualTo(shell.bottom),
+        reason: 'pinnedHeader keeps AuthHeader out of the scrollable, so the '
+            'keyboard must not be able to push it out of view',
+      );
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      expect(find.byType(LoginScreen), findsNothing);
+    });
+
+    testWidgets('narrow viewports stay fluid; wide ones honour the max width',
+        (tester) async {
+      final narrowRouter = await pumpEntry(tester, logicalSize: compactPhone);
+      await openLogin(tester, narrowRouter);
+
+      expect(
+        tester.getSize(find.byType(LoginContent)).width,
+        closeTo(compactPhone.width - AuthShell.horizontalMargin * 2, 1),
+        reason: 'below the cap the form fills the width minus its margins',
+      );
+    });
+
+    testWidgets('a wide viewport caps the form at maxContentWidth',
+        (tester) async {
+      final router = await pumpEntry(tester, logicalSize: wideTablet);
+      await openLogin(tester, router);
+
+      expect(
+        tester.getSize(find.byType(LoginContent)).width,
+        closeTo(AuthShell.maxContentWidth, 1),
+        reason: '900pt wide must not stretch the form across the whole screen',
+      );
+    });
   });
 }
