@@ -449,7 +449,8 @@ Objectives:
 * Authentication state. — `DONE` (`AuthStatus` + `SessionSignal`)
 * Token lifecycle. — `DONE` (issue, rotate on restore, clear on 401/logout)
 
-**Evidence.** 63 tests in `packages/core` and 27 in `apps/client_app`;
+**Evidence.** 72 tests in `packages/core` and 67 in `apps/client_app`
+(re-baselined 2026-09-02);
 `session_bloc_test.dart` covers the full restore matrix (no token / valid /
 401 / 403 / offline / server error / unreadable storage), the expiry and burst
 paths, client discard, and the anti-resurrection guard.
@@ -784,7 +785,9 @@ Documentation: `docs/authentication/auth_flow.md`,
 `docs/flows/onboarding.md`, `docs/flows/guest_access.md`,
 `docs/screens/authentication/`.
 
-**Evidence.** 144 tests, `dart run melos run verify` exit 0.
+**Evidence.** 157 tests, `dart run melos run verify` exit 0 (re-baselined
+2026-09-02; suite = 72 core + 67 client_app + 14 design_system + 1 each in the
+four skeleton/package units).
 `password_recovery_bloc_test.dart` (8) and `password_recovery_flow_test.dart` (6)
 cover the flow, the account-enumeration mitigation, and the rejected-code path.
 
@@ -900,7 +903,7 @@ Verify:
 
 **Just completed — Track 16, Password Recovery (Stitch 011–014).** Four screens,
 four routes, a feature-scoped `PasswordRecoveryBloc` in `client_app`, 22 ARB keys
-× 2 locales, 15 new tests. **144 tests, gate exit 0.**
+× 2 locales, 15 new tests. **157 tests, gate exit 0 (re-baselined 2026-09-02).**
 
 Screen 014 is `StatusView`'s **first production consumer**, which is what finally
 validates a Track 12 component against real usage rather than only its own tests.

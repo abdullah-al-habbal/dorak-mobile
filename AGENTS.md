@@ -198,8 +198,10 @@ dart run melos run test        # flutter test, every package
 dart run melos run verify      # all five, in order — the gate
 ```
 
-`verify` must exit 0 before any work is called done. Current baseline: 7
-packages analyze clean, taxonomy passes, 90 tests pass.
+`verify` must exit 0 before any work is called done. Current baseline
+(re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
+**157 tests pass** (72 core, 67 client_app, 14 design_system, 1 each for
+business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
 
@@ -510,7 +512,7 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. 80 keys, identical sets.
+  `app_ar.arb`. **102 keys, identical sets** (verified 2026-09-02).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
@@ -526,9 +528,11 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-23 test files; 129 tests pass (72 in `core`, 39 in `client_app`, 14 in
-`design_system` — the Track 12 state-component suite plus the
-`locale_switcher` tests — 4 placeholders).
+**157 tests pass** (72 in `core`, 67 in `client_app`, 14 in `design_system` —
+the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
+smoke test each in `business_app`, `stylist_app`, `localization`,
+`feature_floor_plan`). Re-baselined via `dart run melos run verify`
+2026-09-02.
 
 | File | Covers |
 |---|---|
