@@ -67,7 +67,7 @@ docs/screens/authentication/{forgot_password,recovery_otp,
                              create_new_password,password_reset_success}.md
 docs/flows/onboarding.md                 docs/flows/guest_access.md
 docs/navigation/routes.md                docs/navigation/guards.md
-docs/future-features/perPage/perPage.md
+docs/future-features/perPage/perPage.md  docs/future-features/discovery-016.md
 apps/{client,business,stylist}_app/docs/feature-index.md
 ```
 
@@ -385,6 +385,10 @@ Authentication always outranks the onboarding flag.
 
 - Profile completion (Stitch 010), Discovery Feed (016), Booking (017),
   AI Style (018), Stylist Profile (019), Review (020).
+  Discovery (016) is **scoped** in `docs/future-features/discovery-016.md` —
+  a read-only contract pass; nothing of the feature exists.
+- **Favorites: no backend route, no client UI.** `rg favorite` in
+  `dorak-backend/modules/` is empty. Do not fake a local-only favorite toggle.
 - Authenticated password change. `/client/password` exists as a route constant;
   nothing calls it (Track 17). Password *recovery* (011–014) **is** built.
 - Social login. The endpoint constant exists; the backend has no configured

@@ -1,7 +1,7 @@
 # Actionable Plan — Mobile
 
 > Repo entry doc. Read `../AGENTS.md` → `CLAUDE.md` → `docs/index.md` first.
-> Updated 2026-09-02 — Track 10 done. Branch `main`.
+> Updated 2026-09-02 — Track 10 done, Discovery scoped. Branch `main`.
 
 ## Phase C — Re-baseline + pick next work ✅ BASELINED 2026-09-02
 
@@ -23,6 +23,30 @@
       `docs/index.md` §6 Track 10 + current-execution-point (dependency
       registration `PARTIAL`-by-design, a recorded decision not a debt item).
       `melos run verify` exit 0 before Done.
+
+## Phase D — Discovery 016 scoping ✅ SCOPED 2026-09-02 (read-only)
+
+- [x] D1: Read Stitch export `docs/stitch/exports/016_discovery_feed/plan.md`.
+- [x] D2: Read the real backend `modules/Explore` contract: 4 routes,
+      `ExploreBranchesRequest` (required lat/long/radius/universe `men|women`;
+      optional `available_now`, `price_range[min,max]`, `rating_min`,
+      `catalog_item_ids[]`, `face_shape_compatible`, `per_page≤100`),
+      `BranchResource` fields, `ApiResponseTrait::paginated` meta shape.
+- [x] D3: Verified contract alignment — mobile `getPaginated` reads
+      `meta.pagination.{total,count,per_page,current_page,total_pages}`; backend
+      emits exactly that → feed paginates on existing core, nothing new.
+- [x] D4: Recorded gaps/decisions: **favorites don't exist in the backend at
+      all** (ship without, product decision); no search `q`; BranchResource
+      lacks image/rating/services/price/availability/sponsored; no location
+      package → `LocationProvider` seam (Track 13/14); 4-tab shell destination
+      list for Track 11 (Discover + 3 placeholders).
+- [x] D5: Wrote `docs/future-features/discovery-016.md` — the spec:
+      contract table, stitch↔contract coverage matrix, nav shell, location
+      rule, **Track 05 feed-cache consumer envelope** (§5), Track 18 feature
+      shape, acceptance list. This is the single source the next two tracks
+      read.
+
+**Next: Track 05 — Storage (cache strategy), target = discovery-016 §5.**
 
 ## Track 10 completion record
 

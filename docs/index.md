@@ -910,8 +910,10 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** completed. Track 10 (DI & bootstrap) closed; choose the next
-one below.
+**Current Track:** none active. Discovery (016) was **scoped** (read-only
+contract pass — see `docs/future-features/discovery-016.md`); the scope made
+Track 05 the next concrete step and unblocked Track 11's destination list. Next
+up: **Track 05 — Storage (cache strategy)**.
 
 **Just completed — Track 10, Dependency Injection & Bootstrap.** The last open
 objective — application lifecycle — was already implemented and tested (the
@@ -920,22 +922,44 @@ resume `RestoreRequested` probe in `DorakApp`); it is now documented in
 closes as `PARTIAL`-**by-design** (manual wiring in `DorakApp.initState` is the
 recorded architecture, not a debt item).
 
+Then a **Discovery 016 scope pass** (2026-09-02, `docs/future-features/
+discovery-016.md`): read the real backend `Explore` module instead of the Stitch
+demo data. Findings that changed the plan:
+
+* `/explore/branches` requires `latitude`, `longitude`, `radius`, `universe`
+  (`men|women`) — no search `q`, no sort, no `distance` filter. BranchResource
+  carries no image/rating/services/price/availability/sponsored field; only
+  `distance`, `compatibility_score`, `rank`.
+* **Favorites do not exist anywhere in the backend** — the Stitch heart cannot
+  be shipped; recorded as a product decision (ship without) + backend work
+  packet.
+* Location permission plumbing does not exist (no geo package in the workspace).
+  V1: a `LocationProvider` seam under Track 13/14, no silent fake coords, no
+  auto-permission on mount.
+* **Track 05's wait-for-consumer condition is now satisfied** — the feed cache
+  envelope is defined in the scope doc (§5), a bounded
+  `explore/branches` + universe + lat/long/radius-bucket key model.
+* Track 11's four tab destinations are now concrete: Discover (live) +
+  Bookings/Favorites/Profile (placeholders).
+
 **Track statuses.** `DONE`: 00–04, 06, 07, 08, 10, 16. `IN_PROGRESS`: 05 (cache
-strategy), 09 (pagination pending a consumer), 11 (nested nav, guest guards,
-deep links), 12 (`StatusView` now consumed; `AppLoader` and `ShimmerBox` still
-await Discovery). `PENDING`: 13, 14, 15, 17–21.
+strategy — now unblocked, has a consumer), 09 (pagination pending a consumer),
+11 (nested nav, guest guards, deep links — destinations now defined by the
+Discovery scope), 12 (`StatusView` now consumed; `AppLoader` and `ShimmerBox`
+still await Discovery). `PENDING`: 13, 14, 15, 17–21.
 
-**Candidates for the next track, in dependency order.** Discovery (016) needs
-the first two before it can start:
+**Candidates for the next track, in dependency order:**
 
-* `Track 05 — Storage` — cache strategy, its last unblocked objective. Note it
-  has no consumer yet, which is the condition that got the pagination notifiers
-  deleted; consider whether it should wait for Discovery.
-* `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute`. Blocked in
-  practice: three of Discovery's four tab destinations do not exist.
+* `Track 05 — Storage` — cache strategy, targeting the Discovery-016 feed
+  envelope (§5 of `docs/future-features/discovery-016.md`). This resolves the
+  "no consumer" caveat that previously kept it deferred; Discovery (018,
+  CL-09) is the first consumer, built on top.
+* `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute` with four
+  destinations (Discover replaces Home; Bookings/Favorites/Profile as
+  placeholders). Comes after 05.
 
-Track 18 / Discovery 016 additionally needs location-permission plumbing and feed
-DTOs, neither of which exists.
+Track 18 / Discovery 016 additionally needs location-permission plumbing, feed
+DTOs, and the trimmed-to-contract surface agreed in the scope doc.
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),
