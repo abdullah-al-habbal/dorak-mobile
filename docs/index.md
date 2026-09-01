@@ -410,7 +410,7 @@ packages/core
 
 ## Track 05 — Storage
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE` (2026-09-02)
 
 Objectives:
 
@@ -419,7 +419,21 @@ Objectives:
 * Onboarding persistence. — `DONE`
 * `"Don't show again"` persistence. — `DONE`
 * Profile-completion persistence. — `PENDING` (blocked on Track 17)
-* Cache strategy. — `PENDING`
+* Cache strategy. — `DONE` (`FeedCache` / `SharedFeedCache`, raw-wire-payload
+  feed cache; bounded keys = universe + lat/long 3-dp + 5 km radius bucket +
+  per_page; read-time staleness via `FeedCacheEntry.isStale`,
+  `feedCacheTtl` = 30 min; explicit `evict`/`clear`; corrupt payloads → null).
+
+**Evidence.** 11 tests in `packages/core/test/feed_cache_test.dart` (key
+bucketing incl. same-neighbourhood sharing; write/read/evict/clear round-trips;
+staleness against an injected clock; corrupt payload → null). Full gate:
+`dart run melos run verify` exit 0, **168 tests** (core 72 → 83,
+re-baselined 2026-09-02).
+
+The cache's first consumer is the Discovery 016 feed (`docs/future-features/
+discovery-016.md` §5) — the wait-for-consumer caveat that kept this track
+deferred is resolved: the envelope it stores was derived from the real backend
+`/explore/branches` contract, and Discovery (Track 18) reads it.
 
 Documentation: `docs/core/storage.md`.
 
@@ -910,56 +924,35 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** none active. Discovery (016) was **scoped** (read-only
-contract pass — see `docs/future-features/discovery-016.md`); the scope made
-Track 05 the next concrete step and unblocked Track 11's destination list. Next
-up: **Track 05 — Storage (cache strategy)**.
+**Current Track:** none active. Track 05 completed; the Discovery-016 scope
+made the order concrete — **Track 11 (Navigation)** is next, then Track 18 /
+Discovery (CL-09).
 
-**Just completed — Track 10, Dependency Injection & Bootstrap.** The last open
-objective — application lifecycle — was already implemented and tested (the
-resume `RestoreRequested` probe in `DorakApp`); it is now documented in
-`docs/runtime/app_lifecycle.md` and the track is closed. Dependency registration
-closes as `PARTIAL`-**by-design** (manual wiring in `DorakApp.initState` is the
-recorded architecture, not a debt item).
+**Just completed — Track 05, Storage (cache strategy).** `FeedCache` /
+`SharedFeedCache` landed in `packages/core` (11 tests): raw-wire-payload feed
+cache with bounded keys (universe + lat/long rounded to 3 dp + 5 km radius
+bucket + per_page), read-time staleness (`FeedCacheEntry.isStale`,
+`feedCacheTtl` = 30 min), explicit eviction, corrupt payloads → null. Built
+against the Discovery-016 feed envelope (`docs/future-features/discovery-016.md`
+§5) so the "no consumer" caveat that kept it deferred is gone. `melos verify`
+exit 0, **168 tests** (core 72 → 83).
 
-Then a **Discovery 016 scope pass** (2026-09-02, `docs/future-features/
-discovery-016.md`): read the real backend `Explore` module instead of the Stitch
-demo data. Findings that changed the plan:
+**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 16. `IN_PROGRESS`: 09
+(pagination pending a consumer — its `Paged<T>` already ships), 11 (nested nav,
+guest guards, deep links — destinations now defined by the Discovery scope), 12
+(`StatusView` now consumed; `AppLoader` and `ShimmerBox` still await Discovery).
+`PENDING`: 13, 14, 15, 17–21.
 
-* `/explore/branches` requires `latitude`, `longitude`, `radius`, `universe`
-  (`men|women`) — no search `q`, no sort, no `distance` filter. BranchResource
-  carries no image/rating/services/price/availability/sponsored field; only
-  `distance`, `compatibility_score`, `rank`.
-* **Favorites do not exist anywhere in the backend** — the Stitch heart cannot
-  be shipped; recorded as a product decision (ship without) + backend work
-  packet.
-* Location permission plumbing does not exist (no geo package in the workspace).
-  V1: a `LocationProvider` seam under Track 13/14, no silent fake coords, no
-  auto-permission on mount.
-* **Track 05's wait-for-consumer condition is now satisfied** — the feed cache
-  envelope is defined in the scope doc (§5), a bounded
-  `explore/branches` + universe + lat/long/radius-bucket key model.
-* Track 11's four tab destinations are now concrete: Discover (live) +
-  Bookings/Favorites/Profile (placeholders).
+**Next candidate:**
 
-**Track statuses.** `DONE`: 00–04, 06, 07, 08, 10, 16. `IN_PROGRESS`: 05 (cache
-strategy — now unblocked, has a consumer), 09 (pagination pending a consumer),
-11 (nested nav, guest guards, deep links — destinations now defined by the
-Discovery scope), 12 (`StatusView` now consumed; `AppLoader` and `ShimmerBox`
-still await Discovery). `PENDING`: 13, 14, 15, 17–21.
-
-**Candidates for the next track, in dependency order:**
-
-* `Track 05 — Storage` — cache strategy, targeting the Discovery-016 feed
-  envelope (§5 of `docs/future-features/discovery-016.md`). This resolves the
-  "no consumer" caveat that previously kept it deferred; Discovery (018,
-  CL-09) is the first consumer, built on top.
 * `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute` with four
   destinations (Discover replaces Home; Bookings/Favorites/Profile as
-  placeholders). Comes after 05.
+  placeholders). The destination list is defined in
+  `docs/future-features/discovery-016.md` §3 — no longer blocked.
 
 Track 18 / Discovery 016 additionally needs location-permission plumbing, feed
-DTOs, and the trimmed-to-contract surface agreed in the scope doc.
+DTOs, `ExploreEndpoints`/`ExploreRepository` in core, and the trimmed-to-contract
+surface agreed in the scope doc.
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

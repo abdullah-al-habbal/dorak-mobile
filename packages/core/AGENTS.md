@@ -41,6 +41,8 @@ lib/src/
   storage/
     token.storage.dart                   TokenStorage + SecureTokenStorage
     preferences.storage.dart             AppPreferences + SharedAppPreferences
+    feed_cache.storage.dart              FeedCache + SharedFeedCache (feed cache strategy)
+    feed_cache_entry.entity.dart         FeedCacheEntry value object + feedCacheTtl
     storage.barrel.dart
 ```
 
@@ -182,12 +184,28 @@ session bloc.
 |---|---|---|
 | `TokenStorage` | `SecureTokenStorage` | `dorak_client_token` (secure) |
 | `AppPreferences` | `SharedAppPreferences` | `dont_show_onboarding` (prefs) |
+| `FeedCache` | `SharedFeedCache` | `dorak_cache:v1:<universe>:<lat>:<lon>:<radius>:<per_page>` (prefs) |
 
 `SecureTokenStorage.read()` normalises `''` to `null`.
 `AppPreferences.dontShowOnboarding` is a **synchronous** getter — the launch
 gate branches on it with no await. Build it once with
 `await SharedAppPreferences.create()`; that factory exists so apps never
 declare `shared_preferences` themselves.
+
+**Feed cache strategy (Track 05, consumer = Discovery 016 — see
+`dorak-mobile/docs/future-features/discovery-016.md` §5):**
+
+* Stores the **raw JSON response payload** (item maps + pagination meta), not
+  parsed DTOs — `*.dto.dart` uses `createToJson: false`, so wire payloads are
+  re-parsed via the same `itemParser`/`PaginationMeta.fromJson` on cache read.
+* Key derivation folds the query into bounded buckets: lat/long rounded to 3 dp
+  (≈111 m), radius snapped to a 5 km bucket, `universe` + `per_page` exact.
+  The same key space the feed query itself ranks over.
+* **No TTL enforcement inside the cache.** `FeedCacheEntry.storedAt` +
+  `isStale(now)`/`feedCacheTtl` (30 min) live in the value object; the consumer
+  decides whether stale data is acceptable (offline) or must be revalidated
+  (pull-to-refresh). Universe switch / filter change → `evict(key)` then re-query.
+* Corrupt/unparseable payloads read as `null`, never throw.
 
 ## 7. Adding things
 
@@ -218,6 +236,10 @@ declare `shared_preferences` themselves.
   `refresh-token`.
 - **`NetworkException` exposes `DioExceptionType`**, so any package
   constructing one in a test needs a `dio` dev dependency.
+- **Feed cache never stores parsed DTOs** — wire payload only. See storage.
+- **The feed cache has no TTL built in** — staleness is the consumer's call via
+  `FeedCacheEntry.isStale`. A TTL inside the store would force re-fetch even
+  when offline (the one case the cache exists for).
 - **A 401/403 on an authenticated request is reported, not swallowed.**
   `ApiClient.unauthorizedStream` emits once per burst
   (`reportUnauthorized()` + `resetUnauthorizedSignal()`);
@@ -226,7 +248,7 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 59 tests.
+`packages/core/test/` — 83 tests.
 
 | File | Covers |
 |---|---|
@@ -237,6 +259,7 @@ declare `shared_preferences` themselves.
 | `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, `SessionAuthenticated`, logout, global signal emission |
 | `unauthorized_signal_test.dart` | 401/403 burst emission + reset, lifecycle routes, no-bearer, transport, 5xx |
 | `storage_test.dart` | preference defaults + round-trip |
+| `feed_cache_test.dart` | key bucketing (same-neighbourhood share, universe/radius/per_page split, far coords differ), write/read round-trip, evict/clear, staleness vs injected clock, corrupt payload → null |
 | `onboarding_config_repository_test.dart` | as named |
 
 Helpers: `test/helpers/fake_dio.dart` (interceptor-based fake, envelope

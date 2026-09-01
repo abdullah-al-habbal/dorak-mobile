@@ -202,7 +202,7 @@ dart run melos run verify      # all five, in order — the gate
 
 `verify` must exit 0 before any work is called done. Current baseline
 (re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
-**157 tests pass** (72 core, 67 client_app, 14 design_system, 1 each for
+**168 tests pass** (83 core, 67 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -372,6 +372,7 @@ Authentication always outranks the onboarding flag.
 | Localization EN + AR, 102 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
+| Feed cache strategy (Track 05) | `packages/core/lib/src/storage/feed_cache.storage.dart` |
 | Session lifecycle | `packages/core/lib/src/session` |
 | Auth repository (8 methods over 10 route constants) | `packages/core/.../repositories/auth.repository.dart` |
 | Splash | `client_app/.../features/splash` (Stitch 001) |
@@ -534,7 +535,7 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**157 tests pass** (72 in `core`, 67 in `client_app`, 14 in `design_system` —
+**168 tests pass** (83 in `core`, 67 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
@@ -548,6 +549,7 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, 401/422 mapping |
 | `core/test/unauthorized_signal_test.dart` | 401/403 burst emission + reset on the `unauthorizedStream` |
 | `core/test/storage_test.dart` | preference round-trip + defaults |
+| `core/test/feed_cache_test.dart` | feed-cache key bucketing, round-trip, evict/clear, staleness, corrupt payload |
 | `client_app/test/widget_test.dart` | real `DorakApp` bootstrap: splash → gate → auth entry |
 | `client_app/test/app_gate_test.dart` | all six gate branches |
 | `client_app/test/auth_flow_test.dart` | login, validation, sign-up → verify, OTP, skip, resend cooldown |

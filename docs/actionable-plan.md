@@ -48,6 +48,28 @@
 
 **Next: Track 05 — Storage (cache strategy), target = discovery-016 §5.**
 
+## Phase E — Track 05 (cache strategy) ✅ DONE 2026-09-02
+
+- [x] E1: `FeedCache` abstract + `SharedFeedCache` in
+      `packages/core/lib/src/storage/feed_cache.storage.dart` — raw-wire-payload
+      feed cache (item maps + pagination meta), bounded keys (universe +
+      lat/long 3-dp + 5 km radius bucket + per_page), explicit `evict`/`clear`.
+- [x] E2: `FeedCacheEntry` value object + `feedCacheTtl` (30 min) — read-time
+      staleness (`isStale`), store never refuses to return (consumer decides:
+      offline → stale render, refresh → revalidate).
+- [x] E3: Exported via `storage.barrel.dart`.
+- [x] E4: 11 tests in `packages/core/test/feed_cache_test.dart` — same-
+      neighbourhood keys share; universe/radius/per_page split; far coords
+      differ; round-trip preserves items+meta+storedAt; evict single key;
+      clear-all; staleness vs injected clock; corrupt payload → null.
+- [x] E5: Docs — `core/AGENTS.md` (§1/§6/§9), `docs/core/storage.md`,
+      `docs/index.md` Track 05 → DONE + §6, mobile `AGENTS.md` (§5/§6/§7/§12).
+- [x] E6: `dart run melos run verify` — **exit 0, 168 tests** (core 72 → 83).
+
+**Next: Track 11 — Navigation (four-tab `StatefulShellRoute`; destinations per
+discovery-016 §3: Discover replaces Home, Bookings/Favorites/Profile =
+placeholders).**
+
 ## Track 10 completion record
 
 - No source, test, or ARB change this pass — lifecycle code + 5 tests already
