@@ -1,7 +1,7 @@
 # Actionable Plan — Mobile
 
 > Repo entry doc. Read `../AGENTS.md` → `CLAUDE.md` → `docs/index.md` first.
-> Updated 2026-09-02 — baseline verified, next track chosen. Branch `main`.
+> Updated 2026-09-02 — Track 10 done. Branch `main`.
 
 ## Phase C — Re-baseline + pick next work ✅ BASELINED 2026-09-02
 
@@ -16,8 +16,20 @@
       Rationale: application lifecycle is its last objective; self-contained;
       unblocks Discovery 016. Track 05 cache deferred (no consumer). Track 11
       still blocked (3 of 4 nav destinations missing).
-- [ ] Start Track 10: app lifecycle handling per `docs/runtime/app_lifecycle.md`;
-      manual-DI wiring stays; `melos run verify` must exit 0 before Done.
+- [x] C5: **Track 10 done 2026-09-02.** Lifecycle objective was already
+      implemented + tested (resume `RestoreRequested` probe in `_DorakAppState`);
+      missing deliverable was its doc. Wrote `docs/runtime/app_lifecycle.md`
+      (mechanism, guards, event-coverage table, 5-test evidence), closed
+      `docs/index.md` §6 Track 10 + current-execution-point (dependency
+      registration `PARTIAL`-by-design, a recorded decision not a debt item).
+      `melos run verify` exit 0 before Done.
+
+## Track 10 completion record
+
+- No source, test, or ARB change this pass — lifecycle code + 5 tests already
+  shipped (see `docs/runtime/app_lifecycle.md` evidence).
+- `docs/runtime/` previously a never-existing directory per `AGENTS.md` §1; now
+  holds its first content file. Update that note → done in this commit.
 
 ## Not built — do not assume these exist
 

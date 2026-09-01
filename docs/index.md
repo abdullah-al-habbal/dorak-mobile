@@ -570,18 +570,29 @@ packages/feature_*
 
 ## Track 10 — Dependency Injection & Bootstrap
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE` (2026-09-02)
 
 Objectives:
 
 * Application bootstrap. — `DONE` for `client_app` (`main.dart` + `app.dart`;
-  see `docs/flows/app_launch.md`). `business_app` / `stylist_app` untouched.
-* Dependency registration. — `PARTIAL`. Wiring is manual construction in
-  `DorakApp.initState` with constructor seams for tests. No DI container.
+  see `docs/flows/app_launch.md`). `business_app` / `stylist_app` untouched
+  (skeletons, out of scope for this track).
+* Dependency registration. — **Closed as `PARTIAL`-by-design.** Wiring is manual
+  construction in `DorakApp.initState` with constructor seams for tests; no DI
+  container. This is the recorded architecture (see `AGENTS.md` §7 — a
+  container was never mandated; the blob free of packages does the wiring by
+  construction). Not unfinished work.
 * Environment initialization. — `DONE` (dotenv + `ConfigProvider`)
 * Core service initialization. — `DONE` (storage, `ApiClient`, session,
   onboarding config)
-* Application lifecycle. — `PENDING`
+* Application lifecycle. — `DONE`. `AppLifecycleListener(onResume: …)` in
+  `DorakApp` re-probes the session on resume; guards the `unknown` status and
+  in-flight restores. See `docs/runtime/app_lifecycle.md`.
+
+**Evidence.** 5 lifecycle tests in `apps/client_app/test/widget_test.dart`
+(resume re-probes once per resume; rebuilds do not re-probe; `unknown` raced;
+revoked token → guest). Full gate: `dart run melos run verify` exit 0,
+**157 tests** (re-baselined 2026-09-02).
 
 Implementation target:
 
@@ -899,43 +910,26 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** none active. Track 16 closed; choose the next one below.
+**Current Track:** completed. Track 10 (DI & bootstrap) closed; choose the next
+one below.
 
-**Just completed — Track 16, Password Recovery (Stitch 011–014).** Four screens,
-four routes, a feature-scoped `PasswordRecoveryBloc` in `client_app`, 22 ARB keys
-× 2 locales, 15 new tests. **157 tests, gate exit 0 (re-baselined 2026-09-02).**
+**Just completed — Track 10, Dependency Injection & Bootstrap.** The last open
+objective — application lifecycle — was already implemented and tested (the
+resume `RestoreRequested` probe in `DorakApp`); it is now documented in
+`docs/runtime/app_lifecycle.md` and the track is closed. Dependency registration
+closes as `PARTIAL`-**by-design** (manual wiring in `DorakApp.initState` is the
+recorded architecture, not a debt item).
 
-Screen 014 is `StatusView`'s **first production consumer**, which is what finally
-validates a Track 12 component against real usage rather than only its own tests.
+**Track statuses.** `DONE`: 00–04, 06, 07, 08, 10, 16. `IN_PROGRESS`: 05 (cache
+strategy), 09 (pagination pending a consumer), 11 (nested nav, guest guards,
+deep links), 12 (`StatusView` now consumed; `AppLoader` and `ShimmerBox` still
+await Discovery). `PENDING`: 13, 14, 15, 17–21.
 
-Three backend constraints shaped the flow and are recorded in
-`docs/authentication/password_recovery.md` so nobody re-derives them:
+**Candidates for the next track, in dependency order.** Discovery (016) needs
+the first two before it can start:
 
-1. **No verify-reset-code endpoint.** The code lives in the Laravel cache for 10
-   minutes and is only checked by `reset-password`, so a rejected code surfaces on
-   screen **013**, not 012 — with a "Re-enter code" route back.
-2. **`exists:clients,email` is an account-enumeration oracle.** The client
-   deliberately does **not** surface that 422; the flow advances either way with
-   neutral copy. Transport failures still block.
-3. **Recovery resend is `forgotPassword`**, not `sendEmailVerification` —
-   different endpoints, different throttles.
-
-Also in this pass: the onboarding hero now offers a retry when
-`/app/onboarding-config` fails, layered over the bundled-asset fallback rather
-than replacing it (an error view there would be strictly worse than the asset).
-
-**Track statuses.** `DONE`: 00–04, 06, 07, 08, 16. `IN_PROGRESS`: 05 (cache
-strategy), 09 (pagination pending a consumer), 10 (application lifecycle), 11
-(nested nav, guest guards, deep links), 12 (`StatusView` now consumed; `AppLoader`
-and `ShimmerBox` still await Discovery). `PENDING`: 13, 14, 15, 17–21.
-
-**Candidates for the next track, in dependency order.** Discovery (016) needs the
-first two before it can start:
-
-* `Track 10 — Dependency Injection & Bootstrap` — application lifecycle, its last
-  objective. Small and self-contained; would let the session re-probe on resume.
-* `Track 05 — Storage` — cache strategy, its last unblocked objective. Note it has
-  no consumer yet, which is the condition that got the pagination notifiers
+* `Track 05 — Storage` — cache strategy, its last unblocked objective. Note it
+  has no consumer yet, which is the condition that got the pagination notifiers
   deleted; consider whether it should wait for Discovery.
 * `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute`. Blocked in
   practice: three of Discovery's four tab destinations do not exist.

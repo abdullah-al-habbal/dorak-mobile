@@ -44,8 +44,9 @@ two units, read both.
 
 **Most files under `docs/` are 0-byte stubs**, and `docs/index.md` names several
 directories that do not exist at all (`docs/agent/`, `docs/engineering/`,
-`docs/runtime/`, `docs/networking/`, `docs/storage/`). Never assume a doc exists
-because it is referenced.
+`docs/networking/`, `docs/storage/`). Never assume a doc exists because it is
+referenced. `docs/runtime/` existed nowhere until 2026-09-02 (Track 10); its
+only content file is `docs/runtime/app_lifecycle.md`.
 
 These are the only docs with content:
 
@@ -61,6 +62,7 @@ docs/core/exceptions.md                  docs/core/result_state.md
 docs/core/storage.md                     docs/core/session.md
 docs/authentication/auth_flow.md         docs/flows/app_launch.md
 docs/authentication/password_recovery.md
+docs/runtime/app_lifecycle.md
 docs/screens/authentication/{forgot_password,recovery_otp,
                              create_new_password,password_reset_success}.md
 docs/flows/onboarding.md                 docs/flows/guest_access.md
