@@ -70,6 +70,22 @@
 discovery-016 §3: Discover replaces Home, Bookings/Favorites/Profile =
 placeholders).**
 
+## Phase F — Track 11 UI placeholders ✅ 2026-09-02
+
+- [x] F1: `BookingsScreen` + `_BookingsView` in
+      `apps/client_app/lib/src/features/booking/bookings.screen.dart` — uses
+      `StatusView` with empty state, localized strings, `Discover` action
+      navigates to tab 0.
+- [x] F2: `FavoritesScreen` + `_FavoritesView` in
+      `apps/client_app/lib/src/features/profile/favorites.screen.dart` — same
+      pattern, `favorite_border_outlined` icon.
+- [x] F3: Added 6 ARB keys to `app_en.arb` + `app_ar.arb`:
+      `bookingsTitle`, `bookingsSubtitle`, `bookingsActionLabel`,
+      `favoritesTitle`, `favoritesSubtitle`, `favoritesActionLabel`.
+- [x] F4: `dart run melos run generate` — regenerated `AppLocalizations`.
+- [x] F5: `dart run melos run verify` — **exit 0, 170 tests** (core 83, client_app
+      67, design_system 14, 1 each other).
+
 ## Track 10 completion record
 
 - No source, test, or ARB change this pass — lifecycle code + 5 tests already

@@ -331,4 +331,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingConfigUnavailable =>
       'Couldn\'t load the latest artwork.';
+
+  @override
+  String get bookingsTitle => 'No bookings yet';
+
+  @override
+  String get bookingsSubtitle =>
+      'Your upcoming and past bookings will appear here.';
+
+  @override
+  String get bookingsActionLabel => 'Discover';
+
+  @override
+  String get favoritesTitle => 'No favorites yet';
+
+  @override
+  String get favoritesSubtitle =>
+      'Tap the heart on a salon or barber to save it here.';
+
+  @override
+  String get favoritesActionLabel => 'Discover';
 }

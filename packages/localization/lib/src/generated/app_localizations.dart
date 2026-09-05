@@ -709,6 +709,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load the latest artwork.'**
   String get onboardingConfigUnavailable;
+
+  /// Bookings screen empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings yet'**
+  String get bookingsTitle;
+
+  /// Bookings screen empty state subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Your upcoming and past bookings will appear here.'**
+  String get bookingsSubtitle;
+
+  /// Bookings empty state action button label
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get bookingsActionLabel;
+
+  /// Favorites screen empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get favoritesTitle;
+
+  /// Favorites screen empty state subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the heart on a salon or barber to save it here.'**
+  String get favoritesSubtitle;
+
+  /// Favorites empty state action button label
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get favoritesActionLabel;
 }
 
 class _AppLocalizationsDelegate

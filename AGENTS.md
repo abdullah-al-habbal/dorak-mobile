@@ -381,6 +381,8 @@ Authentication always outranks the onboarding flag.
 | Password recovery, 4 screens | `client_app/.../features/auth` (011–014) |
 | Launch gate + go_router route table | `client_app/.../core/navigation` |
 | Home placeholder | `client_app/.../features/home` |
+| Bookings placeholder | `client_app/.../features/booking` |
+| Favorites placeholder | `client_app/.../features/profile` |
 
 ### Not built — do not assume these exist
 
@@ -519,7 +521,7 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **102 keys, identical sets** (verified 2026-09-02).
+  `app_ar.arb`. **108 keys, identical sets** (verified 2026-09-02).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the

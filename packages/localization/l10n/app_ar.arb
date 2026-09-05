@@ -351,5 +351,29 @@
   "recoveryReenterCode": "إعادة إدخال الرمز",
   "passwordResetSuccessTitle": "تم تحديث كلمة المرور",
   "passwordResetSuccessMessage": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
-  "onboardingConfigUnavailable": "لم نتمكن من تحميل أحدث صورة."
+  "onboardingConfigUnavailable": "لم نتمكن من تحميل أحدث صورة.",
+  "bookingsTitle": "لا توجد حجوزات بعد",
+  "@bookingsTitle": {
+    "description": "Bookings screen empty state title"
+  },
+  "bookingsSubtitle": "ستظهر حجوزاتك القادمة والسابقة هنا.",
+  "@bookingsSubtitle": {
+    "description": "Bookings screen empty state subtitle"
+  },
+  "bookingsActionLabel": "اكتشف",
+  "@bookingsActionLabel": {
+    "description": "Bookings empty state action button label"
+  },
+  "favoritesTitle": "لا توجد مفضلات بعد",
+  "@favoritesTitle": {
+    "description": "Favorites screen empty state title"
+  },
+  "favoritesSubtitle": "اضغط على القلب في صالون أو حلاق لحفظه هنا.",
+  "@favoritesSubtitle": {
+    "description": "Favorites screen empty state subtitle"
+  },
+  "favoritesActionLabel": "اكتشف",
+  "@favoritesActionLabel": {
+    "description": "Favorites empty state action button label"
+  }
 }

@@ -427,5 +427,29 @@
   "onboardingConfigUnavailable": "Couldn't load the latest artwork.",
   "@onboardingConfigUnavailable": {
     "description": "onboardingConfigUnavailable"
+  },
+  "bookingsTitle": "No bookings yet",
+  "@bookingsTitle": {
+    "description": "Bookings screen empty state title"
+  },
+  "bookingsSubtitle": "Your upcoming and past bookings will appear here.",
+  "@bookingsSubtitle": {
+    "description": "Bookings screen empty state subtitle"
+  },
+  "bookingsActionLabel": "Discover",
+  "@bookingsActionLabel": {
+    "description": "Bookings empty state action button label"
+  },
+  "favoritesTitle": "No favorites yet",
+  "@favoritesTitle": {
+    "description": "Favorites screen empty state title"
+  },
+  "favoritesSubtitle": "Tap the heart on a salon or barber to save it here.",
+  "@favoritesSubtitle": {
+    "description": "Favorites screen empty state subtitle"
+  },
+  "favoritesActionLabel": "Discover",
+  "@favoritesActionLabel": {
+    "description": "Favorites empty state action button label"
   }
 }

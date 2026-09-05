@@ -331,4 +331,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingConfigUnavailable => 'لم نتمكن من تحميل أحدث صورة.';
+
+  @override
+  String get bookingsTitle => 'لا توجد حجوزات بعد';
+
+  @override
+  String get bookingsSubtitle => 'ستظهر حجوزاتك القادمة والسابقة هنا.';
+
+  @override
+  String get bookingsActionLabel => 'اكتشف';
+
+  @override
+  String get favoritesTitle => 'لا توجد مفضلات بعد';
+
+  @override
+  String get favoritesSubtitle => 'اضغط على القلب في صالون أو حلاق لحفظه هنا.';
+
+  @override
+  String get favoritesActionLabel => 'اكتشف';
 }
