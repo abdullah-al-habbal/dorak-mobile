@@ -924,10 +924,8 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** none active. Track 11 completed — four-tab
-`StatefulShellRoute` wired with Discover/Bookings/Favorites/Profile.
-Next: **Track 18 / Discovery (CL-09)** — location permission, feed DTOs,
-`ExploreEndpoints`/`ExploreRepository` in core, then build.
+**Current Track:** **Track 18 / Discovery (CL-09) in progress** — core infra
+complete, building Discovery screen/Bloc/widgets.
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -939,20 +937,25 @@ Auth Entry (verified by `session_expired_test.dart`). `melos verify` exit 0,
 **170 tests** (core 83, client_app 67, design_system 14, 1×4), **114 ARB
 keys** (EN+AR).
 
+Then **Track 18 prep (2026-09-02)** — core infra for Discovery:
+`LocationProvider`/`GeolocatorLocationProvider`, `ExploreEndpoints`/`ExploreRepository`,
+`BranchDto`, `FeedCache`/`SharedFeedCache` all in `packages/core`. `melos verify`
+exit 0, **170 tests** (core 83, client_app 67, design_system 14, 1×4).
+
 **Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16. `IN_PROGRESS`: 09
 (pagination pending a consumer — its `Paged<T>` already ships), 12 (`StatusView`
-now consumed; `AppLoader` and `ShimmerBox` still await Discovery). `PENDING`:
+now consumed; `AppLoader` and `ShimmerBox` still await Discovery), **18 / Discovery
+(CL-09) — screen/Bloc/widgets being built on completed core infra**. `PENDING`:
 13, 14, 15, 17–21.
 
 **Next candidate:**
 
-* `Track 18 / Discovery 016` (CL-09) — location-permission plumbing, feed DTOs,
-  `ExploreEndpoints`/`ExploreRepository` in core, then build the Discovery
-  feed against the real backend contract (`docs/future-features/discovery-016.md`).
+* `Track 18 / Discovery 016` (CL-09) — build Discovery screen/Bloc/widgets
+  (discovery.screen.dart, discovery_bloc.dart, widgets) on the completed core
+  infra (`docs/future-features/discovery-016.md`).
 
-Track 18 / Discovery 016 additionally needs location-permission plumbing, feed
-DTOs, `ExploreEndpoints`/`ExploreRepository` in core, and the trimmed-to-contract
-surface agreed in the scope doc.
+Track 18 / Discovery 016 additionally needs the UI implementation against the
+trimmed-to-contract surface agreed in the scope doc.
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

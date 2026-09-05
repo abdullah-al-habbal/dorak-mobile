@@ -102,8 +102,24 @@ placeholders).**
 - [x] G6: `dart run melos run verify` — **exit 0, 170 tests** (core 83, client_app
       67, design_system 14, 1×4), 114 ARB keys (EN+AR).
 
-**Next: Track 18 / Discovery (CL-09) — location permission, feed DTOs,
-ExploreEndpoints/Repository, then build.**
+## Phase H — Track 18 prep (core infra) ✅ 2026-09-02
+
+- [x] H1: `LocationProvider` + `GeolocatorLocationProvider` in
+      `packages/core/lib/src/location/` — `ensurePermission()`, `getCurrentPosition()`,
+      `permissionChanges()`.
+- [x] H2: `LocationPermissionStatus` enum (`granted`, `denied`, `restricted`,
+      `serviceDisabled`).
+- [x] H3: `ExploreEndpoints` (branches, barbers, branchDetail, barberDetail).
+- [x] H4: `ExploreRepository` + `DioExploreRepository` — `getBranches()` with
+      all query params (lat/long/radius/universe/filters/pagination).
+- [x] H5: `BranchDto` — JSON-serializable wire model matching `BranchResource`.
+- [x] H6: `FeedCache`/`SharedFeedCache` (Track 05) — raw-wire-payload cache with
+      bounded keys, read-time staleness, explicit eviction.
+- [x] H7: `melos run verify` — **exit 0, 170 tests** (core 83, client_app 67,
+      design_system 14, 1×4).
+
+**Next: Track 18 / Discovery (CL-09) — build Discovery screen/Bloc/widgets on
+completed core infra.**
 
 ## Track 10 completion record
 
