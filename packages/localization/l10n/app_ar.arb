@@ -387,5 +387,49 @@
   "profileActionLabel": "اكتشف",
   "@profileActionLabel": {
     "description": "Profile empty state action button label"
+  },
+  "discoveryTitle": "اعثر على الأنسب لك.",
+  "@discoveryTitle": {
+    "description": "Discovery screen headline"
+  },
+  "discoverySubtitle": "استكشف المتاجر القريبة وأفضل الحلاقين والخدمات المتميزة المصممة لاحتياجاتك.",
+  "@discoverySubtitle": {
+    "description": "Discovery screen subtitle"
+  },
+  "locationRequiredTitle": "مطلوب الموقع",
+  "@locationRequiredTitle": {
+    "description": "Location required screen title"
+  },
+  "locationRequiredMessage": "أذِن بالوصول للموقع لاكتشاف الفروع القريبة.",
+  "@locationRequiredMessage": {
+    "description": "Location required screen message"
+  },
+  "enableLocationAction": "تفعيل الموقع",
+  "@enableLocationAction": {
+    "description": "Enable location action button label"
+  },
+  "availableNow": "متاح الآن",
+  "@availableNow": {
+    "description": "Available now filter label"
+  },
+  "price": "السعر",
+  "@price": {
+    "description": "Price filter label"
+  },
+  "rating": "التقييم",
+  "@rating": {
+    "description": "Rating filter label"
+  },
+  "distance": "المسافة",
+  "@distance": {
+    "description": "Distance filter label"
+  },
+  "viewDetails": "عرض التفاصيل",
+  "@viewDetails": {
+    "description": "View details button label"
+  },
+  "bookNow": "احجز الآن",
+  "@bookNow": {
+    "description": "Book now button label"
   }
 }

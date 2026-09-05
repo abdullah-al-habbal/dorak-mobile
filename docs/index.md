@@ -924,31 +924,31 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** none active. Track 05 completed; the Discovery-016 scope
-made the order concrete — **Track 11 (Navigation)** is next, then Track 18 /
-Discovery (CL-09).
+**Current Track:** none active. Track 11 completed — four-tab
+`StatefulShellRoute` wired with Discover/Bookings/Favorites/Profile.
+Next: **Track 18 / Discovery (CL-09)** — location permission, feed DTOs,
+`ExploreEndpoints`/`ExploreRepository` in core, then build.
 
-**Just completed — Track 05, Storage (cache strategy).** `FeedCache` /
-`SharedFeedCache` landed in `packages/core` (11 tests): raw-wire-payload feed
-cache with bounded keys (universe + lat/long rounded to 3 dp + 5 km radius
-bucket + per_page), read-time staleness (`FeedCacheEntry.isStale`,
-`feedCacheTtl` = 30 min), explicit eviction, corrupt payloads → null. Built
-against the Discovery-016 feed envelope (`docs/future-features/discovery-016.md`
-§5) so the "no consumer" caveat that kept it deferred is gone. `melos verify`
-exit 0, **168 tests** (core 72 → 83).
+**Just completed — Track 11 Navigation (2026-09-02).** Four-tab
+`StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
+Discover (replaces Home), Bookings, Favorites, Profile placeholders.
+`_MainShell` widget with localized labels + active icons. `AppGate.resolve`
+routes to `/discover` for authenticated/onboarded guests. Legacy `/home`
+redirects to `/discover`. `SessionSignal.sessionExpired` correctly goes to
+Auth Entry (verified by `session_expired_test.dart`). `melos verify` exit 0,
+**170 tests** (core 83, client_app 67, design_system 14, 1×4), **114 ARB
+keys** (EN+AR).
 
-**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 16. `IN_PROGRESS`: 09
-(pagination pending a consumer — its `Paged<T>` already ships), 11 (nested nav,
-guest guards, deep links — destinations now defined by the Discovery scope), 12
-(`StatusView` now consumed; `AppLoader` and `ShimmerBox` still await Discovery).
-`PENDING`: 13, 14, 15, 17–21.
+**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16. `IN_PROGRESS`: 09
+(pagination pending a consumer — its `Paged<T>` already ships), 12 (`StatusView`
+now consumed; `AppLoader` and `ShimmerBox` still await Discovery). `PENDING`:
+13, 14, 15, 17–21.
 
 **Next candidate:**
 
-* `Track 11 — Navigation` — the bottom-nav `StatefulShellRoute` with four
-  destinations (Discover replaces Home; Bookings/Favorites/Profile as
-  placeholders). The destination list is defined in
-  `docs/future-features/discovery-016.md` §3 — no longer blocked.
+* `Track 18 / Discovery 016` (CL-09) — location-permission plumbing, feed DTOs,
+  `ExploreEndpoints`/`ExploreRepository` in core, then build the Discovery
+  feed against the real backend contract (`docs/future-features/discovery-016.md`).
 
 Track 18 / Discovery 016 additionally needs location-permission plumbing, feed
 DTOs, `ExploreEndpoints`/`ExploreRepository` in core, and the trimmed-to-contract

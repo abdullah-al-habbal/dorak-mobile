@@ -86,6 +86,25 @@ placeholders).**
 - [x] F5: `dart run melos run verify` — **exit 0, 170 tests** (core 83, client_app
       67, design_system 14, 1 each other).
 
+## Phase G — Track 11 Navigation wiring ✅ 2026-09-02
+
+- [x] G1: `StatefulShellRoute.indexedStack` with 4 branches (Discover,
+      Bookings, Favorites, Profile) in `app.router.dart`.
+- [x] G2: `_MainShell` widget with `NavigationBar` — localized labels, active
+      icons, `Discover` action navigates to tab 0.
+- [x] G3: `ProfileScreen` + `_ProfileView` placeholder (empty state via
+      `StatusView`), 3 ARB keys (`profileTitle/Subtitle/ActionLabel`).
+- [x] G4: `AppGate.resolve` routes authenticated users + guests who completed
+      onboarding to `/discover` (shell entry). Legacy `/home` redirects to
+      `/discover`.
+- [x] G5: `SessionSignal.sessionExpired` correctly redirects to `AuthEntry`
+      (not Discover) — verified by `session_expired_test.dart`.
+- [x] G6: `dart run melos run verify` — **exit 0, 170 tests** (core 83, client_app
+      67, design_system 14, 1×4), 114 ARB keys (EN+AR).
+
+**Next: Track 18 / Discovery (CL-09) — location permission, feed DTOs,
+ExploreEndpoints/Repository, then build.**
+
 ## Track 10 completion record
 
 - No source, test, or ARB change this pass — lifecycle code + 5 tests already

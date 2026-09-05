@@ -358,4 +358,32 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileActionLabel => 'اكتشف';
+
+  @override
+  String get locationRequiredTitle => 'مطلوب الموقع';
+
+  @override
+  String get locationRequiredMessage =>
+      'أذِن بالوصول للموقع لاكتشاف الفروع القريبة.';
+
+  @override
+  String get enableLocationAction => 'تفعيل الموقع';
+
+  @override
+  String get availableNow => 'متاح الآن';
+
+  @override
+  String get price => 'السعر';
+
+  @override
+  String get rating => 'التقييم';
+
+  @override
+  String get distance => 'المسافة';
+
+  @override
+  String get viewDetails => 'عرض التفاصيل';
+
+  @override
+  String get bookNow => 'احجز الآن';
 }

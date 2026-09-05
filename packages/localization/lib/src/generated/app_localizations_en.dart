@@ -361,4 +361,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileActionLabel => 'Discover';
+
+  @override
+  String get locationRequiredTitle => 'Location Required';
+
+  @override
+  String get locationRequiredMessage =>
+      'Enable location access to discover nearby branches.';
+
+  @override
+  String get enableLocationAction => 'Enable Location';
+
+  @override
+  String get availableNow => 'Available Now';
+
+  @override
+  String get price => 'Price';
+
+  @override
+  String get rating => 'Rating';
+
+  @override
+  String get distance => 'Distance';
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get bookNow => 'Book Now';
 }

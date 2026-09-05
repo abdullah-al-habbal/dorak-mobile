@@ -763,6 +763,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discover'**
   String get profileActionLabel;
+
+  /// Location required screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Location Required'**
+  String get locationRequiredTitle;
+
+  /// Location required screen message
+  ///
+  /// In en, this message translates to:
+  /// **'Enable location access to discover nearby branches.'**
+  String get locationRequiredMessage;
+
+  /// Enable location action button label
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Location'**
+  String get enableLocationAction;
+
+  /// Available now filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Available Now'**
+  String get availableNow;
+
+  /// Price filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// Rating filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get rating;
+
+  /// Distance filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get distance;
+
+  /// View details button label
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get viewDetails;
+
+  /// Book now button label
+  ///
+  /// In en, this message translates to:
+  /// **'Book Now'**
+  String get bookNow;
 }
 
 class _AppLocalizationsDelegate

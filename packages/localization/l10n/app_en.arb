@@ -463,5 +463,49 @@
   "profileActionLabel": "Discover",
   "@profileActionLabel": {
     "description": "Profile empty state action button label"
+  },
+  "discoveryTitle": "Find the perfect fit.",
+  "@discoveryTitle": {
+    "description": "Discovery screen headline"
+  },
+  "discoverySubtitle": "Explore nearby shops, expert barbers, and premium services tailored to your needs.",
+  "@discoverySubtitle": {
+    "description": "Discovery screen subtitle"
+  },
+  "locationRequiredTitle": "Location Required",
+  "@locationRequiredTitle": {
+    "description": "Location required screen title"
+  },
+  "locationRequiredMessage": "Enable location access to discover nearby branches.",
+  "@locationRequiredMessage": {
+    "description": "Location required screen message"
+  },
+  "enableLocationAction": "Enable Location",
+  "@enableLocationAction": {
+    "description": "Enable location action button label"
+  },
+  "availableNow": "Available Now",
+  "@availableNow": {
+    "description": "Available now filter label"
+  },
+  "price": "Price",
+  "@price": {
+    "description": "Price filter label"
+  },
+  "rating": "Rating",
+  "@rating": {
+    "description": "Rating filter label"
+  },
+  "distance": "Distance",
+  "@distance": {
+    "description": "Distance filter label"
+  },
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "View details button label"
+  },
+  "bookNow": "Book Now",
+  "@bookNow": {
+    "description": "Book now button label"
   }
 }
