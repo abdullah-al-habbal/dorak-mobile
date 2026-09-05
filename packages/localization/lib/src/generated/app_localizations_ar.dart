@@ -349,4 +349,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get favoritesActionLabel => 'اكتشف';
+
+  @override
+  String get profileTitle => 'الملف الشخصي';
+
+  @override
+  String get profileSubtitle => 'سيظهر حسابك وتفضيلاتك هنا.';
+
+  @override
+  String get profileActionLabel => 'اكتشف';
 }

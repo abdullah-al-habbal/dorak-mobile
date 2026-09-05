@@ -745,6 +745,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discover'**
   String get favoritesActionLabel;
+
+  /// Profile screen empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// Profile screen empty state subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and preferences will appear here.'**
+  String get profileSubtitle;
+
+  /// Profile empty state action button label
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get profileActionLabel;
 }
 
 class _AppLocalizationsDelegate

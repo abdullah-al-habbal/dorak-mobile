@@ -18,6 +18,13 @@ class AppRoutes {
   static const String authResetPassword = '/auth/reset-password';
   static const String authResetPasswordSuccess = '/auth/reset-password/success';
 
+  // Main shell routes (StatefulShellRoute)
+  static const String discover = '/discover';
+  static const String bookings = '/bookings';
+  static const String favorites = '/favorites';
+  static const String profile = '/profile';
+
+  // Legacy home route (kept for onboarding/guest redirects)
   static const String home = '/home';
 
   static const String welcomeSegment = 'welcome';

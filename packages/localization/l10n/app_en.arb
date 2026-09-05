@@ -451,5 +451,17 @@
   "favoritesActionLabel": "Discover",
   "@favoritesActionLabel": {
     "description": "Favorites empty state action button label"
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Profile screen empty state title"
+  },
+  "profileSubtitle": "Your account and preferences will appear here.",
+  "@profileSubtitle": {
+    "description": "Profile screen empty state subtitle"
+  },
+  "profileActionLabel": "Discover",
+  "@profileActionLabel": {
+    "description": "Profile empty state action button label"
   }
 }

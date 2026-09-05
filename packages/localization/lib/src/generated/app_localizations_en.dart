@@ -351,4 +351,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoritesActionLabel => 'Discover';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileSubtitle =>
+      'Your account and preferences will appear here.';
+
+  @override
+  String get profileActionLabel => 'Discover';
 }

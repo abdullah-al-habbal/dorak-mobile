@@ -375,5 +375,17 @@
   "favoritesActionLabel": "اكتشف",
   "@favoritesActionLabel": {
     "description": "Favorites empty state action button label"
+  },
+  "profileTitle": "الملف الشخصي",
+  "@profileTitle": {
+    "description": "Profile screen empty state title"
+  },
+  "profileSubtitle": "سيظهر حسابك وتفضيلاتك هنا.",
+  "@profileSubtitle": {
+    "description": "Profile screen empty state subtitle"
+  },
+  "profileActionLabel": "اكتشف",
+  "@profileActionLabel": {
+    "description": "Profile empty state action button label"
   }
 }

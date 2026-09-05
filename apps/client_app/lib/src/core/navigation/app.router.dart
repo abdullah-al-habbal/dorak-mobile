@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
-import 'package:flutter/foundation.dart';
+import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app_gate.entity.dart';
 import 'package:client_app/src/core/navigation/app_routes.entity.dart';
@@ -18,12 +20,15 @@ import 'package:client_app/src/features/auth/recovery_otp.screen.dart';
 import 'package:client_app/src/features/auth/recovery_signal.entity.dart';
 import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
+import 'package:client_app/src/features/booking/bookings.screen.dart';
 import 'package:client_app/src/features/home/home.screen.dart';
 import 'package:client_app/src/features/onboarding/ai_showcase.screen.dart';
 import 'package:client_app/src/features/onboarding/booking.screen.dart';
 import 'package:client_app/src/features/onboarding/discovery.screen.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/welcome.screen.dart';
+import 'package:client_app/src/features/profile/favorites.screen.dart';
+import 'package:client_app/src/features/profile/profile.screen.dart';
 import 'package:client_app/src/features/splash/splash.screen.dart';
 
 class AppRouter {
@@ -101,13 +106,13 @@ class AppRouter {
   void _onAuthChanged(AuthState state) {
     switch (state.signal) {
       case AuthSignal.loginSucceeded:
-        router.go(AppRoutes.home);
+        router.go(AppRoutes.discover);
         auth.add(AuthSignalAcknowledged());
       case AuthSignal.registrationSucceeded:
         router.push<void>(AppRoutes.authVerify, extra: state.client?.email ?? '');
         auth.add(AuthSignalAcknowledged());
       case AuthSignal.verificationSucceeded:
-        router.go(AppRoutes.home);
+        router.go(AppRoutes.discover);
         auth.add(AuthSignalAcknowledged());
       case AuthSignal.none:
         break;
@@ -129,13 +134,13 @@ class AppRouter {
     );
   }
 
-  void _skipForNow() => router.go(AppRoutes.home);
+  void _skipForNow() => router.go(AppRoutes.discover);
 
   Future<void> _dismissForever() async {
     try {
       await preferences.setDontShowOnboarding(true);
     } finally {
-      router.go(AppRoutes.home);
+      router.go(AppRoutes.discover);
     }
   }
 
@@ -218,7 +223,7 @@ class AppRouter {
             builder: (context, state) => VerifyAccountScreen(
               auth: auth,
               destination: state.extra as String? ?? '',
-              onSkip: () => router.go(AppRoutes.home),
+              onSkip: () => router.go(AppRoutes.discover),
               onLocaleToggle: switchLocale,
             ),
           ),
@@ -257,10 +262,106 @@ class AppRouter {
           ),
         ],
       ),
+      // Legacy home route redirects to the shell (Discover tab)
       GoRoute(
         path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+        redirect: (context, state) => AppRoutes.discover,
+      ),
+      // Main authenticated shell with bottom navigation
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return _MainShell(navigationShell: navigationShell);
+        },
+        branches: [
+          // Tab 0: Discover
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.discover,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          // Tab 1: Bookings
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.bookings,
+                builder: (context, state) => const BookingsScreen(),
+              ),
+            ],
+          ),
+          // Tab 2: Favorites
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.favorites,
+                builder: (context, state) => const FavoritesScreen(),
+              ),
+            ],
+          ),
+          // Tab 3: Profile
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
     ];
+  }
+}
+
+class _MainShell extends StatelessWidget {
+  const _MainShell({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  void _onItemTapped(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = DorakColors.of(context);
+
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: _onItemTapped,
+        indicatorColor: colors.primaryContainer,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.explore_outlined),
+            selectedIcon: const Icon(Icons.explore),
+            label: l10n.discoveryCardShops,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.calendar_month_outlined),
+            selectedIcon: const Icon(Icons.calendar_month),
+            label: l10n.bookingsActionLabel,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.favorite_border_outlined),
+            selectedIcon: const Icon(Icons.favorite),
+            label: l10n.favoritesActionLabel,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: l10n.profileActionLabel,
+          ),
+        ],
+      ),
+    );
   }
 }
