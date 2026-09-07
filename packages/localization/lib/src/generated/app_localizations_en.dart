@@ -389,4 +389,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookNow => 'Book Now';
+
+  @override
+  String get discoverUniverseMen => 'Men';
+
+  @override
+  String get discoverUniverseWomen => 'Women';
+
+  @override
+  String get discoverRankedByDistance => 'Ranked by distance';
+
+  @override
+  String discoverDistanceLabel(double km) {
+    return '$km km';
+  }
+
+  @override
+  String get discoverStaleLabel => 'Showing saved results';
 }

@@ -817,6 +817,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Book Now'**
   String get bookNow;
+
+  /// Universe switcher option for men-only branches
+  ///
+  /// In en, this message translates to:
+  /// **'Men'**
+  String get discoverUniverseMen;
+
+  /// Universe switcher option for women-only branches
+  ///
+  /// In en, this message translates to:
+  /// **'Women'**
+  String get discoverUniverseWomen;
+
+  /// Caption confirming results are ordered by distance
+  ///
+  /// In en, this message translates to:
+  /// **'Ranked by distance'**
+  String get discoverRankedByDistance;
+
+  /// Distance in kilometres shown on a result card
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String discoverDistanceLabel(double km);
+
+  /// Badge shown when the feed renders from a cached fetch
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved results'**
+  String get discoverStaleLabel;
 }
 
 class _AppLocalizationsDelegate

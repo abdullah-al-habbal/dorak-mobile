@@ -431,5 +431,30 @@
   "bookNow": "احجز الآن",
   "@bookNow": {
     "description": "Book now button label"
+  },
+  "discoverUniverseMen": "رجال",
+  "@discoverUniverseMen": {
+    "description": "Universe switcher option for men-only branches"
+  },
+  "discoverUniverseWomen": "نساء",
+  "@discoverUniverseWomen": {
+    "description": "Universe switcher option for women-only branches"
+  },
+  "discoverRankedByDistance": "مرتبة حسب المسافة",
+  "@discoverRankedByDistance": {
+    "description": "Caption confirming results are ordered by distance"
+  },
+  "discoverDistanceLabel": "{km} كم",
+  "@discoverDistanceLabel": {
+    "description": "Distance in kilometres shown on a result card",
+    "placeholders": {
+      "km": {
+        "type": "double"
+      }
+    }
+  },
+  "discoverStaleLabel": "عرض النتائج المحفوظة",
+  "@discoverStaleLabel": {
+    "description": "Badge shown when the feed renders from a cached fetch"
   }
 }

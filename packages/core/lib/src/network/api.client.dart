@@ -14,6 +14,12 @@ import 'package:core/src/network/pagination_meta.dto.dart';
 
 typedef JsonParser<T> = T Function(dynamic json);
 
+typedef RawPaginated<T> = ({
+  PaginatedData<T> data,
+  List<Object?> rawItems,
+  Map<String, dynamic> rawMeta,
+});
+
 class ApiClient {
   static const Duration defaultConnectTimeout = Duration(seconds: 15);
   static const Duration defaultReceiveTimeout = Duration(seconds: 30);
@@ -131,22 +137,39 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     required JsonParser<T> itemParser,
   }) async {
+    final raw = await getRawPaginated(
+      path,
+      queryParameters: queryParameters,
+      itemParser: itemParser,
+    );
+    return raw.data;
+  }
+
+  Future<RawPaginated<T>> getRawPaginated<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    required JsonParser<T> itemParser,
+  }) async {
     final response =
         await _guard(() => dio.get<dynamic>(path, queryParameters: queryParameters));
     final body = _bodyOf(response);
     _throwIfFailure(body, response.statusCode ?? 200);
     final rawData = body['data'];
-    final items = (rawData is List ? rawData : const <dynamic>[])
-        .map(itemParser)
-        .toList();
-    final rawMeta = body['meta'];
-    final pagination =
-        rawMeta is Map<String, dynamic> ? rawMeta['pagination'] : null;
+    final rawItems = rawData is List ? rawData : const <Object?>[];
+    final items = rawItems.map(itemParser).toList();
+    final rawMeta = body['meta'] is Map<String, dynamic>
+        ? body['meta'] as Map<String, dynamic>
+        : const <String, dynamic>{};
+    final pagination = rawMeta['pagination'];
     final meta = pagination is Map<String, dynamic>
         ? PaginationMeta.fromJson(pagination)
         : const PaginationMeta.empty();
 
-    return PaginatedData(data: items, meta: meta);
+    return (
+      data: PaginatedData(data: items, meta: meta),
+      rawItems: rawItems,
+      rawMeta: rawMeta,
+    );
   }
 
   Future<Response<dynamic>> _guard(

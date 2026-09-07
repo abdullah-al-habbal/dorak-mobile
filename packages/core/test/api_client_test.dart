@@ -263,4 +263,67 @@ void main() {
       );
     });
   });
+
+  group('ApiClient.getRawPaginated', () {
+    test('returns parsed items with their raw wire maps', () async {
+      final fake = fakeDio(
+        handler: (options) => jsonResponse(
+          options,
+          data: successEnvelope(
+            data: [
+              {'id': 'a'},
+              {'id': 'b'},
+            ],
+            meta: {
+              'pagination': {
+                'total': 2,
+                'count': 2,
+                'per_page': 20,
+                'current_page': 1,
+                'total_pages': 1,
+              },
+            },
+          ),
+        ),
+      );
+      final client = clientWith(fake);
+
+      final raw = await client.getRawPaginated(
+        '/explore/branches',
+        itemParser: (json) => (json as Map<String, dynamic>)['id'] as String,
+      );
+
+      expect(raw.data.data, ['a', 'b']);
+      expect(raw.rawItems, [
+        {'id': 'a'},
+        {'id': 'b'},
+      ]);
+      expect(
+        raw.rawMeta['pagination'],
+        isA<Map<String, dynamic>>(),
+      );
+    });
+
+    test('tolerates omitted meta', () async {
+      final fake = fakeDio(
+        handler: (options) => jsonResponse(
+          options,
+          data: successEnvelope(
+            data: [
+              {'id': 'a'},
+            ],
+          ),
+        ),
+      );
+      final client = clientWith(fake);
+
+      final raw = await client.getRawPaginated(
+        '/explore/branches',
+        itemParser: (json) => (json as Map<String, dynamic>)['id'] as String,
+      );
+
+      expect(raw.data.meta, const PaginationMeta.empty());
+      expect(raw.rawMeta, isEmpty);
+    });
+  });
 }

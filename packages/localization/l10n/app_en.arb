@@ -507,5 +507,30 @@
   "bookNow": "Book Now",
   "@bookNow": {
     "description": "Book now button label"
+  },
+  "discoverUniverseMen": "Men",
+  "@discoverUniverseMen": {
+    "description": "Universe switcher option for men-only branches"
+  },
+  "discoverUniverseWomen": "Women",
+  "@discoverUniverseWomen": {
+    "description": "Universe switcher option for women-only branches"
+  },
+  "discoverRankedByDistance": "Ranked by distance",
+  "@discoverRankedByDistance": {
+    "description": "Caption confirming results are ordered by distance"
+  },
+  "discoverDistanceLabel": "{km} km",
+  "@discoverDistanceLabel": {
+    "description": "Distance in kilometres shown on a result card",
+    "placeholders": {
+      "km": {
+        "type": "double"
+      }
+    }
+  },
+  "discoverStaleLabel": "Showing saved results",
+  "@discoverStaleLabel": {
+    "description": "Badge shown when the feed renders from a cached fetch"
   }
 }

@@ -386,4 +386,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get bookNow => 'احجز الآن';
+
+  @override
+  String get discoverUniverseMen => 'رجال';
+
+  @override
+  String get discoverUniverseWomen => 'نساء';
+
+  @override
+  String get discoverRankedByDistance => 'مرتبة حسب المسافة';
+
+  @override
+  String discoverDistanceLabel(double km) {
+    return '$km كم';
+  }
+
+  @override
+  String get discoverStaleLabel => 'عرض النتائج المحفوظة';
 }

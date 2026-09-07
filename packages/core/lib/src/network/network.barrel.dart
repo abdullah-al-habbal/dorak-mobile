@@ -21,6 +21,5 @@ export 'package:core/src/network/paged.entity.dart';
 export 'package:core/src/network/paginated_data.dto.dart';
 export 'package:core/src/network/pagination_meta.dto.dart';
 export 'package:core/src/network/repositories/explore.repository.dart';
-export 'package:core/src/network/repositories/dio_explore.repository.dart';
 export 'package:core/src/network/repositories/auth.repository.dart';
 export 'package:core/src/network/repositories/onboarding_config.repository.dart';
