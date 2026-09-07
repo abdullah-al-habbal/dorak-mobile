@@ -202,7 +202,7 @@ dart run melos run verify      # all five, in order — the gate
 
 `verify` must exit 0 before any work is called done. Current baseline
 (re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
-**168 tests pass** (83 core, 67 client_app, 14 design_system, 1 each for
+**188 tests pass** (88 core, 82 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -369,7 +369,7 @@ Authentication always outranks the onboarding flag.
 | Area | Where |
 |---|---|
 | Design tokens, theme, 14 shared widgets | `packages/design_system` |
-| Localization EN + AR, 102 keys, RTL | `packages/localization` |
+| Localization EN + AR, 128 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
 | Feed cache strategy (Track 05) | `packages/core/lib/src/storage/feed_cache.storage.dart` |
@@ -380,16 +380,16 @@ Authentication always outranks the onboarding flag.
 | Auth entry / login / sign-up / verify | `client_app/.../features/auth` (006–009) |
 | Password recovery, 4 screens | `client_app/.../features/auth` (011–014) |
 | Launch gate + go_router route table | `client_app/.../core/navigation` |
-| Home placeholder | `client_app/.../features/home` |
+| Discovery feed (016) | `client_app/.../features/discovery` (bloc + screen + filter bar + result card over core `Paged`/`FeedCache`) |
+| Home placeholder | `client_app/.../features/home` (superseded — Discover tab renders the feed; file unused) |
 | Bookings placeholder | `client_app/.../features/booking` |
 | Favorites placeholder | `client_app/.../features/profile` |
 
 ### Not built — do not assume these exist
 
-- Profile completion (Stitch 010), Discovery Feed (016), Booking (017),
+- Profile completion (Stitch 010), Booking (017),
   AI Style (018), Stylist Profile (019), Review (020).
-  Discovery (016) is **scoped** in `docs/future-features/discovery-016.md` —
-  a read-only contract pass; nothing of the feature exists.
+  Discovery Feed (016) is **built** per `docs/future-features/discovery-016.md`.
 - **Favorites: no backend route, no client UI.** `rg favorite` in
   `dorak-backend/modules/` is empty. Do not fake a local-only favorite toggle.
 - Authenticated password change. `/client/password` exists as a route constant;
@@ -407,7 +407,9 @@ Authentication always outranks the onboarding flag.
   authentication-required flows exist (Track 06/11), and Track 12 added the
   loading/empty/error/offline/retry state widgets — **consumed only by auth
   (`StatusBanner`); the rest await Discovery 016**. Track 15 covers inputs,
-  cards, chips, dialogs — **only the 14 widgets in §10 exist**.
+  cards, chips, dialogs — **only the 14 widgets in §10 exist**. Track 12
+state components (`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner`)
+are consumed by auth **and** the Discovery feed.
 
 ---
 
@@ -521,7 +523,7 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **108 keys, identical sets** (verified 2026-09-02).
+  `app_ar.arb`. **128 keys, identical sets** (verified 2026-09-02).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
@@ -537,7 +539,7 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**168 tests pass** (83 in `core`, 67 in `client_app`, 14 in `design_system` —
+**188 tests pass** (88 in `core`, 82 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
@@ -558,6 +560,8 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `client_app/test/onboarding_skip_test.dart` | Skip vs Don't show again vs Cancel, full walk, empty back-stack |
 | `client_app/test/locale_switcher_flow_test.dart` | shared `LocaleSwitcher` on auth entry / login / sign-up / verify: visible, EN↔AR round trip, RTL flip |
 | `client_app/test/session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
+| `client_app/test/discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
+| `core/test/explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
 
 Rules:
 
@@ -586,7 +590,8 @@ Rules:
 
 - Onboarding screens 002–005 lay out in a non-scrolling `Column` and clip on
   short viewports. Making them scroll is unowned work.
-- `HomeScreen` is a single `Text`. No app bar, no navigation, no account
+- `HomeScreen` is a single `Text`, superseded by the Discovery feed on the
+  Discover tab. The file is unused; no app bar, no navigation, no account
   affordance.
 - `apps/client_app/README.md` is untouched Flutter template boilerplate.
 

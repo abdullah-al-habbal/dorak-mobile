@@ -403,4 +403,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get discoverStaleLabel => 'عرض النتائج المحفوظة';
+
+  @override
+  String discoverRankBadge(int rank) {
+    return '#$rank';
+  }
+
+  @override
+  String get discoverTabLabel => 'اكتشف';
+
+  @override
+  String discoverCompatibilityBadge(int percent) {
+    return '$percent%';
+  }
 }

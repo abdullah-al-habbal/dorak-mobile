@@ -7,5 +7,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   final preferences = await SharedAppPreferences.create();
-  runApp(DorakApp(preferences: preferences));
+  final feedCache = await SharedFeedCache.create();
+  runApp(DorakApp(preferences: preferences, feedCache: feedCache));
 }

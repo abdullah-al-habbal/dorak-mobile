@@ -17,7 +17,7 @@ lib/src/
     config.provider.dart                 ConfigProvider.config, from dotenv
     config.barrel.dart
   network/
-    api.client.dart                      ApiClient + JsonParser<T>
+    api.client.dart                      ApiClient + JsonParser<T> + RawPaginated<T>
     api_response.dto.dart                ApiResponse<T> envelope
     paginated_data.dto.dart              PaginatedData<T>
     pagination_meta.dto.dart             PaginationMeta
@@ -26,7 +26,7 @@ lib/src/
     endpoints/                           app · auth (+ endpoints.barrel.dart, orphaned)
     exceptions/                          api · network · validation
     interceptors/                        auth · locale · logging · retry
-    repositories/                        auth · onboarding_config
+    repositories/                        auth · onboarding_config · explore
   session/
     auth_status.entity.dart              AuthStatus enum
     auth.bloc.dart                       AuthBloc — login / register / verify / resend
@@ -78,8 +78,10 @@ ApiClient(
 );
 ```
 
-Verbs: `get` `post` `put` `patch` `delete` `getPaginated`. Each parser-typed
-except `delete`. Timeouts: connect 15 s, receive 30 s.
+Verbs: `get` `post` `put` `patch` `delete` `getPaginated` `getRawPaginated`.
+Each parser-typed except `delete`. Timeouts: connect 15 s, receive 30 s.
+`getRawPaginated` returns the parsed page **plus** the raw wire items/meta —
+the `FeedCache` write path (parsed DTOs have no `toJson`).
 
 Interceptor order: `Locale → [Auth] → [Logging] → Retry`.
 `RetryInterceptor` covers `GET/PUT/PATCH/DELETE` on timeouts, connection
@@ -115,6 +117,13 @@ Non-envelope payload → `ApiException(status, 'INVALID_RESPONSE')`.
 
 `OnboardingConfigRepository` / `DioOnboardingConfigRepository` —
 `GET /app/onboarding-config`, cached per locale in memory.
+
+`ExploreRepository` / `DioExploreRepository` (one file,
+`explore.repository.dart`) — `getBranches` (parsed page) and
+`getBranchesPayload` (parsed + raw for cache writes) over
+`GET /explore/branches`, with `page` for pagination and the full filter set
+(latitude/longitude/radius/universe/per_page/catalog_item_ids/available_now/
+price_range/rating_min/face_shape_compatible).
 
 `AuthEndpoints` declares 10 routes; the repository covers 8.
 `changePassword` and `socialLogin(provider)` have constants but **no method**.
@@ -248,11 +257,12 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 83 tests.
+`packages/core/test/` — 88 tests.
 
 | File | Covers |
 |---|---|
-| `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination |
+| `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination, raw paginated payload |
+| `explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, 401/422 mapping |
 | `auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, `AuthSignalAcknowledged` |

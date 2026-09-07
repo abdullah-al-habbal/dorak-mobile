@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 80 keys
+## 3. The 128 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -91,13 +91,23 @@ supportedLocales: AppLocalizations.supportedLocales,
 `verifyDidNotReceive` `verifyResend` `verifyResendDisabled` `verifyErrorInvalid`
 `verifySkip`
 
+**Discovery feed (016)** — `discoveryTitle` `discoverySubtitle`
+`locationRequiredTitle` `locationRequiredMessage` `enableLocationAction`
+`availableNow` `price` `rating` `distance` `viewDetails` `bookNow`
+`discoverUniverseMen` `discoverUniverseWomen` `discoverRankedByDistance`
+`discoverStaleLabel` `discoverTabLabel` `discoverDistanceLabel`
+`discoverRankBadge` `discoverCompatibilityBadge`
+
 ## 4. Parameterised keys
 
-Only two, and they generate **methods**, not getters:
+Five, and they generate **methods**, not getters:
 
 ```dart
 String verifySubtitle(String email);        // "…code we sent to {email}"
 String verifyResendDisabled(int seconds);   // "Resend Code ({seconds}s)"
+String discoverDistanceLabel(double km);    // "{km} km"
+String discoverRankBadge(int rank);         // "#{rank}"
+String discoverCompatibilityBadge(int percent); // "{percent}%"
 ```
 
 ARB form:

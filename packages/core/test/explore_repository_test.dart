@@ -106,6 +106,7 @@ void main() {
         longitude: 46.6753,
         radius: 10,
         universe: 'women',
+        page: 2,
         perPage: 15,
       );
 
@@ -114,6 +115,7 @@ void main() {
       expect(captured.queryParameters['longitude'], 46.6753);
       expect(captured.queryParameters['radius'], 10);
       expect(captured.queryParameters['universe'], 'women');
+      expect(captured.queryParameters['page'], 2);
       expect(captured.queryParameters['per_page'], 15);
     });
   });

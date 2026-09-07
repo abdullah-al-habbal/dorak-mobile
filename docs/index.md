@@ -924,8 +924,9 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Track 18 / Discovery (CL-09) in progress** — core infra
-complete, building Discovery screen/Bloc/widgets.
+**Current Track:** **Track 18 / Discovery (CL-09) DONE 2026-09-02** — feed
+built on the Track 18 prep core infra: `DiscoveryBloc` over `Paged<BranchDto>`
++ `FeedCache`, universe/filter bar, result cards, Discover tab wired.
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -942,20 +943,33 @@ Then **Track 18 prep (2026-09-02)** — core infra for Discovery:
 `BranchDto`, `FeedCache`/`SharedFeedCache` all in `packages/core`. `melos verify`
 exit 0, **170 tests** (core 83, client_app 67, design_system 14, 1×4).
 
-**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16. `IN_PROGRESS`: 09
-(pagination pending a consumer — its `Paged<T>` already ships), 12 (`StatusView`
-now consumed; `AppLoader` and `ShimmerBox` still await Discovery), **18 / Discovery
-(CL-09) — screen/Bloc/widgets being built on completed core infra**. `PENDING`:
-13, 14, 15, 17–21.
+**Just completed — Track 18 / Discovery 016 (CL-09) (2026-09-02).**
+`DiscoveryBloc` (location → cache → network, `Paged<BranchDto>`,
+`FeedCache` read/stale-label/revalidate, universe + available-now + price +
+rating wired to `/explore/branches`), `DiscoveryScreen` (location-required /
+error / loading / empty / feed with `DiscoveryFilterBar` +
+`DiscoveryResultCard`, pull-to-refresh, infinite scroll, stale + refresh-failure
+banners), Discover tab replaces `HomeScreen` (guest Book Now →
+`RequireAuthentication`). Core: `ApiClient.getRawPaginated` +
+`ExploreRepository.getBranchesPayload` (parsed + raw for cache writes),
+repo merged into one file, `page` param added. `melos verify` exit 0,
+**188 tests** (core 88, client_app 82, design_system 14, 1×4), **128 ARB
+keys** (EN+AR, parity verified).
+
+**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, **18 / Discovery
+(CL-09)**. `IN_PROGRESS`: 09 (pagination now consumed by Discovery),
+12 (`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner` all consumed by
+Discovery). `PENDING`: 13, 14, 15, 17–21.
 
 **Next candidate:**
 
-* `Track 18 / Discovery 016` (CL-09) — build Discovery screen/Bloc/widgets
-  (discovery.screen.dart, discovery_bloc.dart, widgets) on the completed core
-  infra (`docs/future-features/discovery-016.md`).
+* `Track 17 / Authenticated password change` (`/client/password` route constant
+  exists, nothing calls it) — or continue the Stitch order with Booking (017).
 
-Track 18 / Discovery 016 additionally needs the UI implementation against the
-trimmed-to-contract surface agreed in the scope doc.
+Architecture deviations are recorded as
+[ADR 0001](./architecture/decisions/0001-bloc-in-core.md),
+[ADR 0002](./architecture/decisions/0002-design-system-go-router.md) and
+[ADR 0003](./architecture/decisions/0003-track-12-before-05-and-10.md).
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

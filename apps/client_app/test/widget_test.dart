@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:client_app/app.dart';
 import 'package:client_app/src/features/auth/auth_entry.screen.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart' as discovery_feed;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,7 +88,7 @@ void main() {
         (tester) async {
       final repository = await pumpAuthenticatedApp(tester);
 
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
       expect(
         repository.refreshTokenCalls,
         1,
@@ -102,7 +102,7 @@ void main() {
         2,
         reason: 'resume must dispatch RestoreRequested',
       );
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     });
 
     testWidgets('each resume re-probes exactly once', (tester) async {
@@ -173,14 +173,14 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
       await tester.pumpAndSettle();
 
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
       expect(repository.refreshTokenCalls, 1);
     });
 
     testWidgets('a resume after the token was revoked resolves to guest',
         (tester) async {
       final repository = await pumpAuthenticatedApp(tester);
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
 
       // The token dies while the app is backgrounded.
       repository.refreshTokenError = unauthorized();
@@ -190,7 +190,7 @@ void main() {
       // Matches the cold-start contract asserted by session_expired_test.dart:
       // a revoked token at restore resolves to guest without raising
       // sessionExpired, so the route is not replaced here either.
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     });
   });
 }

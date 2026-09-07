@@ -6,7 +6,7 @@ import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/features/auth/auth_entry.screen.dart';
 import 'package:client_app/src/features/auth/login.screen.dart';
 import 'package:client_app/src/features/auth/widgets/auth_text_field.widget.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart' as discovery_feed;
 
 import 'helpers/fakes.dart';
 
@@ -50,13 +50,13 @@ void main() {
       (tester) async {
     createSession(token: 'valid-token');
     await pumpHome(tester);
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
 
     session.add(UnauthorizedDetected());
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
     expect(storage.token, isNull);
     expect(session.state.status, AuthStatus.guest);
     expect(session.state.signal, SessionSignal.none);
@@ -72,7 +72,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
     expect(storage.token, isNull);
   });
 
@@ -85,13 +85,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
-    expect(find.byType(HomeScreen, skipOffstage: false), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen, skipOffstage: false), findsOneWidget);
 
     router.router.pop();
     await tester.pumpAndSettle();
 
     expect(find.byType(AuthEntryScreen), findsNothing);
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
   });
 
   testWidgets('after expiry the user can sign back in', (tester) async {
@@ -110,7 +110,7 @@ void main() {
     await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(storage.token, 'login-token');
     expect(session.state.isAuthenticated, isTrue);
   });
@@ -128,7 +128,7 @@ void main() {
     await tester.enterText(find.byType(AuthTextField).at(1), 'secret123');
     await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
 
     session.add(UnauthorizedDetected());
     await tester.pumpAndSettle();
@@ -145,7 +145,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
     expect(
       session.state.status,
       AuthStatus.guest,
@@ -166,7 +166,7 @@ void main() {
     expect(session.state.status, AuthStatus.guest);
     expect(session.state.signal, SessionSignal.none);
     expect(storage.token, isNull);
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(find.byType(AuthEntryScreen), findsNothing);
   });
 }

@@ -24,8 +24,9 @@ lib/src/features/
   auth/                           8 screens + 11 widgets + 3 entities
                                   + password_recovery bloc/event/state (011–014)
   onboarding/                     4 screens + 9 widgets + config bloc
-  home/                           home.screen.dart (placeholder)
-  discovery/ booking/ profile/    empty scaffolding directories
+  home/                           home.screen.dart (superseded placeholder, unused)
+  discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
+  booking/ profile/               empty scaffolding directories
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
 ```
@@ -144,7 +145,11 @@ string. A 422's `errors` map *is* real Laravel copy and is shown per-field.
 verify, **password recovery (011–014)**, launch gate + go_router route table,
 Home placeholder, session-expired redirect (401 → auth).
 
-**Not built:** profile completion (010), discovery feed (016), booking (017),
+**Built:** discovery feed (016) — `DiscoveryBloc` over `Paged<BranchDto>` +
+`FeedCache`, universe/filter bar, result cards, Discover tab; guest Book Now
+raises `RequireAuthentication`.
+
+**Not built:** profile completion (010), booking (017),
 AI style (018), stylist profile (019), review (020), authenticated password
 change (`/client/password`, Track 17), logout UI, per-route guards, deep links,
 locale persistence.
@@ -176,8 +181,12 @@ directories.
 | `AuthHeader`'s trailing `SizedBox(width: 64)` + `FittedBox` | Balances the leading `IconButton` so the brand stays centred; the right slot hosts the shared `LocaleSwitcher` (scale-down) and still mirrors the back button's 64 px width. |
 | `AuthShell` wraps every auth screen | One outer geometry — `SafeArea → LayoutBuilder → SingleChildScrollView → maxWidth 480, margin 20` — shared by Auth Entry / Login / Register / Verify (and future Forgot-Password screens). Two modes: **composed** (default; header is part of the centered scrollable group — used by Auth Entry, which has no transactional needs) and **pinned header** (`pinnedHeader: true`; header sits above an `Expanded` content area — used by Login/Register/Verify so back button + locale switcher never scroll away under viewport pressure). Two-mode **height policy**: when the available height (from `LayoutBuilder`, not MediaQuery) is ≥ 840 the content centers vertically (`ConstrainedBox(minHeight) + Center`); below it the content top-anchors and scrolls naturally — no dead bands, keyboard-open lands in the anchored mode, CTA stays reachable. 840 is derived, not arbitrary: the tallest composition (Register, ≈680 px natural height) + 2×24 margins + ≥56 px intentional centering band each side. Result: centering only on tablet-portrait/desktop/tall windows; every phone portrait is top-anchored. Update the constant in one place if the composition grows. |
 | `dio` as a dev dependency | `NetworkException` carries a `DioExceptionType`; test fakes need it. |
+| `geolocator` as a dev dependency | `LocationProvider` returns a geolocator `Position`; `FakeLocationProvider` + `testPosition` need the type. Same precedent as `dio`. |
+| `DiscoveryBloc` reads `position.latitude/longitude` via inference | Naming the `Position` type would import `geolocator` into app `lib/` — inferred `final position = await …` keeps the dependency in core. |
+| Guest Book Now raises `RequireAuthentication` | The router pushes Auth Entry; authenticated booking is Track 017, so the callback is a no-op for signed-in users. |
+| Segmented universe control, not chips | `design_system` has no chip (Track 15) — Material `SegmentedButton` covers men/women without inventing one. |
 
-## 8. Tests — 54, in `test/`
+## 8. Tests — 82, in `test/`
 
 | File | Covers |
 |---|---|
@@ -190,7 +199,8 @@ directories.
 | `password_recovery_flow_test.dart` | 011→014 route walk; unregistered email still advances; rejected code routes back to 012; 014 drops the stack |
 | `onboarding_config_bloc_test.dart` | config load, retry after failure, locale refetch |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `discovery`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`, `unauthorized()`, `offline()` |
+| `discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
 
 Conventions:
 
@@ -210,8 +220,9 @@ Conventions:
 
 - Onboarding screens 002–005 lay out in a non-scrolling `Column` and clip on
   short viewports.
-- `HomeScreen` is a single `Text` — no app bar, no navigation, no account or
-  logout affordance.
+- `HomeScreen` is a single `Text`, superseded by the Discovery feed on the
+  Discover tab — no app bar, no navigation, no account or logout affordance.
+  The file is unused.
 - `README.md` is untouched Flutter template boilerplate.
 - Locale toggle is in-memory and resets on restart.
 

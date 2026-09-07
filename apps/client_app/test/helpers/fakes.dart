@@ -4,11 +4,13 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
+import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
 // todo: read this file, and I think is better to make a fakes folder and then move each block/class into a file for better code.
@@ -30,6 +32,7 @@ AppRouter buildRouter({
   required ApiClient apiClient,
   PasswordRecoveryBloc? recovery,
   AuthRepository? recoveryRepository,
+  DiscoveryBloc? discovery,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
@@ -39,6 +42,7 @@ AppRouter buildRouter({
         PasswordRecoveryBloc(recoveryRepository ?? FakeAuthRepository()),
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
+    discovery: discovery ?? fakeDiscoveryBloc(),
     switchLocale: switchLocale,
     apiClient: apiClient,
   );
@@ -217,6 +221,184 @@ class FakeOnboardingConfigRepository implements OnboardingConfigRepository {
 
 OnboardingConfigBloc fakeOnboardingConfig() {
   return OnboardingConfigBloc(FakeOnboardingConfigRepository());
+}
+
+Position testPosition({
+  double latitude = 24.7136,
+  double longitude = 46.6753,
+}) =>
+    Position(
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime.utc(2026, 1, 1),
+      accuracy: 5,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+
+BranchDto testBranch({int id = 1}) => BranchDto(
+      id: id,
+      name: 'Branch $id',
+      email: 'branch$id@example.com',
+      status: 'approved',
+      latitude: 24.7136,
+      longitude: 46.6753,
+      brandId: 7,
+      distance: 3.5,
+      compatibilityScore: 0.92,
+      rank: id,
+    );
+
+PaginatedData<BranchDto> testBranchPage({
+  List<BranchDto>? branches,
+  int currentPage = 1,
+  int totalPages = 1,
+}) {
+  final items = branches ?? [testBranch()];
+  return PaginatedData(
+    data: items,
+    meta: PaginationMeta(
+      total: items.length,
+      count: items.length,
+      perPage: 20,
+      currentPage: currentPage,
+      totalPages: totalPages,
+    ),
+  );
+}
+
+class FakeExploreRepository implements ExploreRepository {
+  PaginatedData<BranchDto> firstPage = testBranchPage();
+  PaginatedData<BranchDto>? morePage;
+  List<Object?> rawItems = const [];
+  Map<String, dynamic> rawMeta = const {};
+  Object? error;
+
+  int getBranchesCalls = 0;
+  int getBranchesPayloadCalls = 0;
+  int lastPage = 1;
+  String? lastUniverse;
+  bool? lastAvailableNow;
+
+  @override
+  Future<PaginatedData<BranchDto>> getBranches({
+    required double latitude,
+    required double longitude,
+    required double radius,
+    required String universe,
+    int page = 1,
+    int perPage = 20,
+    List<int>? catalogItemIds,
+    bool? availableNow,
+    double? priceRangeMin,
+    double? priceRangeMax,
+    double? ratingMin,
+    String? faceShapeCompatible,
+  }) async {
+    getBranchesCalls++;
+    lastPage = page;
+    lastUniverse = universe;
+    lastAvailableNow = availableNow;
+    final failure = error;
+    if (failure != null) throw failure;
+    if (page > 1 && morePage != null) return morePage!;
+    return firstPage;
+  }
+
+  @override
+  Future<RawPaginated<BranchDto>> getBranchesPayload({
+    required double latitude,
+    required double longitude,
+    required double radius,
+    required String universe,
+    int page = 1,
+    int perPage = 20,
+    List<int>? catalogItemIds,
+    bool? availableNow,
+    double? priceRangeMin,
+    double? priceRangeMax,
+    double? ratingMin,
+    String? faceShapeCompatible,
+  }) async {
+    getBranchesPayloadCalls++;
+    lastUniverse = universe;
+    lastAvailableNow = availableNow;
+    final failure = error;
+    if (failure != null) throw failure;
+    return (data: firstPage, rawItems: rawItems, rawMeta: rawMeta);
+  }
+}
+
+class FakeLocationProvider implements LocationProvider {
+  LocationPermissionStatus status = LocationPermissionStatus.granted;
+  Position? position = testPosition();
+
+  int ensurePermissionCalls = 0;
+
+  @override
+  Future<LocationPermissionStatus> ensurePermission() async {
+    ensurePermissionCalls++;
+    return status;
+  }
+
+  @override
+  Future<Position?> getCurrentPosition() async => position;
+
+  @override
+  Stream<LocationPermissionStatus> permissionChanges() =>
+      Stream.value(status);
+}
+
+class FakeFeedCache implements FeedCache {
+  final Map<String, FeedCacheEntry> entries = {};
+  final List<String> evictedKeys = [];
+  int writeCalls = 0;
+
+  @override
+  String keyFor({
+    required String universe,
+    required double latitude,
+    required double longitude,
+    required double radius,
+    int perPage = 20,
+  }) =>
+      'fake:$universe:$latitude:$longitude:$radius:$perPage';
+
+  @override
+  Future<FeedCacheEntry?> read(String key) async => entries[key];
+
+  @override
+  Future<void> write(String key, FeedCacheEntry entry) async {
+    entries[key] = entry;
+    writeCalls++;
+  }
+
+  @override
+  Future<void> evict(String key) async {
+    entries.remove(key);
+    evictedKeys.add(key);
+  }
+
+  @override
+  Future<void> clear() async => entries.clear();
+}
+
+DiscoveryBloc fakeDiscoveryBloc({
+  FakeExploreRepository? repository,
+  FakeLocationProvider? location,
+  FakeFeedCache? cache,
+  DateTime Function()? clock,
+}) {
+  return DiscoveryBloc(
+    repository ?? FakeExploreRepository(),
+    location ?? FakeLocationProvider(),
+    cache: cache ?? FakeFeedCache(),
+    clock: clock,
+  );
 }
 
 ApiException unauthorized() => const ApiException(

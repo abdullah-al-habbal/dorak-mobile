@@ -13,7 +13,7 @@ import 'package:client_app/src/features/auth/widgets/login_content.widget.dart';
 import 'package:client_app/src/features/auth/widgets/sign_up_content.widget.dart';
 import 'package:client_app/src/features/auth/widgets/auth_text_field.widget.dart';
 import 'package:client_app/src/features/auth/widgets/otp_input_field.widget.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart' as discovery_feed;
 
 import 'helpers/fakes.dart';
 
@@ -76,7 +76,7 @@ void main() {
     await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(storage.token, 'login-token');
     expect(session.state.isAuthenticated, isTrue);
   });
@@ -94,7 +94,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
     expect(find.text('Invalid email or password'), findsOneWidget);
     expect(storage.token, isNull);
   });
@@ -159,7 +159,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.verifiedCode, '123456');
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
   });
 
   testWidgets('a rejected code keeps the user on the verify screen', (tester) async {
@@ -188,7 +188,7 @@ void main() {
     await tester.tap(find.text('Verify later'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
   });
 
   testWidgets('resend is blocked until the cooldown elapses', (tester) async {

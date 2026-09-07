@@ -60,6 +60,9 @@ dev_dependencies:
   # Test-only: NetworkException carries a DioExceptionType, so constructing one
   # in a fake requires the dio types.
   dio: ^5.7.0
+  # Test-only: LocationProvider returns a geolocator Position, so fakes need
+  # the type to script coordinates.
+  geolocator: ^14.0.1
   flutter_test:
     sdk: flutter
 

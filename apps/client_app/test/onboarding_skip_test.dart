@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/navigation/app_routes.entity.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart' as discovery_feed;
 import 'package:client_app/src/features/onboarding/welcome.screen.dart';
 
 import 'helpers/fakes.dart';
@@ -50,7 +50,7 @@ void main() {
     await tester.tap(find.text('Skip for now'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(
       preferences.dontShowOnboarding,
       isFalse,
@@ -65,7 +65,7 @@ void main() {
     await tester.tap(find.text("Don't show again"));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(preferences.dontShowOnboarding, isTrue);
   });
 
@@ -77,7 +77,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
     expect(preferences.dontShowOnboarding, isFalse);
   });
 
@@ -93,7 +93,7 @@ void main() {
     await tester.tap(find.text('Get Started'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(preferences.dontShowOnboarding, isTrue);
   });
 

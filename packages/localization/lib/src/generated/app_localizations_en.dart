@@ -406,4 +406,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoverStaleLabel => 'Showing saved results';
+
+  @override
+  String discoverRankBadge(int rank) {
+    return '#$rank';
+  }
+
+  @override
+  String get discoverTabLabel => 'Discover';
+
+  @override
+  String discoverCompatibilityBadge(int percent) {
+    return '$percent%';
+  }
 }

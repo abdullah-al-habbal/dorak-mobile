@@ -75,8 +75,14 @@
 - `test/onboarding_skip_test.dart` — Skip vs Don't show again vs Cancel, full four-step walk, empty back-stack.
 - `test/helpers/fakes.dart` — router harness + in-memory storage/preferences/auth fakes.
 
+### Discovery Feed — Stitch 016 (CL-09)
+- `lib/src/features/discovery/discovery.{bloc,event,state}.dart` + `discovery_filter.entity.dart` — location-gated feed over `Paged<BranchDto>` + `FeedCache` (stale label, revalidate, evict-on-filter-change).
+- `lib/src/features/discovery/discovery.screen.dart` — location-required / error / loading / empty / feed states, pull-to-refresh, infinite scroll.
+- `lib/src/features/discovery/widgets/discovery_filter_bar.widget.dart` — universe segmented control, available-now switch, price range, rating slider.
+- `lib/src/features/discovery/widgets/discovery_result_card.widget.dart` — rank/compatibility/distance badges, Book Now, optional View Details.
+- `test/discovery_bloc_test.dart` — 15 bloc cases; `test/helpers/fakes.dart` gains `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc`.
+
 ### Empty Scaffolds (no files yet)
-- `lib/src/features/discovery/{data,domain,presentation}/`
 - `lib/src/features/booking/{data,domain,presentation}/`
 - `lib/src/features/profile/`
 - `lib/src/core/{di,theme}/`
@@ -102,7 +108,7 @@
 | CL-08c | Locale switcher on all pre-Home screens (onboarding header + auth entry/login/register/verify via shared `LocaleSwitcher`) | ✅ Complete | — |
 | CL-08b | Password recovery — forgot / code / new password / success | ✅ Complete | Stitch 011–014 |
 | CL-14 | Launch gate + go_router route table | ✅ Complete | Tracks 10–11 |
-| CL-09 | Discovery Feed | ⏳ Not started | Stitch 016 |
+| CL-09 | Discovery Feed | ✅ Complete | Stitch 016 |
 | CL-10 | Branch Floor Plan & Booking | ⏳ Not started | Stitch 017 |
 | CL-11 | Personalised Profile & AI Style | ⏳ Not started | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |

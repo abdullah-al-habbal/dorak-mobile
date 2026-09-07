@@ -96,8 +96,11 @@
 ### Home
 - `home.screen.dart` — placeholder landing (`homeTitle`), real dashboard TBD. No logout affordance yet.
 
+### Discovery Feed — Stitch 016 (CL-09) ✅ Complete
+- `DiscoveryBloc` + filter entity over `Paged<BranchDto>` + `FeedCache`; `DiscoveryScreen` with filter bar + result cards on the Discover tab; guest Book Now raises `RequireAuthentication`.
+
 ### Empty Scaffolds (not implemented)
-- `features/discovery/{data,domain,presentation}`, `features/booking/{data,domain,presentation}`, `features/profile/` — directories only, no files.
+- `features/booking/{data,domain,presentation}`, `features/profile/` — directories only, no files.
 
 ---
 
@@ -133,7 +136,7 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 012 | Forgot Password OTP | CL-08 | ✅ Migrated |
 | 013 | Create New Password | CL-08 | ✅ Migrated |
 | 014 | Password Reset Success | CL-08 | ✅ Migrated |
-| 016 | Discovery Feed | CL-09 | ⏳ Pending |
+| 016 | Discovery Feed | CL-09 | ✅ Complete |
 | 017 | Branch Floor Plan & Booking | CL-10 | ⏳ Pending |
 | 018 | Personalised Profile & AI Style | CL-11 | ⏳ Pending |
 | 019 | Stylist Profile | CL-12 | ⏳ Pending |

@@ -21,7 +21,9 @@ import 'package:client_app/src/features/auth/recovery_signal.entity.dart';
 import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
 import 'package:client_app/src/features/booking/bookings.screen.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.bloc.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart'
+    as discovery_feed;
 import 'package:client_app/src/features/onboarding/ai_showcase.screen.dart';
 import 'package:client_app/src/features/onboarding/booking.screen.dart';
 import 'package:client_app/src/features/onboarding/discovery.screen.dart';
@@ -37,6 +39,7 @@ class AppRouter {
   final PasswordRecoveryBloc recovery;
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
+  final DiscoveryBloc discovery;
   final VoidCallback switchLocale;
   final ApiClient apiClient;
 
@@ -51,6 +54,7 @@ class AppRouter {
     required this.recovery,
     required this.preferences,
     required this.onboardingConfig,
+    required this.discovery,
     required this.switchLocale,
     required this.apiClient,
   }) {
@@ -135,6 +139,12 @@ class AppRouter {
   }
 
   void _skipForNow() => router.go(AppRoutes.discover);
+
+  void _onBookNow() {
+    if (!session.state.isAuthenticated) {
+      session.add(RequireAuthentication());
+    }
+  }
 
   Future<void> _dismissForever() async {
     try {
@@ -278,7 +288,11 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.discover,
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => discovery_feed.DiscoveryScreen(
+                  bloc: discovery,
+                  onLocaleToggle: switchLocale,
+                  onBookNow: _onBookNow,
+                ),
               ),
             ],
           ),
@@ -343,7 +357,7 @@ class _MainShell extends StatelessWidget {
           NavigationDestination(
             icon: const Icon(Icons.explore_outlined),
             selectedIcon: const Icon(Icons.explore),
-            label: l10n.discoveryCardShops,
+            label: l10n.discoverTabLabel,
           ),
           NavigationDestination(
             icon: const Icon(Icons.calendar_month_outlined),

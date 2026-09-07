@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:client_app/src/features/auth/auth_entry.screen.dart';
-import 'package:client_app/src/features/home/home.screen.dart';
+import 'package:client_app/src/features/discovery/discovery.screen.dart' as discovery_feed;
 
 import 'helpers/fakes.dart';
 
@@ -50,7 +50,7 @@ void main() {
       preferences: InMemoryAppPreferences(),
     );
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(find.byType(AuthEntryScreen), findsNothing);
   });
 
@@ -65,7 +65,7 @@ void main() {
     );
 
     expect(find.byType(AuthEntryScreen), findsOneWidget);
-    expect(find.byType(HomeScreen), findsNothing);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsNothing);
   });
 
   testWidgets('returning guest who already saw the tour goes Home', (tester) async {
@@ -78,7 +78,7 @@ void main() {
       preferences: InMemoryAppPreferences(dontShowOnboarding: true),
     );
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
     expect(find.byType(AuthEntryScreen), findsNothing);
   });
 
@@ -112,7 +112,7 @@ void main() {
       preferences: InMemoryAppPreferences(dontShowOnboarding: true),
     );
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
   });
 
   testWidgets('offline start keeps the session and goes Home', (tester) async {
@@ -128,6 +128,6 @@ void main() {
     );
 
     expect(storage.token, 'stored-token');
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(discovery_feed.DiscoveryScreen), findsOneWidget);
   });
 }

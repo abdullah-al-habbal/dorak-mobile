@@ -532,5 +532,27 @@
   "discoverStaleLabel": "Showing saved results",
   "@discoverStaleLabel": {
     "description": "Badge shown when the feed renders from a cached fetch"
+  },
+  "discoverRankBadge": "#{rank}",
+  "@discoverRankBadge": {
+    "description": "Rank position badge on a result card",
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "discoverTabLabel": "Discover",
+  "@discoverTabLabel": {
+    "description": "Discover tab label in the bottom navigation bar"
+  },
+  "discoverCompatibilityBadge": "{percent}%",
+  "@discoverCompatibilityBadge": {
+    "description": "Compatibility score badge on a result card",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -118,8 +118,34 @@ placeholders).**
 - [x] H7: `melos run verify` — **exit 0, 170 tests** (core 83, client_app 67,
       design_system 14, 1×4).
 
-**Next: Track 18 / Discovery (CL-09) — build Discovery screen/Bloc/widgets on
-completed core infra.**
+## Phase I — Track 18 / Discovery 016 (CL-09) ✅ 2026-09-02
+
+- [x] I1: `ApiClient.getRawPaginated` — parsed `PaginatedData<T>` plus raw wire
+      items/meta for `FeedCache` writes; `getPaginated` shares the parse path.
+- [x] I2: `ExploreRepository.getBranchesPayload` (parsed + raw); abstract+impl
+      merged into `explore.repository.dart` per AGENTS §4; `page` param added
+      for load-more.
+- [x] I3: `DiscoveryBloc` + event/state/filter entity — location-gated first
+      load (no auto-permission on mount), `FeedCache` read with stale label +
+      revalidation, offline keeps cached items stale, universe/filter change
+      evicts + reloads, load-more appends, pull-to-refresh revalidates.
+- [x] I4: `DiscoveryScreen` + `DiscoveryFilterBar` (universe segmented,
+      available-now switch, price range, rating slider) +
+      `DiscoveryResultCard` (rank/compat/distance badges, Book Now, optional
+      View Details) — all strings ARB (`discover*`, 128 keys EN+AR).
+- [x] I5: Wiring — `DorakApp` builds `DiscoveryBloc`
+      (`DioExploreRepository` + `GeolocatorLocationProvider` + `SharedFeedCache`
+      from `main.dart`, nullable seam for tests); Discover tab renders the feed;
+      guest Book Now raises `RequireAuthentication`; tab label `discoverTabLabel`.
+- [x] I6: Tests — 15 `discovery_bloc_test.dart` cases +
+      `FakeExploreRepository`/`FakeLocationProvider`/`FakeFeedCache`/
+      `testPosition`/`testBranch`/`testBranchPage` in `fakes.dart`;
+      `buildRouter` takes `discovery`; flow tests assert the feed screen.
+- [x] I7: `dart run melos run verify` — **exit 0, 188 tests** (core 88,
+      client_app 82, design_system 14, 1×4), 128 ARB keys (EN+AR parity).
+
+**Next: Track 17 (authenticated password change) or Stitch 017 Booking —
+see `docs/index.md` §6.**
 
 ## Track 10 completion record
 

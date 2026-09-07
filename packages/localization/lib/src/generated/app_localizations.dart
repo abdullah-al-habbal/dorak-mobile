@@ -847,6 +847,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Showing saved results'**
   String get discoverStaleLabel;
+
+  /// Rank position badge on a result card
+  ///
+  /// In en, this message translates to:
+  /// **'#{rank}'**
+  String discoverRankBadge(int rank);
+
+  /// Discover tab label in the bottom navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get discoverTabLabel;
+
+  /// Compatibility score badge on a result card
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String discoverCompatibilityBadge(int percent);
 }
 
 class _AppLocalizationsDelegate
