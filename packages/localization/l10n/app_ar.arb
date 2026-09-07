@@ -506,6 +506,64 @@
   "@changePasswordDone": {
     "description": "Change password success dismiss button label"
   },
+  "bookingsTabLabel": "حجوزات",
+  "@bookingsTabLabel": {
+    "description": "Bookings tab label in the bottom navigation bar"
+  },
+  "bookingFilterUpcoming": "القادمة",
+  "@bookingFilterUpcoming": {
+    "description": "Bookings filter option for upcoming bookings"
+  },
+  "bookingFilterPast": "السابقة",
+  "@bookingFilterPast": {
+    "description": "Bookings filter option for past bookings"
+  },
+  "bookingStatusConfirmed": "مؤكد",
+  "@bookingStatusConfirmed": {
+    "description": "Booking status badge for confirmed bookings"
+  },
+  "bookingStatusCanceled": "ملغي",
+  "@bookingStatusCanceled": {
+    "description": "Booking status badge for canceled bookings"
+  },
+  "bookingStatusCompleted": "مكتمل",
+  "@bookingStatusCompleted": {
+    "description": "Booking status badge for completed bookings"
+  },
+  "bookingWithBarber": "مع {name}",
+  "@bookingWithBarber": {
+    "description": "Booking card barber attribution line",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingChairLabel": "كرسي {label}",
+  "@bookingChairLabel": {
+    "description": "Booking card chair line",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingCancelAction": "إلغاء الحجز",
+  "@bookingCancelAction": {
+    "description": "Cancel booking button label"
+  },
+  "bookingCancelConfirmTitle": "إلغاء هذا الحجز؟",
+  "@bookingCancelConfirmTitle": {
+    "description": "Cancel booking confirmation dialog title"
+  },
+  "bookingCancelConfirmMessage": "سيتم تحرير موعدك. يمكنك الحجز مرة أخرى في أي وقت.",
+  "@bookingCancelConfirmMessage": {
+    "description": "Cancel booking confirmation dialog message"
+  },
+  "bookingCancelConfirm": "نعم، إلغاء",
+  "@bookingCancelConfirm": {
+    "description": "Cancel booking confirmation dialog confirm button"
+  },
   "discoverCompatibilityBadge": "{percent}%",
   "@discoverCompatibilityBadge": {
     "description": "Compatibility score badge on a result card",

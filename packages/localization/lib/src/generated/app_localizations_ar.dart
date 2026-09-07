@@ -441,6 +441,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get changePasswordDone => 'تم';
 
   @override
+  String get bookingsTabLabel => 'حجوزات';
+
+  @override
+  String get bookingFilterUpcoming => 'القادمة';
+
+  @override
+  String get bookingFilterPast => 'السابقة';
+
+  @override
+  String get bookingStatusConfirmed => 'مؤكد';
+
+  @override
+  String get bookingStatusCanceled => 'ملغي';
+
+  @override
+  String get bookingStatusCompleted => 'مكتمل';
+
+  @override
+  String bookingWithBarber(String name) {
+    return 'مع $name';
+  }
+
+  @override
+  String bookingChairLabel(String label) {
+    return 'كرسي $label';
+  }
+
+  @override
+  String get bookingCancelAction => 'إلغاء الحجز';
+
+  @override
+  String get bookingCancelConfirmTitle => 'إلغاء هذا الحجز؟';
+
+  @override
+  String get bookingCancelConfirmMessage =>
+      'سيتم تحرير موعدك. يمكنك الحجز مرة أخرى في أي وقت.';
+
+  @override
+  String get bookingCancelConfirm => 'نعم، إلغاء';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

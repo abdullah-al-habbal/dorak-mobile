@@ -13,6 +13,7 @@ import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/auth/change_password.bloc.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
+import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
@@ -41,6 +42,7 @@ class _DorakAppState extends State<DorakApp> {
   late final AuthBloc _authBloc;
   late final SessionBloc _sessionBloc;
   late final PasswordRecoveryBloc _recoveryBloc;
+  late final BookingBloc _bookingBloc;
   late final ChangePasswordBloc _passwordChangeBloc;
   late final DiscoveryBloc _discoveryBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
@@ -67,6 +69,7 @@ class _DorakAppState extends State<DorakApp> {
     _authBloc = AuthBloc(repository, _tokenStorage);
     _sessionBloc = SessionBloc(repository, _tokenStorage);
     _recoveryBloc = PasswordRecoveryBloc(repository);
+    _bookingBloc = BookingBloc(DioBookingRepository(_apiClient));
     _passwordChangeBloc = ChangePasswordBloc(repository);
     _discoveryBloc = DiscoveryBloc(
       DioExploreRepository(_apiClient),
@@ -105,6 +108,7 @@ class _DorakAppState extends State<DorakApp> {
       recovery: _recoveryBloc,
       preferences: widget.preferences,
       onboardingConfig: _onboardingConfigBloc,
+      bookings: _bookingBloc,
       passwordChange: _passwordChangeBloc,
       discovery: _discoveryBloc,
       switchLocale: _switchLocale,
@@ -122,6 +126,7 @@ class _DorakAppState extends State<DorakApp> {
     _authBloc.close();
     _sessionBloc.close();
     _recoveryBloc.close();
+    _bookingBloc.close();
     _passwordChangeBloc.close();
     _discoveryBloc.close();
     _onboardingConfigBloc.close();

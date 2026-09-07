@@ -22,6 +22,7 @@ import 'package:client_app/src/features/auth/recovery_otp.screen.dart';
 import 'package:client_app/src/features/auth/recovery_signal.entity.dart';
 import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
+import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/booking/bookings.screen.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.screen.dart'
@@ -41,6 +42,7 @@ class AppRouter {
   final PasswordRecoveryBloc recovery;
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
+  final BookingBloc bookings;
   final ChangePasswordBloc passwordChange;
   final DiscoveryBloc discovery;
   final VoidCallback switchLocale;
@@ -57,6 +59,7 @@ class AppRouter {
     required this.recovery,
     required this.preferences,
     required this.onboardingConfig,
+    required this.bookings,
     required this.passwordChange,
     required this.discovery,
     required this.switchLocale,
@@ -305,7 +308,10 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.bookings,
-                builder: (context, state) => const BookingsScreen(),
+                builder: (context, state) => BookingsScreen(
+                  bloc: bookings,
+                  onLocaleToggle: switchLocale,
+                ),
               ),
             ],
           ),
@@ -378,7 +384,7 @@ class _MainShell extends StatelessWidget {
           NavigationDestination(
             icon: const Icon(Icons.calendar_month_outlined),
             selectedIcon: const Icon(Icons.calendar_month),
-            label: l10n.bookingsActionLabel,
+            label: l10n.bookingsTabLabel,
           ),
           NavigationDestination(
             icon: const Icon(Icons.favorite_border_outlined),

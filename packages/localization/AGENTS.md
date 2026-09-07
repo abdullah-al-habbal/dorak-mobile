@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 137 keys
+## 3. The 149 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -103,6 +103,12 @@ supportedLocales: AppLocalizations.supportedLocales,
 `changePasswordConfirmLabel` `changePasswordSubmit`
 `changePasswordSuccessTitle` `changePasswordSuccessMessage`
 `changePasswordDone`
+
+**My Bookings (017a)** — `bookingsTabLabel` `bookingFilterUpcoming`
+`bookingFilterPast` `bookingStatusConfirmed` `bookingStatusCanceled`
+`bookingStatusCompleted` `bookingWithBarber` `bookingChairLabel`
+`bookingCancelAction` `bookingCancelConfirmTitle`
+`bookingCancelConfirmMessage` `bookingCancelConfirm`
 
 ## 4. Parameterised keys
 

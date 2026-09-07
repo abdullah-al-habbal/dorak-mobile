@@ -582,6 +582,64 @@
   "@changePasswordDone": {
     "description": "Change password success dismiss button label"
   },
+  "bookingsTabLabel": "Bookings",
+  "@bookingsTabLabel": {
+    "description": "Bookings tab label in the bottom navigation bar"
+  },
+  "bookingFilterUpcoming": "Upcoming",
+  "@bookingFilterUpcoming": {
+    "description": "Bookings filter option for upcoming bookings"
+  },
+  "bookingFilterPast": "Past",
+  "@bookingFilterPast": {
+    "description": "Bookings filter option for past bookings"
+  },
+  "bookingStatusConfirmed": "Confirmed",
+  "@bookingStatusConfirmed": {
+    "description": "Booking status badge for confirmed bookings"
+  },
+  "bookingStatusCanceled": "Canceled",
+  "@bookingStatusCanceled": {
+    "description": "Booking status badge for canceled bookings"
+  },
+  "bookingStatusCompleted": "Completed",
+  "@bookingStatusCompleted": {
+    "description": "Booking status badge for completed bookings"
+  },
+  "bookingWithBarber": "with {name}",
+  "@bookingWithBarber": {
+    "description": "Booking card barber attribution line",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingChairLabel": "Chair {label}",
+  "@bookingChairLabel": {
+    "description": "Booking card chair line",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingCancelAction": "Cancel Booking",
+  "@bookingCancelAction": {
+    "description": "Cancel booking button label"
+  },
+  "bookingCancelConfirmTitle": "Cancel this booking?",
+  "@bookingCancelConfirmTitle": {
+    "description": "Cancel booking confirmation dialog title"
+  },
+  "bookingCancelConfirmMessage": "Your slot will be freed. You can book again anytime.",
+  "@bookingCancelConfirmMessage": {
+    "description": "Cancel booking confirmation dialog message"
+  },
+  "bookingCancelConfirm": "Yes, Cancel",
+  "@bookingCancelConfirm": {
+    "description": "Cancel booking confirmation dialog confirm button"
+  },
   "discoverCompatibilityBadge": "{percent}%",
   "@discoverCompatibilityBadge": {
     "description": "Compatibility score badge on a result card",

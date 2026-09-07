@@ -27,7 +27,8 @@ lib/src/features/
   onboarding/                     4 screens + 9 widgets + config bloc
   home/                           home.screen.dart (superseded placeholder, unused)
   discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
-  booking/ profile/               empty scaffolding directories
+  booking/                        booking.{bloc,event,state}.dart + screen + card (017a list/cancel)
+  profile/                        password entry button only
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
 ```
@@ -186,9 +187,12 @@ directories.
 | `DiscoveryBloc` reads `position.latitude/longitude` via inference | Naming the `Position` type would import `geolocator` into app `lib/` — inferred `final position = await …` keeps the dependency in core. |
 | Guest Book Now raises `RequireAuthentication` | The router pushes Auth Entry; authenticated booking is Track 017, so the callback is a no-op for signed-in users. |
 | Profile tab hosts the change-password entry | Profile completion (010) owns the real profile UI; Track 17 adds one `SecondaryButton` below the placeholder `StatusView` pushing `/profile/password` (nested shell route). |
+| Bookings filter renders in the empty state too | The filter was unreachable on an empty list (it lived in the feed header) — `_BookingsFilter` is shared between the empty `Column` and the feed. |
+| Booking times use `intl` directly | Locale-aware `DateFormat.yMMMd(locale).add_Hm()`; `intl: ^0.20.0` pinned same as `localization`. |
+| Cancel is a Material `AlertDialog`, not a sheet | No dialog exists in `design_system` (Track 15); a two-action confirm dialog is the responsible minimum for a destructive action. |
 | Segmented universe control, not chips | `design_system` has no chip (Track 15) — Material `SegmentedButton` covers men/women without inventing one. |
 
-## 8. Tests — 88, in `test/`
+## 8. Tests — 102, in `test/`
 
 | File | Covers |
 |---|---|

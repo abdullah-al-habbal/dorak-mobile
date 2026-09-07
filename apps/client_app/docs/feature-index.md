@@ -88,8 +88,13 @@
 - Entered from the Profile tab (`SecondaryButton`), nested `/profile/password` route.
 - `test/change_password_bloc_test.dart` + `test/change_password_flow_test.dart`.
 
+### My Bookings — Stitch 017a (CL-10a)
+- `lib/src/features/booking/booking.{bloc,event,state}.dart` — upcoming/past filter, refresh, load-more, cancel-then-reload over `Paged<BookingDto>`.
+- `lib/src/features/booking/bookings.screen.dart` — filter + list + cancel confirm dialog; filter renders in the empty state.
+- `lib/src/features/booking/widgets/booking_card.widget.dart` — locale-aware time, status badge, barber/chair/services, cancel affordance.
+- `test/booking_bloc_test.dart` + `test/booking_flow_test.dart`; `FakeBookingRepository`, `testBooking`/`testBookingPage`, `fakeBookingBloc` in fakes.
+
 ### Empty Scaffolds (no files yet)
-- `lib/src/features/booking/{data,domain,presentation}/`
 - `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
 
@@ -116,7 +121,8 @@
 | CL-14 | Launch gate + go_router route table | ✅ Complete | Tracks 10–11 |
 | CL-09 | Discovery Feed | ✅ Complete | Stitch 016 |
 | CL-17 | Authenticated password change | ✅ Complete | Track 17 |
-| CL-10 | Branch Floor Plan & Booking | ⏳ Not started | Stitch 017 |
+| CL-10a | My Bookings (list/filter/cancel) | ✅ Complete | Stitch 017a |
+| CL-10b | Branch Floor Plan & Booking creation | ⏳ Not started | Stitch 017b |
 | CL-11 | Personalised Profile & AI Style | ⏳ Not started | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |
 | CL-13 | Review & Rating | ⏳ Not started | Stitch 020 |

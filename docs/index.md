@@ -924,10 +924,11 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Track 17 / Authenticated password change DONE 2026-09-02**
-— `PATCH /client/password` via `AuthRepository.changePassword`,
-`ChangePasswordBloc` + form screen entered from the Profile tab, 422 field
-errors shown per-field, success exits back to Profile.
+**Current Track:** **Stitch 017a / My Bookings DONE 2026-09-02** —
+`BookingRepository` (list/filter/paginate/cancel) + `BookingDto` family,
+`BookingBloc` over `Paged<BookingDto>`, Bookings tab with upcoming/past
+filter, booking cards, cancel with confirmation dialog. Floor-plan detail +
+booking creation (017b) remain.
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -962,18 +963,30 @@ keys** (EN+AR, parity verified).
 `current_password` + confirmed `password`), `ChangePasswordBloc` + form screen
 (`ChangePasswordContent` over `AuthTextField`/`AuthValidators`/`AuthError`,
 wrong-current-password 422 shown per-field), Profile tab entry button,
-`/profile/password` nested route. `melos verify` exit 0, **196 tests** (core
-90, client_app 88, design_system 14, 1×4), **137 ARB keys** (EN+AR parity).
+`/profile/password` nested route.
+
+**Just completed — Stitch 017a / My Bookings (CL-10) (2026-09-02).**
+`BookingEndpoints` + `BookingRepository`/`DioBookingRepository`
+(`GET /bookings` with status/page/per_page, `POST
+/client/bookings/{booking}/cancel`) + `BookingDto` with nested
+chair/barber/service DTOs (codegen). `BookingBloc` over `Paged<BookingDto>`
+(filterUpcoming/past, refresh, load-more, cancel-then-reload with
+per-card spinner). `BookingsScreen` (filter visible in empty state too),
+`BookingCard` (locale-aware time, status badge, barber/chair/services),
+cancel confirmation `AlertDialog`. `melos verify` exit 0, **214 tests**
+(core 94, client_app 102, design_system 14, 1×4), **149 ARB keys** (EN+AR
+parity).
 
 **Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, 17, 18 / Discovery
-(CL-09). `IN_PROGRESS`: 09 (pagination now consumed by Discovery),
-12 (`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner` all consumed by
-Discovery + change-password). `PENDING`: 13, 14, 15, 19–21.
+(CL-09). `IN_PROGRESS`: 09, 12 (both consumed), **Stitch 017 (CL-10) —
+017a list/cancel done; 017b floor-plan detail + booking creation remain**.
+`PENDING`: 13, 14, 15, 19–21.
 
 **Next candidate:**
 
-* `Stitch 017 / Booking` (CL-10) — the next unbuilt Stitch screen after
-  Discovery (016).
+* `Stitch 017b / Branch floor-plan detail + booking creation` (CL-10) —
+  needs client catalog/chair endpoint recon (`GET /branches/{branch}/floor-plan`
+  exists server-side; chair/service listing for booking TBD).
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

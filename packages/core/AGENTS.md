@@ -26,7 +26,7 @@ lib/src/
     endpoints/                           app · auth (+ endpoints.barrel.dart, orphaned)
     exceptions/                          api · network · validation
     interceptors/                        auth · locale · logging · retry
-    repositories/                        auth · onboarding_config · explore
+    repositories/                        auth · onboarding_config · explore · booking
   session/
     auth_status.entity.dart              AuthStatus enum
     auth.bloc.dart                       AuthBloc — login / register / verify / resend
@@ -124,6 +124,13 @@ Non-envelope payload → `ApiException(status, 'INVALID_RESPONSE')`.
 `GET /explore/branches`, with `page` for pagination and the full filter set
 (latitude/longitude/radius/universe/per_page/catalog_item_ids/available_now/
 price_range/rating_min/face_shape_compatible).
+
+`BookingRepository` / `DioBookingRepository` (one file,
+`booking.repository.dart`) — `getBookings` (status/page/per_page filter over
+`GET /bookings`, parsed via `getPaginated`) and `cancelBooking` (`POST
+/client/bookings/{booking}/cancel`, `{booking}` substituted, `_discardBody`).
+Wire models: `BookingDto` + nested `BookingChairDto`/`BookingBarberDto`/
+`BookingServiceDto` (codegen, tolerant nulls for unloaded relations).
 
 `AuthEndpoints` declares 10 routes; the repository covers 8.
 `changePassword` and `socialLogin(provider)` have constants but **no method**.
@@ -257,7 +264,7 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 90 tests.
+`packages/core/test/` — 94 tests.
 
 | File | Covers |
 |---|---|

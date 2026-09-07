@@ -914,6 +914,78 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get changePasswordDone;
 
+  /// Bookings tab label in the bottom navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get bookingsTabLabel;
+
+  /// Bookings filter option for upcoming bookings
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get bookingFilterUpcoming;
+
+  /// Bookings filter option for past bookings
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get bookingFilterPast;
+
+  /// Booking status badge for confirmed bookings
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingStatusConfirmed;
+
+  /// Booking status badge for canceled bookings
+  ///
+  /// In en, this message translates to:
+  /// **'Canceled'**
+  String get bookingStatusCanceled;
+
+  /// Booking status badge for completed bookings
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get bookingStatusCompleted;
+
+  /// Booking card barber attribution line
+  ///
+  /// In en, this message translates to:
+  /// **'with {name}'**
+  String bookingWithBarber(String name);
+
+  /// Booking card chair line
+  ///
+  /// In en, this message translates to:
+  /// **'Chair {label}'**
+  String bookingChairLabel(String label);
+
+  /// Cancel booking button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Booking'**
+  String get bookingCancelAction;
+
+  /// Cancel booking confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this booking?'**
+  String get bookingCancelConfirmTitle;
+
+  /// Cancel booking confirmation dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Your slot will be freed. You can book again anytime.'**
+  String get bookingCancelConfirmMessage;
+
+  /// Cancel booking confirmation dialog confirm button
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Cancel'**
+  String get bookingCancelConfirm;
+
   /// Compatibility score badge on a result card
   ///
   /// In en, this message translates to:

@@ -163,7 +163,29 @@ placeholders).**
 - [x] J7: `dart run melos run verify` — **exit 0, 196 tests** (core 90,
       client_app 88, design_system 14, 1×4).
 
-**Next: Stitch 017 / Booking (CL-10) — see `docs/index.md` §6.**
+## Phase K — Stitch 017a / My Bookings (CL-10) ✅ 2026-09-02
+
+- [x] K1: `BookingEndpoints` (bookings, bookingDetail, cancelBooking) +
+      `BookingRepository`/`DioBookingRepository` — status/page/per_page list,
+      cancel POST, `{booking}` substitution.
+- [x] K2: `BookingDto` + `BookingChairDto`/`BookingBarberDto`/
+      `BookingServiceDto` (codegen, `createToJson: false`, tolerant nulls).
+- [x] K3: `BookingBloc` + event/state over `Paged<BookingDto>` — upcoming/past
+      filter, refresh, load-more, cancel-then-reload, per-card spinner,
+      keep-items-on-refresh-failure with error banner.
+- [x] K4: `BookingsScreen` (filter extracted so it renders in the empty state
+      too) + `BookingCard` (intl locale-aware time, status badge, barber/
+      chair/services) + cancel confirmation `AlertDialog`; `bookingsTabLabel`.
+- [x] K5: Wiring — `DorakApp` builds the bloc, Bookings tab renders the list,
+      `buildRouter` takes `bookings`; `intl ^0.20.0` app dep for dates.
+- [x] K6: Tests — 4 core repo tests, 9 bloc tests, 5 flow tests (list, past
+      filter, confirm-cancel reload, dialog dismiss, retry-after-offline).
+- [x] K7: ARB — 12 `booking*` keys EN+AR (149 keys, parity verified).
+- [x] K8: `dart run melos run verify` — **exit 0, 214 tests** (core 94,
+      client_app 102, design_system 14, 1×4).
+
+**Next: Stitch 017b / floor-plan detail + booking creation —
+see `docs/index.md` §6.**
 
 ## Track 10 completion record
 

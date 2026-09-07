@@ -444,6 +444,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePasswordDone => 'Done';
 
   @override
+  String get bookingsTabLabel => 'Bookings';
+
+  @override
+  String get bookingFilterUpcoming => 'Upcoming';
+
+  @override
+  String get bookingFilterPast => 'Past';
+
+  @override
+  String get bookingStatusConfirmed => 'Confirmed';
+
+  @override
+  String get bookingStatusCanceled => 'Canceled';
+
+  @override
+  String get bookingStatusCompleted => 'Completed';
+
+  @override
+  String bookingWithBarber(String name) {
+    return 'with $name';
+  }
+
+  @override
+  String bookingChairLabel(String label) {
+    return 'Chair $label';
+  }
+
+  @override
+  String get bookingCancelAction => 'Cancel Booking';
+
+  @override
+  String get bookingCancelConfirmTitle => 'Cancel this booking?';
+
+  @override
+  String get bookingCancelConfirmMessage =>
+      'Your slot will be freed. You can book again anytime.';
+
+  @override
+  String get bookingCancelConfirm => 'Yes, Cancel';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

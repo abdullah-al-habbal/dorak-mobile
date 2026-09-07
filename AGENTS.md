@@ -202,7 +202,7 @@ dart run melos run verify      # all five, in order — the gate
 
 `verify` must exit 0 before any work is called done. Current baseline
 (re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
-**196 tests pass** (90 core, 88 client_app, 14 design_system, 1 each for
+**214 tests pass** (94 core, 102 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -369,7 +369,7 @@ Authentication always outranks the onboarding flag.
 | Area | Where |
 |---|---|
 | Design tokens, theme, 14 shared widgets | `packages/design_system` |
-| Localization EN + AR, 137 keys, RTL | `packages/localization` |
+| Localization EN + AR, 149 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
 | Feed cache strategy (Track 05) | `packages/core/lib/src/storage/feed_cache.storage.dart` |
@@ -382,14 +382,15 @@ Authentication always outranks the onboarding flag.
 | Launch gate + go_router route table | `client_app/.../core/navigation` |
 | Discovery feed (016) | `client_app/.../features/discovery` (bloc + screen + filter bar + result card over core `Paged`/`FeedCache`) |
 | Home placeholder | `client_app/.../features/home` (superseded — Discover tab renders the feed; file unused) |
-| Bookings placeholder | `client_app/.../features/booking` |
+| My Bookings — list/filter/cancel (017a) | `client_app/.../features/booking` (bloc + screen + card over core `Paged`/`BookingDto`) |
 | Favorites placeholder | `client_app/.../features/profile` |
 
 ### Not built — do not assume these exist
 
-- Profile completion (Stitch 010), Booking (017),
-  AI Style (018), Stylist Profile (019), Review (020).
-  Discovery Feed (016) is **built** per `docs/future-features/discovery-016.md`.
+- Profile completion (Stitch 010), Booking creation + floor-plan detail
+  (017b), AI Style (018), Stylist Profile (019), Review (020).
+  Discovery Feed (016) is **built** per `docs/future-features/discovery-016.md`;
+  My Bookings list/filter/cancel (017a) is **built**.
 - **Favorites: no backend route, no client UI.** `rg favorite` in
   `dorak-backend/modules/` is empty. Do not fake a local-only favorite toggle.
 - Authenticated password change (Track 17) **is built** — `PATCH
@@ -525,7 +526,7 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **137 keys, identical sets** (verified 2026-09-02).
+  `app_ar.arb`. **149 keys, identical sets** (verified 2026-09-02).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
@@ -541,7 +542,7 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**196 tests pass** (90 in `core`, 88 in `client_app`, 14 in `design_system` —
+**214 tests pass** (94 in `core`, 102 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
@@ -566,6 +567,9 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `client_app/test/discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
 | `client_app/test/change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
 | `client_app/test/change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
+| `client_app/test/booking_bloc_test.dart` | start/filter/cancel/load-more/retry over `Paged<BookingDto>` |
+| `client_app/test/booking_flow_test.dart` | tab list, past filter, confirm-cancel reload, dialog dismiss, retry-after-offline |
+| `core/test/booking_repository_test.dart` | nested parsing, status/page params, cancel route + verb |
 | `core/test/explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
 
 Rules:

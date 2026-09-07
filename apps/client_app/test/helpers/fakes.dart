@@ -11,6 +11,7 @@ import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/auth/change_password.bloc.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
+import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
@@ -33,6 +34,7 @@ AppRouter buildRouter({
   required ApiClient apiClient,
   PasswordRecoveryBloc? recovery,
   AuthRepository? recoveryRepository,
+  BookingBloc? bookings,
   ChangePasswordBloc? passwordChange,
   DiscoveryBloc? discovery,
   VoidCallback switchLocale = _noSwitchLocale,
@@ -44,6 +46,7 @@ AppRouter buildRouter({
         PasswordRecoveryBloc(recoveryRepository ?? FakeAuthRepository()),
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
+    bookings: bookings ?? fakeBookingBloc(),
     passwordChange: passwordChange ??
         ChangePasswordBloc(recoveryRepository ?? FakeAuthRepository()),
     discovery: discovery ?? fakeDiscoveryBloc(),
@@ -409,6 +412,77 @@ class FakeFeedCache implements FeedCache {
 
   @override
   Future<void> clear() async => entries.clear();
+}
+
+BookingDto testBooking({String id = 'booking-1', String status = 'confirmed'}) =>
+    BookingDto(
+      id: id,
+      timeSlot: DateTime.utc(2026, 9, 10, 14, 30),
+      status: status,
+      chair: const BookingChairDto(id: 'chair-1', label: 'Chair A'),
+      barber: const BookingBarberDto(id: 'barber-1', name: 'Karim'),
+      services: const [
+        BookingServiceDto(id: 'service-1', name: 'Fade', price: 80),
+      ],
+      createdAt: DateTime.utc(2026, 9, 2, 10),
+    );
+
+PaginatedData<BookingDto> testBookingPage({
+  List<BookingDto>? bookings,
+  int currentPage = 1,
+  int totalPages = 1,
+}) {
+  final items = bookings ?? [testBooking()];
+  return PaginatedData(
+    data: items,
+    meta: PaginationMeta(
+      total: items.length,
+      count: items.length,
+      perPage: 20,
+      currentPage: currentPage,
+      totalPages: totalPages,
+    ),
+  );
+}
+
+class FakeBookingRepository implements BookingRepository {
+  PaginatedData<BookingDto> firstPage = testBookingPage();
+  PaginatedData<BookingDto>? morePage;
+  Object? error;
+  Object? cancelError;
+
+  int getBookingsCalls = 0;
+  int cancelCalls = 0;
+  String? lastStatus;
+  int lastPage = 1;
+  String? lastCancelledId;
+
+  @override
+  Future<PaginatedData<BookingDto>> getBookings({
+    String? status,
+    int page = 1,
+    int perPage = 20,
+  }) async {
+    getBookingsCalls++;
+    lastStatus = status;
+    lastPage = page;
+    final failure = error;
+    if (failure != null) throw failure;
+    if (page > 1 && morePage != null) return morePage!;
+    return firstPage;
+  }
+
+  @override
+  Future<void> cancelBooking(String id) async {
+    cancelCalls++;
+    lastCancelledId = id;
+    final failure = cancelError;
+    if (failure != null) throw failure;
+  }
+}
+
+BookingBloc fakeBookingBloc({FakeBookingRepository? repository}) {
+  return BookingBloc(repository ?? FakeBookingRepository());
 }
 
 DiscoveryBloc fakeDiscoveryBloc({
