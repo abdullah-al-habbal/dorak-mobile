@@ -860,6 +860,60 @@ abstract class AppLocalizations {
   /// **'Discover'**
   String get discoverTabLabel;
 
+  /// Change password screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePasswordTitle;
+
+  /// Change password screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password, then choose a new one.'**
+  String get changePasswordSubtitle;
+
+  /// Current password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get changePasswordCurrentLabel;
+
+  /// New password field label
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get changePasswordNewLabel;
+
+  /// Confirm new password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get changePasswordConfirmLabel;
+
+  /// Change password submit button label
+  ///
+  /// In en, this message translates to:
+  /// **'Update Password'**
+  String get changePasswordSubmit;
+
+  /// Change password success title
+  ///
+  /// In en, this message translates to:
+  /// **'Password Updated'**
+  String get changePasswordSuccessTitle;
+
+  /// Change password success message
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been changed.'**
+  String get changePasswordSuccessMessage;
+
+  /// Change password success dismiss button label
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get changePasswordDone;
+
   /// Compatibility score badge on a result card
   ///
   /// In en, this message translates to:

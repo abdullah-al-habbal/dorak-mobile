@@ -144,8 +144,26 @@ placeholders).**
 - [x] I7: `dart run melos run verify` — **exit 0, 188 tests** (core 88,
       client_app 82, design_system 14, 1×4), 128 ARB keys (EN+AR parity).
 
-**Next: Track 17 (authenticated password change) or Stitch 017 Booking —
-see `docs/index.md` §6.**
+## Phase J — Track 17 / Authenticated password change ✅ 2026-09-02
+
+- [x] J1: `AuthRepository.changePassword` — `PATCH /client/password` with
+      `current_password` + `password` + `password_confirmation` (Laravel
+      `confirmed` rule, same as register); `_discardBody` parser (no `data`).
+- [x] J2: `ChangePasswordBloc` + event/state (app layer, auth feature —
+      same shape as `PasswordRecoveryBloc`).
+- [x] J3: `ChangePasswordScreen` + `ChangePasswordContent` — `AuthShell`,
+      three `AuthTextField`s, `AuthValidators`, `AuthError.from` with 422
+      field errors joined in the banner, success `StatusView` with Done pop.
+- [x] J4: Wiring — Profile tab entry button, `/profile/password` nested route,
+      `DorakApp` builds the bloc, `buildRouter` takes `passwordChange`.
+- [x] J5: Tests — 2 core repo tests (body + PATCH verb, 422 field errors),
+      3 bloc tests, 3 flow tests (entry → success → Done, mismatch blocks,
+      wrong-current shows server copy).
+- [x] J6: ARB — 9 `changePassword*` keys EN+AR (137 keys, parity verified).
+- [x] J7: `dart run melos run verify` — **exit 0, 196 tests** (core 90,
+      client_app 88, design_system 14, 1×4).
+
+**Next: Stitch 017 / Booking (CL-10) — see `docs/index.md` §6.**
 
 ## Track 10 completion record
 

@@ -21,8 +21,9 @@ lib/src/core/navigation/
   app_gate.entity.dart         AppGate.resolve — the post-splash branch
 lib/src/features/
   splash/                         splash.screen.dart + 2 widgets
-  auth/                           8 screens + 11 widgets + 3 entities
+  auth/                           9 screens + 12 widgets + 3 entities
                                   + password_recovery bloc/event/state (011–014)
+                                  + change_password bloc/event/state + screen (Track 17)
   onboarding/                     4 screens + 9 widgets + config bloc
   home/                           home.screen.dart (superseded placeholder, unused)
   discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
@@ -184,9 +185,10 @@ directories.
 | `geolocator` as a dev dependency | `LocationProvider` returns a geolocator `Position`; `FakeLocationProvider` + `testPosition` need the type. Same precedent as `dio`. |
 | `DiscoveryBloc` reads `position.latitude/longitude` via inference | Naming the `Position` type would import `geolocator` into app `lib/` — inferred `final position = await …` keeps the dependency in core. |
 | Guest Book Now raises `RequireAuthentication` | The router pushes Auth Entry; authenticated booking is Track 017, so the callback is a no-op for signed-in users. |
+| Profile tab hosts the change-password entry | Profile completion (010) owns the real profile UI; Track 17 adds one `SecondaryButton` below the placeholder `StatusView` pushing `/profile/password` (nested shell route). |
 | Segmented universe control, not chips | `design_system` has no chip (Track 15) — Material `SegmentedButton` covers men/women without inventing one. |
 
-## 8. Tests — 82, in `test/`
+## 8. Tests — 88, in `test/`
 
 | File | Covers |
 |---|---|
@@ -199,8 +201,10 @@ directories.
 | `password_recovery_flow_test.dart` | 011→014 route walk; unregistered email still advances; rejected code routes back to 012; 014 drops the stack |
 | `onboarding_config_bloc_test.dart` | config load, retry after failure, locale refetch |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `discovery`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`, `unauthorized()`, `offline()` |
 | `discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
+| `change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
+| `change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
 
 Conventions:
 

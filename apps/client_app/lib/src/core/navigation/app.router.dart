@@ -9,6 +9,8 @@ import 'package:localization/localization.dart';
 import 'package:client_app/src/core/navigation/app_gate.entity.dart';
 import 'package:client_app/src/core/navigation/app_routes.entity.dart';
 import 'package:client_app/src/features/auth/auth_entry.screen.dart';
+import 'package:client_app/src/features/auth/change_password.bloc.dart';
+import 'package:client_app/src/features/auth/change_password.screen.dart';
 import 'package:client_app/src/features/auth/create_new_password.screen.dart';
 import 'package:client_app/src/features/auth/forgot_password.screen.dart';
 import 'package:client_app/src/features/auth/login.screen.dart';
@@ -39,6 +41,7 @@ class AppRouter {
   final PasswordRecoveryBloc recovery;
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
+  final ChangePasswordBloc passwordChange;
   final DiscoveryBloc discovery;
   final VoidCallback switchLocale;
   final ApiClient apiClient;
@@ -54,6 +57,7 @@ class AppRouter {
     required this.recovery,
     required this.preferences,
     required this.onboardingConfig,
+    required this.passwordChange,
     required this.discovery,
     required this.switchLocale,
     required this.apiClient,
@@ -319,7 +323,19 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.profile,
-                builder: (context, state) => const ProfileScreen(),
+                builder: (context, state) => ProfileScreen(
+                  onChangePassword: () =>
+                      router.push<void>(AppRoutes.profilePassword),
+                ),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.profilePasswordSegment,
+                    builder: (context, state) => ChangePasswordScreen(
+                      passwordChange: passwordChange,
+                      onLocaleToggle: switchLocale,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

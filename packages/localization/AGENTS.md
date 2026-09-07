@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 128 keys
+## 3. The 137 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -97,6 +97,12 @@ supportedLocales: AppLocalizations.supportedLocales,
 `discoverUniverseMen` `discoverUniverseWomen` `discoverRankedByDistance`
 `discoverStaleLabel` `discoverTabLabel` `discoverDistanceLabel`
 `discoverRankBadge` `discoverCompatibilityBadge`
+
+**Change password (Track 17)** — `changePasswordTitle` `changePasswordSubtitle`
+`changePasswordCurrentLabel` `changePasswordNewLabel`
+`changePasswordConfirmLabel` `changePasswordSubmit`
+`changePasswordSuccessTitle` `changePasswordSuccessMessage`
+`changePasswordDone`
 
 ## 4. Parameterised keys
 

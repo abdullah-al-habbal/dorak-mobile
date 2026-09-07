@@ -30,6 +30,12 @@ abstract class AuthRepository {
     required String password,
     required String passwordConfirmation,
   });
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  });
 }
 
 class DioAuthRepository implements AuthRepository {
@@ -125,6 +131,23 @@ class DioAuthRepository implements AuthRepository {
       data: {
         'email': email,
         'code': code,
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      },
+      parser: _discardBody,
+    );
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) {
+    return _client.patch<void>(
+      AuthEndpoints.changePassword,
+      data: {
+        'current_password': currentPassword,
         'password': password,
         'password_confirmation': passwordConfirmation,
       },

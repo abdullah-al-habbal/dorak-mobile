@@ -113,7 +113,7 @@ Non-envelope payload → `ApiException(status, 'INVALID_RESPONSE')`.
 
 `AuthRepository` / `DioAuthRepository` — `login`, `register`, `logout`,
 `refreshToken`, `sendEmailVerification`, `verifyEmail`, `forgotPassword`,
-`resetPassword`.
+`resetPassword`, `changePassword` (`PATCH /client/password`).
 
 `OnboardingConfigRepository` / `DioOnboardingConfigRepository` —
 `GET /app/onboarding-config`, cached per locale in memory.
@@ -257,14 +257,14 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 88 tests.
+`packages/core/test/` — 90 tests.
 
 | File | Covers |
 |---|---|
 | `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination, raw paginated payload |
 | `explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
-| `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, 401/422 mapping |
+| `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, `PATCH /client/password` + 422 field errors, 401/422 mapping |
 | `auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, `AuthSignalAcknowledged` |
 | `session_bloc_test.dart` | all four `restore()` branches, `ready` idempotence, `SessionAuthenticated`, logout, global signal emission |
 | `unauthorized_signal_test.dart` | 401/403 burst emission + reset, lifecycle routes, no-bearer, transport, 5xx |

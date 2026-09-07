@@ -413,6 +413,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get discoverTabLabel => 'اكتشف';
 
   @override
+  String get changePasswordTitle => 'تغيير كلمة المرور';
+
+  @override
+  String get changePasswordSubtitle =>
+      'أدخل كلمة المرور الحالية، ثم اختر كلمة جديدة.';
+
+  @override
+  String get changePasswordCurrentLabel => 'كلمة المرور الحالية';
+
+  @override
+  String get changePasswordNewLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get changePasswordConfirmLabel => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get changePasswordSubmit => 'تحديث كلمة المرور';
+
+  @override
+  String get changePasswordSuccessTitle => 'تم تحديث كلمة المرور';
+
+  @override
+  String get changePasswordSuccessMessage => 'تم تغيير كلمة المرور الخاصة بك.';
+
+  @override
+  String get changePasswordDone => 'تم';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

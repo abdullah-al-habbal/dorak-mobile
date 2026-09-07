@@ -144,6 +144,13 @@ class FakeAuthRepository implements AuthRepository {
     required String password,
     required String passwordConfirmation,
   }) async {}
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {}
 }
 
 ApiException unauthorized() => const ApiException(

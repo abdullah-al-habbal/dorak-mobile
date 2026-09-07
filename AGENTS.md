@@ -202,7 +202,7 @@ dart run melos run verify      # all five, in order — the gate
 
 `verify` must exit 0 before any work is called done. Current baseline
 (re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
-**188 tests pass** (88 core, 82 client_app, 14 design_system, 1 each for
+**196 tests pass** (90 core, 88 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -369,12 +369,12 @@ Authentication always outranks the onboarding flag.
 | Area | Where |
 |---|---|
 | Design tokens, theme, 14 shared widgets | `packages/design_system` |
-| Localization EN + AR, 128 keys, RTL | `packages/localization` |
+| Localization EN + AR, 137 keys, RTL | `packages/localization` |
 | Networking, interceptors, exceptions, pagination | `packages/core/lib/src/network` |
 | Storage (secure token + preferences) | `packages/core/lib/src/storage` |
 | Feed cache strategy (Track 05) | `packages/core/lib/src/storage/feed_cache.storage.dart` |
 | Session lifecycle | `packages/core/lib/src/session` |
-| Auth repository (8 methods over 10 route constants) | `packages/core/.../repositories/auth.repository.dart` |
+| Auth repository (9 methods over 10 route constants) | `packages/core/.../repositories/auth.repository.dart` |
 | Splash | `client_app/.../features/splash` (Stitch 001) |
 | Onboarding tour, 4 steps + skip sheet | `client_app/.../features/onboarding` (002–005) |
 | Auth entry / login / sign-up / verify | `client_app/.../features/auth` (006–009) |
@@ -392,8 +392,9 @@ Authentication always outranks the onboarding flag.
   Discovery Feed (016) is **built** per `docs/future-features/discovery-016.md`.
 - **Favorites: no backend route, no client UI.** `rg favorite` in
   `dorak-backend/modules/` is empty. Do not fake a local-only favorite toggle.
-- Authenticated password change. `/client/password` exists as a route constant;
-  nothing calls it (Track 17). Password *recovery* (011–014) **is** built.
+- Authenticated password change (Track 17) **is built** — `PATCH
+  /client/password` via `AuthRepository.changePassword`, form screen entered
+  from the Profile tab. Password *recovery* (011–014) **is** built.
 - Social login. The endpoint constant exists; the backend has no configured
   Socialite drivers, so it always 401s.
 - Per-route auth guards (beyond the launch gate + 401 redirect), guest guards,
@@ -426,8 +427,9 @@ Client routes are under `/client`.
 | Send code | `POST /client/email/verify/send` | `auth:client`. 6 digits, 10-minute TTL. Regenerates and invalidates any previous code. Rate-limited: `throttle:3,1` (3/min) |
 | Verify | `POST /client/email/verify` | `auth:client`, `{code}`, `size:6`. 422 on wrong code. 5 wrong attempts invalidate the code (forces a resend) |
 | Logout | `POST /client/logout` | `auth:client`. 200 with **no `data` key** |
+| Change password | `PATCH /client/password` | `auth:client`. `{current_password, password, password_confirmation}` (`confirmed` rule). 422 field errors are real copy. Success message is an untranslated key — never render it |
 
-Also declared and unused: `forgot-password`, `reset-password`, `password`,
+Also declared and unused: `forgot-password`, `reset-password`,
 `social/{provider}`.
 
 ### Defects to work around, not "fix" from the client
@@ -523,7 +525,7 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **128 keys, identical sets** (verified 2026-09-02).
+  `app_ar.arb`. **137 keys, identical sets** (verified 2026-09-02).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
@@ -539,7 +541,7 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**188 tests pass** (88 in `core`, 82 in `client_app`, 14 in `design_system` —
+**196 tests pass** (90 in `core`, 88 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
@@ -548,6 +550,7 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | File | Covers |
 |---|---|
 | `core/test/api_client_test.dart` | envelope parse, verbs, pagination, exception mapping |
+| `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, `PATCH /client/password`, 401/422 mapping |
 | `core/test/auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, auth signal ack |
 | `core/test/session_bloc_test.dart` | all four `restore()` branches, `SessionAuthenticated`, logout, signals |
 | `core/test/auth_repository_test.dart` | request bodies incl. `password_confirmation`, 401/422 mapping |
@@ -561,6 +564,8 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `client_app/test/locale_switcher_flow_test.dart` | shared `LocaleSwitcher` on auth entry / login / sign-up / verify: visible, EN↔AR round trip, RTL flip |
 | `client_app/test/session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
 | `client_app/test/discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
+| `client_app/test/change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
+| `client_app/test/change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
 | `core/test/explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
 
 Rules:

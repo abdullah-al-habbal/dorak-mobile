@@ -185,6 +185,65 @@ void main() {
     );
   });
 
+  test('changePassword patches current + confirmed password', () async {
+    RequestOptions? captured;
+    final fake = fakeDio(
+      handler: (options) {
+        captured = options;
+        return jsonResponse(
+          options,
+          data: successEnvelope(),
+        );
+      },
+    );
+
+    await DioAuthRepository(clientWith(fake)).changePassword(
+      currentPassword: 'old-secret',
+      password: 'new-secret123',
+      passwordConfirmation: 'new-secret123',
+    );
+
+    expect(captured!.path, '/client/password');
+    expect(captured!.method, 'PATCH');
+    expect(captured!.data, {
+      'current_password': 'old-secret',
+      'password': 'new-secret123',
+      'password_confirmation': 'new-secret123',
+    });
+  });
+
+  test('wrong current password surfaces field errors', () async {
+    final fake = fakeDio(
+      handler: (options) => jsonResponse(
+        options,
+        statusCode: 422,
+        data: errorEnvelope(
+          code: 'VALIDATION_FAILED',
+          statusCode: 422,
+          message: 'core::messages.validation_failed',
+          errors: {
+            'current_password': ['The current password is incorrect.'],
+          },
+        ),
+      ),
+    );
+
+    await expectLater(
+      DioAuthRepository(clientWith(fake)).changePassword(
+        currentPassword: 'wrong',
+        password: 'new-secret123',
+        passwordConfirmation: 'new-secret123',
+      ),
+      throwsA(
+        isA<ValidationException>().having(
+          (e) => e.errorsFor('current_password'),
+          'errorsFor(current_password)',
+          ['The current password is incorrect.'],
+        ),
+      ),
+    );
+  });
+
   test('invalid verification code surfaces field errors', () async {
     final fake = fakeDio(
       handler: (options) => jsonResponse(

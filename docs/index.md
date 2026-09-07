@@ -924,9 +924,10 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Track 18 / Discovery (CL-09) DONE 2026-09-02** — feed
-built on the Track 18 prep core infra: `DiscoveryBloc` over `Paged<BranchDto>`
-+ `FeedCache`, universe/filter bar, result cards, Discover tab wired.
+**Current Track:** **Track 17 / Authenticated password change DONE 2026-09-02**
+— `PATCH /client/password` via `AuthRepository.changePassword`,
+`ChangePasswordBloc` + form screen entered from the Profile tab, 422 field
+errors shown per-field, success exits back to Profile.
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -956,15 +957,23 @@ repo merged into one file, `page` param added. `melos verify` exit 0,
 **188 tests** (core 88, client_app 82, design_system 14, 1×4), **128 ARB
 keys** (EN+AR, parity verified).
 
-**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, **18 / Discovery
-(CL-09)**. `IN_PROGRESS`: 09 (pagination now consumed by Discovery),
+**Just completed — Track 17 / Authenticated password change (2026-09-02).**
+`AuthRepository.changePassword` (`PATCH /client/password`,
+`current_password` + confirmed `password`), `ChangePasswordBloc` + form screen
+(`ChangePasswordContent` over `AuthTextField`/`AuthValidators`/`AuthError`,
+wrong-current-password 422 shown per-field), Profile tab entry button,
+`/profile/password` nested route. `melos verify` exit 0, **196 tests** (core
+90, client_app 88, design_system 14, 1×4), **137 ARB keys** (EN+AR parity).
+
+**Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, 17, 18 / Discovery
+(CL-09). `IN_PROGRESS`: 09 (pagination now consumed by Discovery),
 12 (`StatusView`, `AppLoader`, `ShimmerBox`, `StatusBanner` all consumed by
-Discovery). `PENDING`: 13, 14, 15, 17–21.
+Discovery + change-password). `PENDING`: 13, 14, 15, 19–21.
 
 **Next candidate:**
 
-* `Track 17 / Authenticated password change` (`/client/password` route constant
-  exists, nothing calls it) — or continue the Stitch order with Booking (017).
+* `Stitch 017 / Booking` (CL-10) — the next unbuilt Stitch screen after
+  Discovery (016).
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

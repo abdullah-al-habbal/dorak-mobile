@@ -470,6 +470,42 @@
   "@discoverTabLabel": {
     "description": "Discover tab label in the bottom navigation bar"
   },
+  "changePasswordTitle": "تغيير كلمة المرور",
+  "@changePasswordTitle": {
+    "description": "Change password screen title"
+  },
+  "changePasswordSubtitle": "أدخل كلمة المرور الحالية، ثم اختر كلمة جديدة.",
+  "@changePasswordSubtitle": {
+    "description": "Change password screen subtitle"
+  },
+  "changePasswordCurrentLabel": "كلمة المرور الحالية",
+  "@changePasswordCurrentLabel": {
+    "description": "Current password field label"
+  },
+  "changePasswordNewLabel": "كلمة المرور الجديدة",
+  "@changePasswordNewLabel": {
+    "description": "New password field label"
+  },
+  "changePasswordConfirmLabel": "تأكيد كلمة المرور الجديدة",
+  "@changePasswordConfirmLabel": {
+    "description": "Confirm new password field label"
+  },
+  "changePasswordSubmit": "تحديث كلمة المرور",
+  "@changePasswordSubmit": {
+    "description": "Change password submit button label"
+  },
+  "changePasswordSuccessTitle": "تم تحديث كلمة المرور",
+  "@changePasswordSuccessTitle": {
+    "description": "Change password success title"
+  },
+  "changePasswordSuccessMessage": "تم تغيير كلمة المرور الخاصة بك.",
+  "@changePasswordSuccessMessage": {
+    "description": "Change password success message"
+  },
+  "changePasswordDone": "تم",
+  "@changePasswordDone": {
+    "description": "Change password success dismiss button label"
+  },
   "discoverCompatibilityBadge": "{percent}%",
   "@discoverCompatibilityBadge": {
     "description": "Compatibility score badge on a result card",

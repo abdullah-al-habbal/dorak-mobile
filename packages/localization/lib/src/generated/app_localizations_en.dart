@@ -416,6 +416,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverTabLabel => 'Discover';
 
   @override
+  String get changePasswordTitle => 'Change Password';
+
+  @override
+  String get changePasswordSubtitle =>
+      'Enter your current password, then choose a new one.';
+
+  @override
+  String get changePasswordCurrentLabel => 'Current Password';
+
+  @override
+  String get changePasswordNewLabel => 'New Password';
+
+  @override
+  String get changePasswordConfirmLabel => 'Confirm New Password';
+
+  @override
+  String get changePasswordSubmit => 'Update Password';
+
+  @override
+  String get changePasswordSuccessTitle => 'Password Updated';
+
+  @override
+  String get changePasswordSuccessMessage => 'Your password has been changed.';
+
+  @override
+  String get changePasswordDone => 'Done';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

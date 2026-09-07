@@ -546,6 +546,42 @@
   "@discoverTabLabel": {
     "description": "Discover tab label in the bottom navigation bar"
   },
+  "changePasswordTitle": "Change Password",
+  "@changePasswordTitle": {
+    "description": "Change password screen title"
+  },
+  "changePasswordSubtitle": "Enter your current password, then choose a new one.",
+  "@changePasswordSubtitle": {
+    "description": "Change password screen subtitle"
+  },
+  "changePasswordCurrentLabel": "Current Password",
+  "@changePasswordCurrentLabel": {
+    "description": "Current password field label"
+  },
+  "changePasswordNewLabel": "New Password",
+  "@changePasswordNewLabel": {
+    "description": "New password field label"
+  },
+  "changePasswordConfirmLabel": "Confirm New Password",
+  "@changePasswordConfirmLabel": {
+    "description": "Confirm new password field label"
+  },
+  "changePasswordSubmit": "Update Password",
+  "@changePasswordSubmit": {
+    "description": "Change password submit button label"
+  },
+  "changePasswordSuccessTitle": "Password Updated",
+  "@changePasswordSuccessTitle": {
+    "description": "Change password success title"
+  },
+  "changePasswordSuccessMessage": "Your password has been changed.",
+  "@changePasswordSuccessMessage": {
+    "description": "Change password success message"
+  },
+  "changePasswordDone": "Done",
+  "@changePasswordDone": {
+    "description": "Change password success dismiss button label"
+  },
   "discoverCompatibilityBadge": "{percent}%",
   "@discoverCompatibilityBadge": {
     "description": "Compatibility score badge on a result card",

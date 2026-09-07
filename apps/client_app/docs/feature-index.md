@@ -82,9 +82,15 @@
 - `lib/src/features/discovery/widgets/discovery_result_card.widget.dart` — rank/compatibility/distance badges, Book Now, optional View Details.
 - `test/discovery_bloc_test.dart` — 15 bloc cases; `test/helpers/fakes.dart` gains `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc`.
 
+### Authenticated Password Change — Track 17
+- `lib/src/features/auth/change_password.{bloc,event,state}.dart` — submit over `AuthRepository.changePassword`, `succeeded` flag, typed error.
+- `lib/src/features/auth/change_password.screen.dart` + `widgets/change_password_content.widget.dart` — `AuthShell` form (current/new/confirm), `AuthValidators`, 422 field errors in the banner, success `StatusView` with Done pop.
+- Entered from the Profile tab (`SecondaryButton`), nested `/profile/password` route.
+- `test/change_password_bloc_test.dart` + `test/change_password_flow_test.dart`.
+
 ### Empty Scaffolds (no files yet)
 - `lib/src/features/booking/{data,domain,presentation}/`
-- `lib/src/features/profile/`
+- `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
 
 ### Assets
@@ -109,6 +115,7 @@
 | CL-08b | Password recovery — forgot / code / new password / success | ✅ Complete | Stitch 011–014 |
 | CL-14 | Launch gate + go_router route table | ✅ Complete | Tracks 10–11 |
 | CL-09 | Discovery Feed | ✅ Complete | Stitch 016 |
+| CL-17 | Authenticated password change | ✅ Complete | Track 17 |
 | CL-10 | Branch Floor Plan & Booking | ⏳ Not started | Stitch 017 |
 | CL-11 | Personalised Profile & AI Style | ⏳ Not started | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |

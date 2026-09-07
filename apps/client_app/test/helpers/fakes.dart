@@ -9,6 +9,7 @@ import 'package:localization/localization.dart';
 
 import 'package:client_app/src/core/navigation/app.router.dart';
 import 'package:client_app/src/core/session/auth_coordination.entity.dart';
+import 'package:client_app/src/features/auth/change_password.bloc.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
@@ -32,6 +33,7 @@ AppRouter buildRouter({
   required ApiClient apiClient,
   PasswordRecoveryBloc? recovery,
   AuthRepository? recoveryRepository,
+  ChangePasswordBloc? passwordChange,
   DiscoveryBloc? discovery,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
@@ -42,6 +44,8 @@ AppRouter buildRouter({
         PasswordRecoveryBloc(recoveryRepository ?? FakeAuthRepository()),
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
+    passwordChange: passwordChange ??
+        ChangePasswordBloc(recoveryRepository ?? FakeAuthRepository()),
     discovery: discovery ?? fakeDiscoveryBloc(),
     switchLocale: switchLocale,
     apiClient: apiClient,
@@ -204,6 +208,26 @@ class FakeAuthRepository implements AuthRepository {
       'password_confirmation': passwordConfirmation,
     };
     final error = resetPasswordError;
+    if (error != null) throw error;
+  }
+
+  Object? changePasswordError;
+  Map<String, String>? changePasswordPayload;
+  int changePasswordCalls = 0;
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    changePasswordCalls++;
+    changePasswordPayload = {
+      'current_password': currentPassword,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+    };
+    final error = changePasswordError;
     if (error != null) throw error;
   }
 }

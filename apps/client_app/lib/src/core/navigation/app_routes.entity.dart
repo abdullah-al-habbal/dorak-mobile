@@ -23,6 +23,7 @@ class AppRoutes {
   static const String bookings = '/bookings';
   static const String favorites = '/favorites';
   static const String profile = '/profile';
+  static const String profilePassword = '/profile/password';
 
   // Legacy home route (kept for onboarding/guest redirects)
   static const String home = '/home';
@@ -38,4 +39,5 @@ class AppRoutes {
   static const String recoveryOtpSegment = 'otp';
   static const String resetPasswordSegment = 'reset-password';
   static const String resetPasswordSuccessSegment = 'success';
+  static const String profilePasswordSegment = 'password';
 }
