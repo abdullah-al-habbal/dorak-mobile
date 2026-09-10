@@ -24,6 +24,8 @@ import 'package:client_app/src/features/auth/sign_up.screen.dart';
 import 'package:client_app/src/features/auth/verify_account.screen.dart';
 import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/booking/bookings.screen.dart';
+import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
+import 'package:client_app/src/features/booking/branch_detail.screen.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.screen.dart'
     as discovery_feed;
@@ -43,6 +45,7 @@ class AppRouter {
   final AppPreferences preferences;
   final OnboardingConfigBloc onboardingConfig;
   final BookingBloc bookings;
+  final BranchDetailBloc branchDetail;
   final ChangePasswordBloc passwordChange;
   final DiscoveryBloc discovery;
   final VoidCallback switchLocale;
@@ -60,6 +63,7 @@ class AppRouter {
     required this.preferences,
     required this.onboardingConfig,
     required this.bookings,
+    required this.branchDetail,
     required this.passwordChange,
     required this.discovery,
     required this.switchLocale,
@@ -299,7 +303,22 @@ class AppRouter {
                   bloc: discovery,
                   onLocaleToggle: switchLocale,
                   onBookNow: _onBookNow,
+                  onViewDetails: (branchId) => router.push<void>(
+                    AppRoutes.branchDetail(branchId),
+                  ),
                 ),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.branchDetailSegment,
+                    builder: (context, state) => BranchDetailScreen(
+                      bloc: branchDetail,
+                      branchId:
+                          state.pathParameters['branchId'] ?? '',
+                      onLocaleToggle: switchLocale,
+                      onViewBookings: () => router.go(AppRoutes.bookings),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -485,6 +485,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingCancelConfirm => 'Yes, Cancel';
 
   @override
+  String branchChairsCount(int count) {
+    return '$count chairs';
+  }
+
+  @override
+  String get branchAvailableLabel => 'Available';
+
+  @override
+  String get branchOccupiedLabel => 'Occupied';
+
+  @override
+  String get branchMaintenanceLabel => 'Maintenance';
+
+  @override
+  String get branchBarbersTitle => 'Barbers';
+
+  @override
+  String get branchServicesTitle => 'Services';
+
+  @override
+  String get bookingSelectChair => 'Select a chair';
+
+  @override
+  String get bookingSelectServices => 'Select services';
+
+  @override
+  String get bookingSelectTime => 'Select time';
+
+  @override
+  String get bookingConfirmAction => 'Confirm Booking';
+
+  @override
+  String get bookingSuccessTitle => 'Booking Confirmed';
+
+  @override
+  String get bookingSuccessMessage => 'Your slot is reserved.';
+
+  @override
+  String get bookingViewBookings => 'View My Bookings';
+
+  @override
+  String get bookingConflictMessage =>
+      'That slot was just taken. Please pick another time.';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

@@ -7,6 +7,15 @@ abstract class BookingRepository {
     int perPage = 20,
   });
 
+  Future<BookingDto> createBooking({
+    String? chairId,
+    String? barberId,
+    required DateTime timeSlot,
+    List<String>? serviceIds,
+    double? atHomeLatitude,
+    double? atHomeLongitude,
+  });
+
   Future<void> cancelBooking(String id);
 }
 
@@ -29,6 +38,36 @@ class DioBookingRepository implements BookingRepository {
         'per_page': perPage,
       },
       itemParser: (json) => BookingDto.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Future<BookingDto> createBooking({
+    String? chairId,
+    String? barberId,
+    required DateTime timeSlot,
+    List<String>? serviceIds,
+    double? atHomeLatitude,
+    double? atHomeLongitude,
+  }) {
+    final slot = timeSlot.toUtc();
+    String two(int value) => value.toString().padLeft(2, '0');
+    final formatted =
+        '${slot.year}-${two(slot.month)}-${two(slot.day)} ${two(slot.hour)}:${two(slot.minute)}:${two(slot.second)}';
+    return _apiClient.post<BookingDto>(
+      BookingEndpoints.bookings,
+      data: {
+        'chair_id': ?chairId,
+        'barber_id': ?barberId,
+        'time_slot': formatted,
+        'service_ids': ?serviceIds,
+        if (atHomeLatitude != null && atHomeLongitude != null)
+          'at_home_location': {
+            'latitude': atHomeLatitude,
+            'longitude': atHomeLongitude,
+          },
+      },
+      parser: (json) => BookingDto.fromJson(json as Map<String, dynamic>),
     );
   }
 

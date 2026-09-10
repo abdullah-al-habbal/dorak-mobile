@@ -22,11 +22,11 @@ lib/src/
     paginated_data.dto.dart              PaginatedData<T>
     pagination_meta.dto.dart             PaginationMeta
     network.barrel.dart
-    dto/                                 auth_response · client · onboarding_config · token_response
-    endpoints/                           app · auth (+ endpoints.barrel.dart, orphaned)
+    dto/                                 auth_response · client · onboarding_config · booking* · branch_detail · floor_plan · floor_chair · token_response
+    endpoints/                           app · auth · booking · branch · explore (+ endpoints.barrel.dart, orphaned)
     exceptions/                          api · network · validation
     interceptors/                        auth · locale · logging · retry
-    repositories/                        auth · onboarding_config · explore · booking
+    repositories/                        auth · onboarding_config · explore · booking · branch
   session/
     auth_status.entity.dart              AuthStatus enum
     auth.bloc.dart                       AuthBloc — login / register / verify / resend
@@ -264,12 +264,14 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 94 tests.
+`packages/core/test/` — 98 tests.
 
 | File | Covers |
 |---|---|
 | `api_client_test.dart` | envelope parse, 422, 404, invalid payload, transport error, all verbs, pagination, raw paginated payload |
-| `explore_repository_test.dart` | branch parsing, raw payload for cache writes, query params incl. `page` |
+| `explore_repository_test.dart` | branch parsing, `getBranchDetail` (detail + barbers + services), raw payload for cache writes, query params incl. `page` |
+| `branch_repository_test.dart` | `getFloorPlan` parsing (available/occupied chairs + barber) + path |
+| `booking_repository_test.dart` | nested parsing, status/page params, cancel route + verb, `createBooking` UTC slot format + 409 conflict |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, `PATCH /client/password` + 422 field errors, 401/422 mapping |
 | `auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, `AuthSignalAcknowledged` |

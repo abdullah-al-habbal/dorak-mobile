@@ -91,6 +91,67 @@ void main() {
       expect(captured.queryParameters.containsKey('status'), isFalse);
     });
 
+    test('createBooking posts the slot in server format', () async {
+      late RequestOptions captured;
+      final fake = fakeDio(
+        handler: (options) {
+          captured = options;
+          return jsonResponse(
+            options,
+            statusCode: 201,
+            data: successEnvelope(
+              statusCode: 201,
+              code: 'CREATED',
+              data: booking(),
+            ),
+          );
+        },
+      );
+      final repository = DioBookingRepository(clientWith(fake));
+
+      final created = await repository.createBooking(
+        chairId: 'chair-1',
+        barberId: 'barber-1',
+        timeSlot: DateTime.utc(2026, 9, 10, 14, 30),
+        serviceIds: const ['service-1'],
+      );
+
+      expect(captured.path, BookingEndpoints.bookings);
+      expect(captured.method, 'POST');
+      expect(captured.data, {
+        'chair_id': 'chair-1',
+        'barber_id': 'barber-1',
+        'time_slot': '2026-09-10 14:30:00',
+        'service_ids': ['service-1'],
+      });
+      expect(created.id, 'booking-1');
+    });
+
+    test('createBooking conflict surfaces the status code', () async {
+      final fake = fakeDio(
+        handler: (options) => jsonResponse(
+          options,
+          statusCode: 409,
+          data: errorEnvelope(
+            code: 'CONFLICT',
+            statusCode: 409,
+            message: 'booking::messages.chair_not_available',
+          ),
+        ),
+      );
+      final repository = DioBookingRepository(clientWith(fake));
+
+      await expectLater(
+        repository.createBooking(
+          chairId: 'chair-1',
+          timeSlot: DateTime.utc(2026, 9, 10, 14, 30),
+        ),
+        throwsA(
+          isA<ApiException>().having((e) => e.statusCode, 'statusCode', 409),
+        ),
+      );
+    });
+
     test('cancelBooking posts to the cancel route', () async {
       late RequestOptions captured;
       final fake = fakeDio(

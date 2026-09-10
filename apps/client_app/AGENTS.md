@@ -28,6 +28,7 @@ lib/src/features/
   home/                           home.screen.dart (superseded placeholder, unused)
   discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
   booking/                        booking.{bloc,event,state}.dart + screen + card (017a list/cancel)
+                                  branch_detail.{bloc,event,state}.dart + screen + FloorPlanGrid widget (017b detail/create)
   profile/                        password entry button only
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
@@ -151,13 +152,16 @@ Home placeholder, session-expired redirect (401 → auth).
 `FeedCache`, universe/filter bar, result cards, Discover tab; guest Book Now
 raises `RequireAuthentication`.
 
-**Not built:** profile completion (010), booking (017),
-AI style (018), stylist profile (019), review (020), authenticated password
-change (`/client/password`, Track 17), logout UI, per-route guards, deep links,
-locale persistence.
+**Built:** booking (017a + 017b) — `BookingBloc` list/filter/cancel on the
+Bookings tab; `BranchDetailBloc` + `BranchDetailScreen` + `FloorPlanGrid`
+(chair/services/time selection, `createBooking`, 409 conflict → message,
+success → My Bookings) on `/discover/branch/:branchId`.
 
-`features/{discovery,booking,profile}` and `core/{di,theme}` are empty
-directories.
+**Not built:** profile completion (010),
+AI style (018), stylist profile (019), review (020), logout UI, per-route
+guards, deep links, locale persistence.
+
+`features/{profile}` and `core/{di,theme}` are empty directories.
 
 ## 7. Decisions that are not in the code
 
@@ -191,8 +195,14 @@ directories.
 | Booking times use `intl` directly | Locale-aware `DateFormat.yMMMd(locale).add_Hm()`; `intl: ^0.20.0` pinned same as `localization`. |
 | Cancel is a Material `AlertDialog`, not a sheet | No dialog exists in `design_system` (Track 15); a two-action confirm dialog is the responsible minimum for a destructive action. |
 | Segmented universe control, not chips | `design_system` has no chip (Track 15) — Material `SegmentedButton` covers men/women without inventing one. |
+| Branch detail loads detail + floor plan in parallel, plan failure tolerated | A dead floor-plan endpoint must not blank the whole branch page — `planFailed` renders an inline retry `StatusBanner` under the loaded detail. |
+| Booking submit requires chair + time; services optional | `canSubmit = chair && time && !isSubmitting`; `service_ids` is nullable on the wire and sent as `null` when empty (backend `required_without`/lists are optional). |
+| Barber silently resolved from the selected chair | The plan's `ChairResource` carries `barber`; the user picks a chair, not a barber — the submit payload fills `barber_id` from the chair to keep the booking consistent. |
+| 409 mapping lives in the screen, not the bloc | The bloc stores the raw `ApiException` in `submitError`; `_submitMessage` maps `statusCode == 409` → `bookingConflictMessage`, 422 `errors` → field copy, `NetworkException` → `errorNetwork`. Keeps a pure core exception in state. |
+| Time picked with Material date + time pickers | Design has no custom time selector (Track 15); `showDatePicker` + `showTimePicker` give localised pickers for free. Slot stored as local `DateTime`, wire-formatted to UTC by core. |
+| `buildRouter` takes `bookings` + `branchDetail` fakes | Matched-param seams keep constructors honest; defaults per feature keep unrelated router tests untouched. |
 
-## 8. Tests — 102, in `test/`
+## 8. Tests — 110, in `test/`
 
 | File | Covers |
 |---|---|
@@ -205,10 +215,13 @@ directories.
 | `password_recovery_flow_test.dart` | 011→014 route walk; unregistered email still advances; rejected code routes back to 012; 014 drops the stack |
 | `onboarding_config_bloc_test.dart` | config load, retry after failure, locale refetch |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository`, `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery` + `bookings` + `branchDetail`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository` (+ `testBranchDetail`), `FakeBranchRepository` (+ `testFloorPlan`), `FakeBookingRepository` (cancel + `createBooking`), `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`/`fakeBookingBloc()`/`fakeBranchDetailBloc()`, `unauthorized()`, `offline()` |
 | `discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
 | `change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
 | `change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
+| `booking_bloc_test.dart` | start/filter/cancel/load-more/retry over `Paged<BookingDto>` |
+| `booking_flow_test.dart` | tab list, past filter, confirm-cancel reload, dialog dismiss, retry-after-offline |
+| `branch_detail_bloc_test.dart` | detail + plan parallel load, plan-failure tolerance, chair/services/time selection, submit guard, 409 conflict, submit no-op without chair |
 
 Conventions:
 

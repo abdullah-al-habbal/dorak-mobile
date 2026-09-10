@@ -482,6 +482,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingCancelConfirm => 'نعم، إلغاء';
 
   @override
+  String branchChairsCount(int count) {
+    return '$count كراسي';
+  }
+
+  @override
+  String get branchAvailableLabel => 'متاح';
+
+  @override
+  String get branchOccupiedLabel => 'مشغول';
+
+  @override
+  String get branchMaintenanceLabel => 'صيانة';
+
+  @override
+  String get branchBarbersTitle => 'الحلاقون';
+
+  @override
+  String get branchServicesTitle => 'الخدمات';
+
+  @override
+  String get bookingSelectChair => 'اختر الكرسي';
+
+  @override
+  String get bookingSelectServices => 'اختر الخدمات';
+
+  @override
+  String get bookingSelectTime => 'اختر الوقت';
+
+  @override
+  String get bookingConfirmAction => 'تأكيد الحجز';
+
+  @override
+  String get bookingSuccessTitle => 'تم تأكيد الحجز';
+
+  @override
+  String get bookingSuccessMessage => 'تم حجز موعدك.';
+
+  @override
+  String get bookingViewBookings => 'عرض حجوزاتي';
+
+  @override
+  String get bookingConflictMessage =>
+      'تم حجز هذا الموعد للتو. اختر وقتًا آخر.';
+
+  @override
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }

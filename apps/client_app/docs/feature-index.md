@@ -94,6 +94,13 @@
 - `lib/src/features/booking/widgets/booking_card.widget.dart` — locale-aware time, status badge, barber/chair/services, cancel affordance.
 - `test/booking_bloc_test.dart` + `test/booking_flow_test.dart`; `FakeBookingRepository`, `testBooking`/`testBookingPage`, `fakeBookingBloc` in fakes.
 
+### Branch Floor Plan & Booking Creation — Stitch 017b (CL-10b)
+- `lib/src/features/booking/branch_detail.{bloc,event,state}.dart` — parallel detail + floor-plan load (plan failure tolerated), chair/services/time selection, submit (`canSubmit` = chair + time), 409 conflict, retry.
+- `lib/src/features/booking/branch_detail.screen.dart` — floor plan grid, barbers, services checklist, date + time pickers, confirm, success `StatusView` → My Bookings.
+- `lib/src/features/booking/widgets/floor_plan_grid.widget.dart` — legend + tappable available chairs.
+- Nested `/discover/branch/:branchId` route; "View Details" on result cards; `BranchDetailBloc` built in `app.dart`.
+- `test/branch_detail_bloc_test.dart`; `FakeBranchRepository`, `testFloorPlan`, `testBranchDetail`, fake `createBooking` in fakes.
+
 ### Empty Scaffolds (no files yet)
 - `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
@@ -122,7 +129,7 @@
 | CL-09 | Discovery Feed | ✅ Complete | Stitch 016 |
 | CL-17 | Authenticated password change | ✅ Complete | Track 17 |
 | CL-10a | My Bookings (list/filter/cancel) | ✅ Complete | Stitch 017a |
-| CL-10b | Branch Floor Plan & Booking creation | ⏳ Not started | Stitch 017b |
+| CL-10b | Branch Floor Plan & Booking creation | ✅ Complete | Stitch 017b |
 | CL-11 | Personalised Profile & AI Style | ⏳ Not started | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |
 | CL-13 | Review & Rating | ⏳ Not started | Stitch 020 |

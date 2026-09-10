@@ -640,6 +640,67 @@
   "@bookingCancelConfirm": {
     "description": "Cancel booking confirmation dialog confirm button"
   },
+  "branchChairsCount": "{count} chairs",
+  "@branchChairsCount": {
+    "description": "Branch detail chairs count line",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "branchAvailableLabel": "Available",
+  "@branchAvailableLabel": {
+    "description": "Floor plan legend for available chairs"
+  },
+  "branchOccupiedLabel": "Occupied",
+  "@branchOccupiedLabel": {
+    "description": "Floor plan legend for occupied chairs"
+  },
+  "branchMaintenanceLabel": "Maintenance",
+  "@branchMaintenanceLabel": {
+    "description": "Floor plan label for chairs under maintenance"
+  },
+  "branchBarbersTitle": "Barbers",
+  "@branchBarbersTitle": {
+    "description": "Branch detail barbers section title"
+  },
+  "branchServicesTitle": "Services",
+  "@branchServicesTitle": {
+    "description": "Branch detail services section title"
+  },
+  "bookingSelectChair": "Select a chair",
+  "@bookingSelectChair": {
+    "description": "Booking sheet chair step title"
+  },
+  "bookingSelectServices": "Select services",
+  "@bookingSelectServices": {
+    "description": "Booking sheet services step title"
+  },
+  "bookingSelectTime": "Select time",
+  "@bookingSelectTime": {
+    "description": "Booking sheet time step title"
+  },
+  "bookingConfirmAction": "Confirm Booking",
+  "@bookingConfirmAction": {
+    "description": "Booking sheet confirm button label"
+  },
+  "bookingSuccessTitle": "Booking Confirmed",
+  "@bookingSuccessTitle": {
+    "description": "Booking success title"
+  },
+  "bookingSuccessMessage": "Your slot is reserved.",
+  "@bookingSuccessMessage": {
+    "description": "Booking success message"
+  },
+  "bookingViewBookings": "View My Bookings",
+  "@bookingViewBookings": {
+    "description": "Booking success navigation button label"
+  },
+  "bookingConflictMessage": "That slot was just taken. Please pick another time.",
+  "@bookingConflictMessage": {
+    "description": "Message shown when the server reports a booking conflict"
+  },
   "discoverCompatibilityBadge": "{percent}%",
   "@discoverCompatibilityBadge": {
     "description": "Compatibility score badge on a result card",

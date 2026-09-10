@@ -184,7 +184,37 @@ placeholders).**
 - [x] K8: `dart run melos run verify` — **exit 0, 214 tests** (core 94,
       client_app 102, design_system 14, 1×4).
 
-**Next: Stitch 017b / floor-plan detail + booking creation —
+## Phase L — Stitch 017b / Branch floor-plan detail + booking creation (CL-10) ✅ 2026-09-02
+
+- [x] L1: Recon — `GET /branches/{branch}/floor-plan` (shared, ChairResource
+      with status available|occupied|maintenance), `GET
+      /explore/branches/{branch}` (detail + barbers + services + chairs_count),
+      `POST /bookings` (chair_id `required_without`/`prohibits`
+      at_home_location, 201 → BookingResource, 409 on
+      `chair_not_available`/`double_booking`).
+- [x] L2: Core — `BranchEndpoints` + `BranchRepository.getFloorPlan`;
+      `ExploreRepository.getBranchDetail`; `BookingRepository.createBooking`
+      (slot `yyyy-MM-dd HH:mm:ss` UTC); DTOs `BranchDetailDto`/`FloorPlanDto`/
+      `FloorChairDto` (codegen); barrel exports.
+- [x] L3: ARB — 14 `branch*`/`booking*` keys EN+AR (`branchChairsCount`
+      placeholder, plan labels, select chair/services/time, confirm, success,
+      view-my-bookings, conflict) — **163 keys, parity verified**.
+- [x] L4: `BranchDetailBloc` + event/state — parallel detail + plan load
+      (plan-failure tolerated), chair/services/time selection, submit guard
+      `canSubmit` (chair + time), barber from chair, 409 conflict mapping,
+      retry.
+- [x] L5: `BranchDetailScreen` + `FloorPlanGrid` widget — legend, tappable
+      available chairs, services checklist, date + time pickers, confirm
+      `PrimaryButton`, success `StatusView`; `/discover/branch/:branchId`
+      nested route + View Details wiring; DorakApp DI + `buildRouter`
+      `branchDetail` fakes.
+- [x] L6: Tests — 4 core tests (floor plan, branch detail, createBooking
+      format + 409), 8 bloc tests (load, failure tolerance, selection, submit
+      guard + conflict). Client_app 110 tests.
+- [x] L7: `dart run melos run verify` — **exit 0, 226 tests** (core 98,
+      client_app 110, design_system 14, 1×4).
+
+**Next: AI Style (018) / Stylist Profile (019) / Review (020) —
 see `docs/index.md` §6.**
 
 ## Track 10 completion record
@@ -196,8 +226,9 @@ see `docs/index.md` §6.**
 
 ## Not built — do not assume these exist
 
-Stitch 010 (Profile Completion), 016 Discovery, 017 Booking, 018 AI Style,
-019 Stylist Profile, 020 Review. `business_app`/`stylist_app` are skeletons.
+Stitch 010 (Profile Completion), 018 AI Style, 019 Stylist Profile, 020 Review.
+016 Discovery and 017 Booking are built.
+`business_app`/`stylist_app` are skeletons.
 Design-system inputs/cards/chips/dialogs/app bars (Track 15) — only the 14
 widgets in `AGENTS.md` §10 exist.
 

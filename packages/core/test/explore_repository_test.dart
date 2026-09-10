@@ -118,5 +118,44 @@ void main() {
       expect(captured.queryParameters['page'], 2);
       expect(captured.queryParameters['per_page'], 15);
     });
+
+    test('getBranchDetail parses detail with barbers and services', () async {
+      late RequestOptions captured;
+      final fake = fakeDio(
+        handler: (options) {
+          captured = options;
+          return jsonResponse(
+            options,
+            data: successEnvelope(
+              data: {
+                'id': 1,
+                'name': 'Branch 1',
+                'email': 'branch1@example.com',
+                'status': 'approved',
+                'latitude': 24.7136,
+                'longitude': 46.6753,
+                'brand_id': 7,
+                'chairs_count': 2,
+                'barbers': [
+                  {'id': 'barber-1', 'name': 'Karim'},
+                ],
+                'services': [
+                  {'id': 'service-1', 'name': 'Fade', 'price': 80.0},
+                ],
+              },
+            ),
+          );
+        },
+      );
+      final repository = DioExploreRepository(clientWith(fake));
+
+      final detail = await repository.getBranchDetail('1');
+
+      expect(captured.path, '/explore/branches/1');
+      expect(detail.name, 'Branch 1');
+      expect(detail.chairsCount, 2);
+      expect(detail.barbers.map((barber) => barber.name), ['Karim']);
+      expect(detail.services.map((service) => service.price), [80.0]);
+    });
   });
 }

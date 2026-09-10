@@ -30,6 +30,8 @@ abstract class ExploreRepository {
     double? ratingMin,
     String? faceShapeCompatible,
   });
+
+  Future<BranchDetailDto> getBranchDetail(String branchId);
 }
 
 class DioExploreRepository implements ExploreRepository {
@@ -147,6 +149,14 @@ class DioExploreRepository implements ExploreRepository {
       ExploreEndpoints.branches,
       queryParameters: query,
       itemParser: (json) => BranchDto.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Future<BranchDetailDto> getBranchDetail(String branchId) {
+    return _apiClient.get<BranchDetailDto>(
+      ExploreEndpoints.branchDetail.replaceFirst('{branch}', branchId),
+      parser: (json) => BranchDetailDto.fromJson(json as Map<String, dynamic>),
     );
   }
 }

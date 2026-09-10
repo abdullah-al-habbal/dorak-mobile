@@ -924,11 +924,17 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Stitch 017a / My Bookings DONE 2026-09-02** —
-`BookingRepository` (list/filter/paginate/cancel) + `BookingDto` family,
-`BookingBloc` over `Paged<BookingDto>`, Bookings tab with upcoming/past
-filter, booking cards, cancel with confirmation dialog. Floor-plan detail +
-booking creation (017b) remain.
+**Current Track:** **Stitch 017b / Branch floor-plan detail + booking
+creation DONE 2026-09-02** — `BranchDetailBloc` (parallel detail + floor-plan
+load, plan-failure tolerated, chair/services/time selection, `createBooking`
+submit, 409 `chair_not_available` / `double_booking` → conflict message),
+`BranchDetailScreen` (floor-plan grid with tappable available chairs,
+services checklist, date + time pickers, confirm, success `StatusView` → My
+Bookings), `AppRoutes.branchDetail` nested Discover route + result-card
+View Details wiring. Core: `BranchEndpoints` +
+`BranchRepository.getFloorPlan`, `ExploreRepository.getBranchDetail`,
+`BookingRepository.createBooking` (UTC `yyyy-MM-dd HH:mm:ss` slot),
+DTOs `BranchDetailDto` / `FloorPlanDto` / `FloorChairDto` (codegen).
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -977,16 +983,33 @@ cancel confirmation `AlertDialog`. `melos verify` exit 0, **214 tests**
 (core 94, client_app 102, design_system 14, 1×4), **149 ARB keys** (EN+AR
 parity).
 
+**Just completed — Stitch 017b / Branch floor-plan detail + booking
+creation (CL-10) (2026-09-02).** Core: `BranchEndpoints` +
+`BranchRepository.getFloorPlan` (`GET /branches/{branch}/floor-plan`),
+`ExploreRepository.getBranchDetail` (`GET /explore/branches/{branch}`),
+`BookingRepository.createBooking` (`POST /bookings`, slot formatted
+`yyyy-MM-dd HH:mm:ss` UTC, `at_home_location` only when both coords given) +
+`BranchDetailDto` / `FloorPlanDto` / `FloorChairDto` (codegen). App:
+`BranchDetailBloc` (detail + floor plan in parallel, plan failure tolerated
+via `planFailed`, chair/services/time selection, submit requires chair +
+time, barber resolved from the chair, 409 → `bookingConflictMessage`),
+`BranchDetailScreen` (`FloorPlanGrid` with available tappable chairs,
+services `CheckboxListTile`s, date + time pickers, `PrimaryButton`
+`isDisabled: !canSubmit`, success `StatusView`), Discover-tab nested
+`/discover/branch/:branchId` route + "View Details" from result cards.
+`melos verify` exit 0, **226 tests** (core 98, client_app 110,
+design_system 14, 1×4), **163 ARB keys** (EN+AR parity).
+
 **Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, 17, 18 / Discovery
-(CL-09). `IN_PROGRESS`: 09, 12 (both consumed), **Stitch 017 (CL-10) —
-017a list/cancel done; 017b floor-plan detail + booking creation remain**.
+(CL-09), Stitch 017 (CL-10). `IN_PROGRESS`: 09, 12 (both consumed).
 `PENDING`: 13, 14, 15, 19–21.
 
 **Next candidate:**
 
-* `Stitch 017b / Branch floor-plan detail + booking creation` (CL-10) —
-  needs client catalog/chair endpoint recon (`GET /branches/{branch}/floor-plan`
-  exists server-side; chair/service listing for booking TBD).
+* `AI Style (018)` / `Stylist Profile (019)` / `Review (020)` — design
+  exports live in `docs/stitch/exports/` (015–020). 010 profile completion
+  and 015–016 design-system work remain at Track level. Booking creation
+  itself is now interactive end-to-end (chair + services + time).
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

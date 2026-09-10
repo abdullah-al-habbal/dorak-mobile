@@ -14,6 +14,7 @@ import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/auth/change_password.bloc.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
 import 'package:client_app/src/features/booking/booking.bloc.dart';
+import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
@@ -43,6 +44,7 @@ class _DorakAppState extends State<DorakApp> {
   late final SessionBloc _sessionBloc;
   late final PasswordRecoveryBloc _recoveryBloc;
   late final BookingBloc _bookingBloc;
+  late final BranchDetailBloc _branchDetailBloc;
   late final ChangePasswordBloc _passwordChangeBloc;
   late final DiscoveryBloc _discoveryBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
@@ -70,6 +72,11 @@ class _DorakAppState extends State<DorakApp> {
     _sessionBloc = SessionBloc(repository, _tokenStorage);
     _recoveryBloc = PasswordRecoveryBloc(repository);
     _bookingBloc = BookingBloc(DioBookingRepository(_apiClient));
+    _branchDetailBloc = BranchDetailBloc(
+      DioExploreRepository(_apiClient),
+      DioBranchRepository(_apiClient),
+      DioBookingRepository(_apiClient),
+    );
     _passwordChangeBloc = ChangePasswordBloc(repository);
     _discoveryBloc = DiscoveryBloc(
       DioExploreRepository(_apiClient),
@@ -109,6 +116,7 @@ class _DorakAppState extends State<DorakApp> {
       preferences: widget.preferences,
       onboardingConfig: _onboardingConfigBloc,
       bookings: _bookingBloc,
+      branchDetail: _branchDetailBloc,
       passwordChange: _passwordChangeBloc,
       discovery: _discoveryBloc,
       switchLocale: _switchLocale,
@@ -127,6 +135,7 @@ class _DorakAppState extends State<DorakApp> {
     _sessionBloc.close();
     _recoveryBloc.close();
     _bookingBloc.close();
+    _branchDetailBloc.close();
     _passwordChangeBloc.close();
     _discoveryBloc.close();
     _onboardingConfigBloc.close();

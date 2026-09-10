@@ -986,6 +986,90 @@ abstract class AppLocalizations {
   /// **'Yes, Cancel'**
   String get bookingCancelConfirm;
 
+  /// Branch detail chairs count line
+  ///
+  /// In en, this message translates to:
+  /// **'{count} chairs'**
+  String branchChairsCount(int count);
+
+  /// Floor plan legend for available chairs
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get branchAvailableLabel;
+
+  /// Floor plan legend for occupied chairs
+  ///
+  /// In en, this message translates to:
+  /// **'Occupied'**
+  String get branchOccupiedLabel;
+
+  /// Floor plan label for chairs under maintenance
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get branchMaintenanceLabel;
+
+  /// Branch detail barbers section title
+  ///
+  /// In en, this message translates to:
+  /// **'Barbers'**
+  String get branchBarbersTitle;
+
+  /// Branch detail services section title
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get branchServicesTitle;
+
+  /// Booking sheet chair step title
+  ///
+  /// In en, this message translates to:
+  /// **'Select a chair'**
+  String get bookingSelectChair;
+
+  /// Booking sheet services step title
+  ///
+  /// In en, this message translates to:
+  /// **'Select services'**
+  String get bookingSelectServices;
+
+  /// Booking sheet time step title
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get bookingSelectTime;
+
+  /// Booking sheet confirm button label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Booking'**
+  String get bookingConfirmAction;
+
+  /// Booking success title
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Confirmed'**
+  String get bookingSuccessTitle;
+
+  /// Booking success message
+  ///
+  /// In en, this message translates to:
+  /// **'Your slot is reserved.'**
+  String get bookingSuccessMessage;
+
+  /// Booking success navigation button label
+  ///
+  /// In en, this message translates to:
+  /// **'View My Bookings'**
+  String get bookingViewBookings;
+
+  /// Message shown when the server reports a booking conflict
+  ///
+  /// In en, this message translates to:
+  /// **'That slot was just taken. Please pick another time.'**
+  String get bookingConflictMessage;
+
   /// Compatibility score badge on a result card
   ///
   /// In en, this message translates to:

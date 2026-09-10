@@ -16,11 +16,13 @@ class DiscoveryScreen extends StatelessWidget {
     required this.bloc,
     required this.onLocaleToggle,
     required this.onBookNow,
+    this.onViewDetails,
   });
 
   final DiscoveryBloc bloc;
   final VoidCallback onLocaleToggle;
   final VoidCallback onBookNow;
+  final ValueChanged<String>? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class DiscoveryScreen extends StatelessWidget {
         bloc: bloc,
         onLocaleToggle: onLocaleToggle,
         onBookNow: onBookNow,
+        onViewDetails: onViewDetails,
       ),
     );
   }
@@ -40,11 +43,13 @@ class _DiscoveryView extends StatelessWidget {
     required this.bloc,
     required this.onLocaleToggle,
     required this.onBookNow,
+    required this.onViewDetails,
   });
 
   final DiscoveryBloc bloc;
   final VoidCallback onLocaleToggle;
   final VoidCallback onBookNow;
+  final ValueChanged<String>? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +103,7 @@ class _DiscoveryView extends StatelessWidget {
             bloc: bloc,
             state: state,
             onBookNow: onBookNow,
+            onViewDetails: onViewDetails,
           );
         },
       ),
@@ -110,11 +116,13 @@ class _DiscoveryFeed extends StatelessWidget {
     required this.bloc,
     required this.state,
     required this.onBookNow,
+    required this.onViewDetails,
   });
 
   final DiscoveryBloc bloc;
   final DiscoveryState state;
   final VoidCallback onBookNow;
+  final ValueChanged<String>? onViewDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -162,6 +170,9 @@ class _DiscoveryFeed extends StatelessWidget {
                 bookNowLabel: l10n.bookNow,
                 onBookNow: onBookNow,
                 viewDetailsLabel: l10n.viewDetails,
+                onViewDetails: onViewDetails == null
+                    ? null
+                    : () => onViewDetails!(branch.id.toString()),
               ),
             );
           },

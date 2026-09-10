@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 149 keys
+## 3. The 163 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -110,9 +110,16 @@ supportedLocales: AppLocalizations.supportedLocales,
 `bookingCancelAction` `bookingCancelConfirmTitle`
 `bookingCancelConfirmMessage` `bookingCancelConfirm`
 
+**Branch detail + booking creation (017b)** — `branchChairsCount`
+`branchAvailableLabel` `branchOccupiedLabel` `branchMaintenanceLabel`
+`branchBarbersTitle` `branchServicesTitle` `bookingSelectChair`
+`bookingSelectServices` `bookingSelectTime` `bookingConfirmAction`
+`bookingSuccessTitle` `bookingSuccessMessage` `bookingViewBookings`
+`bookingConflictMessage`
+
 ## 4. Parameterised keys
 
-Five, and they generate **methods**, not getters:
+Six, and they generate **methods**, not getters:
 
 ```dart
 String verifySubtitle(String email);        // "…code we sent to {email}"
@@ -120,6 +127,7 @@ String verifyResendDisabled(int seconds);   // "Resend Code ({seconds}s)"
 String discoverDistanceLabel(double km);    // "{km} km"
 String discoverRankBadge(int rank);         // "#{rank}"
 String discoverCompatibilityBadge(int percent); // "{percent}%"
+String branchChairsCount(int count);        // "{count} chairs"
 ```
 
 ARB form:

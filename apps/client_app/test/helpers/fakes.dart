@@ -12,6 +12,7 @@ import 'package:client_app/src/core/session/auth_coordination.entity.dart';
 import 'package:client_app/src/features/auth/change_password.bloc.dart';
 import 'package:client_app/src/features/auth/password_recovery.bloc.dart';
 import 'package:client_app/src/features/booking/booking.bloc.dart';
+import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 
@@ -35,6 +36,7 @@ AppRouter buildRouter({
   PasswordRecoveryBloc? recovery,
   AuthRepository? recoveryRepository,
   BookingBloc? bookings,
+  BranchDetailBloc? branchDetail,
   ChangePasswordBloc? passwordChange,
   DiscoveryBloc? discovery,
   VoidCallback switchLocale = _noSwitchLocale,
@@ -47,6 +49,7 @@ AppRouter buildRouter({
     preferences: preferences,
     onboardingConfig: fakeOnboardingConfig(),
     bookings: bookings ?? fakeBookingBloc(),
+    branchDetail: branchDetail ?? fakeBranchDetailBloc(),
     passwordChange: passwordChange ??
         ChangePasswordBloc(recoveryRepository ?? FakeAuthRepository()),
     discovery: discovery ?? fakeDiscoveryBloc(),
@@ -358,7 +361,33 @@ class FakeExploreRepository implements ExploreRepository {
     if (failure != null) throw failure;
     return (data: firstPage, rawItems: rawItems, rawMeta: rawMeta);
   }
+
+  BranchDetailDto detail = testBranchDetail();
+
+  @override
+  Future<BranchDetailDto> getBranchDetail(String branchId) async {
+    final failure = error;
+    if (failure != null) throw failure;
+    return detail;
+  }
 }
+
+BranchDetailDto testBranchDetail() => const BranchDetailDto(
+      id: 1,
+      name: 'Branch 1',
+      email: 'branch1@example.com',
+      status: 'approved',
+      latitude: 24.7136,
+      longitude: 46.6753,
+      brandId: 7,
+      chairsCount: 2,
+      barbers: [
+        BookingBarberDto(id: 'barber-1', name: 'Karim'),
+      ],
+      services: [
+        BookingServiceDto(id: 'service-1', name: 'Fade', price: 80),
+      ],
+    );
 
 class FakeLocationProvider implements LocationProvider {
   LocationPermissionStatus status = LocationPermissionStatus.granted;
@@ -473,6 +502,25 @@ class FakeBookingRepository implements BookingRepository {
   }
 
   @override
+  Future<BookingDto> createBooking({
+    String? chairId,
+    String? barberId,
+    required DateTime timeSlot,
+    List<String>? serviceIds,
+    double? atHomeLatitude,
+    double? atHomeLongitude,
+  }) async {
+    createCalls++;
+    final failure = createError;
+    if (failure != null) throw failure;
+    return createdBooking ?? testBooking();
+  }
+
+  BookingDto? createdBooking;
+  Object? createError;
+  int createCalls = 0;
+
+  @override
   Future<void> cancelBooking(String id) async {
     cancelCalls++;
     lastCancelledId = id;
@@ -483,6 +531,41 @@ class FakeBookingRepository implements BookingRepository {
 
 BookingBloc fakeBookingBloc({FakeBookingRepository? repository}) {
   return BookingBloc(repository ?? FakeBookingRepository());
+}
+
+FloorPlanDto testFloorPlan() => const FloorPlanDto(
+      branchId: '1',
+      branchName: 'Branch 1',
+      chairs: [
+        FloorChairDto(id: 'chair-1', label: 'A', status: 'available'),
+        FloorChairDto(id: 'chair-2', label: 'B', status: 'occupied'),
+      ],
+    );
+
+class FakeBranchRepository implements BranchRepository {
+  FloorPlanDto plan = testFloorPlan();
+  Object? error;
+  int getFloorPlanCalls = 0;
+
+  @override
+  Future<FloorPlanDto> getFloorPlan(String branchId) async {
+    getFloorPlanCalls++;
+    final failure = error;
+    if (failure != null) throw failure;
+    return plan;
+  }
+}
+
+BranchDetailBloc fakeBranchDetailBloc({
+  FakeExploreRepository? explore,
+  FakeBranchRepository? branches,
+  FakeBookingRepository? bookings,
+}) {
+  return BranchDetailBloc(
+    explore ?? FakeExploreRepository(),
+    branches ?? FakeBranchRepository(),
+    bookings ?? FakeBookingRepository(),
+  );
 }
 
 DiscoveryBloc fakeDiscoveryBloc({
