@@ -1075,6 +1075,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{percent}%'**
   String discoverCompatibilityBadge(int percent);
+
+  /// Service history section title on the profile tab
+  ///
+  /// In en, this message translates to:
+  /// **'Service History'**
+  String get historyTitle;
+
+  /// Service history empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get historyEmptyTitle;
+
+  /// Service history empty state message
+  ///
+  /// In en, this message translates to:
+  /// **'Services you\'ve booked will appear here after their appointment.'**
+  String get historyEmptyMessage;
+
+  /// Rebook action on a history entry
+  ///
+  /// In en, this message translates to:
+  /// **'Book Again'**
+  String get historyRebookAction;
+
+  /// Rebook sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Book Again'**
+  String get historyRebookTitle;
+
+  /// Rebook sheet message naming the service
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a new time for {item}.'**
+  String historyRebookMessage(String item);
+
+  /// Rebook success title
+  ///
+  /// In en, this message translates to:
+  /// **'Booked Again'**
+  String get historyRebookSuccessTitle;
+
+  /// Rebook success message
+  ///
+  /// In en, this message translates to:
+  /// **'Your new slot is reserved. Find it in Bookings.'**
+  String get historyRebookSuccessMessage;
+
+  /// Profile header name fallback when the client name is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get profileMemberLabel;
 }
 
 class _AppLocalizationsDelegate

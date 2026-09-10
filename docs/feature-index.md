@@ -106,6 +106,9 @@
 ### Branch Floor Plan & Booking Creation — Stitch 017b (CL-10) ✅ Complete
 - `BranchRepository.getFloorPlan` + `ExploreRepository.getBranchDetail` + `BookingRepository.createBooking` in core; `BranchDetailBloc` + `BranchDetailScreen` + `FloorPlanGrid` (chair/services/time selection, 409 conflict, success → My Bookings) on `/discover/branch/:branchId`.
 
+### Service History & Rebook — Stitch 018a (CL-11) ✅ Complete
+- `HistoryRepository` + `ServiceHistoryDto` family (barber/branch/catalog-item/media) in core; `HistoryBloc` over `Paged<ServiceHistoryDto>` + rebook; `ProfileScreen` rebuilt as the 018 profile tab (name header card, Service History feed, rebook via Material pickers, 409 conflict, success → My Bookings). 018b (face analysis + AI recommendations) remains.
+
 ### Empty Scaffolds (not implemented)
 - `features/profile/` — directories only, no files.
 
@@ -146,7 +149,8 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 016 | Discovery Feed | CL-09 | ✅ Complete |
 | 017a | My Bookings (list/filter/cancel) | CL-10 | ✅ Complete |
 | 017b | Branch Floor Plan & Booking creation | CL-10 | ✅ Complete |
-| 018 | Personalised Profile & AI Style | CL-11 | ⏳ Pending |
+| 018a | Service History & Rebook | CL-11 | ✅ Complete |
+| 018b | Personalised Profile & AI Style (face analysis + AI recs) | CL-11 | ⏳ Pending |
 | 019 | Stylist Profile | CL-12 | ⏳ Pending |
 | 020 | Review & Rating | CL-13 | ⏳ Pending |
 
@@ -179,7 +183,7 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |
 
 ### Not Started
-- Profile completion (Stitch 010), Personalised Profile & AI Style (018), Stylist Profile (019), Review & Rating (020). Discovery Feed (016) and Booking — list/cancel (017a) + floor-plan detail/creation (017b) — are **built**.
+- Profile completion (Stitch 010), Personalised Profile & AI Style (018b — face analysis + AI recs), Stylist Profile (019), Review & Rating (020). Discovery Feed (016), Booking — list/cancel (017a) + floor-plan detail/creation (017b) — and Service History + Rebook (018a) are **built**.
 - `business_app` and `stylist_app` features — both apps are skeletons.
 
 ### Backend routes for unbuilt features

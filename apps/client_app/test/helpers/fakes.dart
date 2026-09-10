@@ -15,6 +15,7 @@ import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
+import 'package:client_app/src/features/profile/history.bloc.dart';
 
 // todo: read this file, and I think is better to make a fakes folder and then move each block/class into a file for better code.
 Widget routerHarness(AppRouter appRouter) {
@@ -39,6 +40,7 @@ AppRouter buildRouter({
   BranchDetailBloc? branchDetail,
   ChangePasswordBloc? passwordChange,
   DiscoveryBloc? discovery,
+  HistoryBloc? history,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
@@ -53,6 +55,7 @@ AppRouter buildRouter({
     passwordChange: passwordChange ??
         ChangePasswordBloc(recoveryRepository ?? FakeAuthRepository()),
     discovery: discovery ?? fakeDiscoveryBloc(),
+    history: history ?? fakeHistoryBloc(),
     switchLocale: switchLocale,
     apiClient: apiClient,
   );
@@ -531,6 +534,84 @@ class FakeBookingRepository implements BookingRepository {
 
 BookingBloc fakeBookingBloc({FakeBookingRepository? repository}) {
   return BookingBloc(repository ?? FakeBookingRepository());
+}
+
+ServiceHistoryDto testServiceHistory({
+  String id = 'history-1',
+  String? itemName,
+}) =>
+    ServiceHistoryDto(
+      id: id,
+      bookingId: 'booking-1',
+      catalogItemId: 'catalog-1',
+      performedAt: DateTime.utc(2026, 8, 30, 11),
+      clientRating: 5,
+      clientNotes: 'Great fade',
+      barber: const HistoryBarberDto(id: 'barber-1', name: 'Karim'),
+      branch: const HistoryBranchDto(id: 'branch-1', name: 'Riyadh Downtown'),
+      catalogItem: HistoryCatalogItemDto(
+        id: 'catalog-1',
+        name: {'en': itemName ?? 'Classic Fade'},
+      ),
+      createdAt: DateTime.utc(2026, 8, 30, 12),
+    );
+
+PaginatedData<ServiceHistoryDto> testHistoryPage({
+  List<ServiceHistoryDto>? items,
+  int currentPage = 1,
+  int totalPages = 1,
+}) {
+  final data = items ?? [testServiceHistory()];
+  return PaginatedData(
+    data: data,
+    meta: PaginationMeta(
+      total: data.length,
+      count: data.length,
+      perPage: 15,
+      currentPage: currentPage,
+      totalPages: totalPages,
+    ),
+  );
+}
+
+class FakeHistoryRepository implements HistoryRepository {
+  PaginatedData<ServiceHistoryDto> firstPage = testHistoryPage();
+  PaginatedData<ServiceHistoryDto>? morePage;
+  Object? error;
+  Object? rebookError;
+
+  int getHistoryCalls = 0;
+  int lastPage = 1;
+  int rebookCalls = 0;
+  String? lastRebookedId;
+  DateTime? lastRebookSlot;
+
+  @override
+  Future<PaginatedData<ServiceHistoryDto>> getHistory({
+    int page = 1,
+    int perPage = 15,
+  }) async {
+    getHistoryCalls++;
+    lastPage = page;
+    final failure = error;
+    if (failure != null) throw failure;
+    if (page > 1 && morePage != null) return morePage!;
+    return firstPage;
+  }
+
+  @override
+  Future<BookingDto> rebookFromHistory(String historyId, DateTime timeSlot) async {
+    rebookCalls++;
+    lastRebookedId = historyId;
+    lastRebookSlot = timeSlot;
+    final failure = rebookError;
+    if (failure != null) throw failure;
+    return testBooking(id: 'booking-2');
+  }
+}
+
+HistoryBloc fakeHistoryBloc({FakeHistoryRepository? repository}) {
+  return HistoryBloc(repository ?? FakeHistoryRepository());
 }
 
 FloorPlanDto testFloorPlan() => const FloorPlanDto(

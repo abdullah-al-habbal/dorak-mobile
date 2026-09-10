@@ -633,5 +633,46 @@
         "type": "int"
       }
     }
+  },
+  "historyTitle": "سجل الخدمات",
+  "@historyTitle": {
+    "description": "Service history section title on the profile tab"
+  },
+  "historyEmptyTitle": "لا يوجد سجل بعد",
+  "@historyEmptyTitle": {
+    "description": "Service history empty state title"
+  },
+  "historyEmptyMessage": "ستظهر الخدمات التي حجزتها هنا بعد موعدها.",
+  "@historyEmptyMessage": {
+    "description": "Service history empty state message"
+  },
+  "historyRebookAction": "إعادة الحجز",
+  "@historyRebookAction": {
+    "description": "Rebook action on a history entry"
+  },
+  "historyRebookTitle": "إعادة الحجز",
+  "@historyRebookTitle": {
+    "description": "Rebook sheet title"
+  },
+  "historyRebookMessage": "اختر موعدًا جديدًا لـ{item}.",
+  "@historyRebookMessage": {
+    "description": "Rebook sheet message naming the service",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "historyRebookSuccessTitle": "تم إعادة الحجز",
+  "@historyRebookSuccessTitle": {
+    "description": "Rebook success title"
+  },
+  "historyRebookSuccessMessage": "تم حجز موعدك الجديد. ستجده في الحجوزات.",
+  "@historyRebookSuccessMessage": {
+    "description": "Rebook success message"
+  },
+  "profileMemberLabel": "عضو",
+  "@profileMemberLabel": {
+    "description": "Profile header name fallback when the client name is unknown"
   }
 }

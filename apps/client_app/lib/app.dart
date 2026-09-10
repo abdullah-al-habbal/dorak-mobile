@@ -18,6 +18,7 @@ import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
+import 'package:client_app/src/features/profile/history.bloc.dart';
 
 class DorakApp extends StatefulWidget {
   final AppPreferences preferences;
@@ -47,6 +48,7 @@ class _DorakAppState extends State<DorakApp> {
   late final BranchDetailBloc _branchDetailBloc;
   late final ChangePasswordBloc _passwordChangeBloc;
   late final DiscoveryBloc _discoveryBloc;
+  late final HistoryBloc _historyBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
   late final LocaleBloc _localeBloc;
   late final AppRouter _router;
@@ -83,6 +85,7 @@ class _DorakAppState extends State<DorakApp> {
       const GeolocatorLocationProvider(),
       cache: widget.feedCache,
     );
+    _historyBloc = HistoryBloc(DioHistoryRepository(_apiClient));
 
     unawaited(_sessionBloc.ready);
 
@@ -119,6 +122,7 @@ class _DorakAppState extends State<DorakApp> {
       branchDetail: _branchDetailBloc,
       passwordChange: _passwordChangeBloc,
       discovery: _discoveryBloc,
+      history: _historyBloc,
       switchLocale: _switchLocale,
       apiClient: _apiClient,
     );
@@ -138,6 +142,7 @@ class _DorakAppState extends State<DorakApp> {
     _branchDetailBloc.close();
     _passwordChangeBloc.close();
     _discoveryBloc.close();
+    _historyBloc.close();
     _onboardingConfigBloc.close();
     _localeBloc.close();
     _apiClient.dispose();

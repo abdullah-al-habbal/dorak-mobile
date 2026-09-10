@@ -924,17 +924,20 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Stitch 017b / Branch floor-plan detail + booking
-creation DONE 2026-09-02** — `BranchDetailBloc` (parallel detail + floor-plan
-load, plan-failure tolerated, chair/services/time selection, `createBooking`
-submit, 409 `chair_not_available` / `double_booking` → conflict message),
-`BranchDetailScreen` (floor-plan grid with tappable available chairs,
-services checklist, date + time pickers, confirm, success `StatusView` → My
-Bookings), `AppRoutes.branchDetail` nested Discover route + result-card
-View Details wiring. Core: `BranchEndpoints` +
-`BranchRepository.getFloorPlan`, `ExploreRepository.getBranchDetail`,
-`BookingRepository.createBooking` (UTC `yyyy-MM-dd HH:mm:ss` slot),
-DTOs `BranchDetailDto` / `FloorPlanDto` / `FloorChairDto` (codegen).
+**Current Track:** **Stitch 018 / Personalised Profile & AI Style — 018a
+Service History + Rebook DONE 2026-09-10.** `HistoryEndpoints` +
+`HistoryRepository`/`DioHistoryRepository` (`GET /client/history` paged,
+`POST /client/history/{history}/rebook` with UTC `yyyy-MM-dd HH:mm:ss`
+slot) + `ServiceHistoryDto` with nested `HistoryBarberDto` /
+`HistoryBranchDto` / `HistoryCatalogItemDto` (translations map) /
+`HistoryMediaDto` (codegen). App: `HistoryBloc` over `Paged<ServiceHistoryDto>`
+(refresh, load-more, retry, rebook submit → `rebooked` flag + ack),
+`ProfileScreen` rebuilt as the 018 profile tab (client-name header card,
+Change Password entry, Service History section, per-entry rebook via Material
+date + time pickers, 409 → conflict message, success `StatusView` → My
+Bookings). `melos verify` exit 0, **241 tests** (core 101, client_app 122,
+design_system 14, 1×4), **172 ARB keys** (EN+AR parity). 018b (face
+analysis + AI recommendations) not started.
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:
@@ -1000,16 +1003,34 @@ services `CheckboxListTile`s, date + time pickers, `PrimaryButton`
 `melos verify` exit 0, **226 tests** (core 98, client_app 110,
 design_system 14, 1×4), **163 ARB keys** (EN+AR parity).
 
+**Just completed — Stitch 018a / Service History + Rebook (CL-11)
+(2026-09-10).** Core: `HistoryEndpoints` +
+`HistoryRepository`/`DioHistoryRepository` (`GET /client/history`
+status/page pagination, `POST /client/history/{history}/rebook` with the
+shared UTC `yyyy-MM-dd HH:mm:ss` slot format) + `ServiceHistoryDto` and
+nested `HistoryBarberDto`/`HistoryBranchDto`/`HistoryCatalogItemDto`
+(locale `name` translations map)/`HistoryMediaDto` (codegen). App:
+`HistoryBloc` over `Paged<ServiceHistoryDto>` (start/refresh/load-more/
+retry + rebook submit → `rebooked` flag + ack reset), `ProfileScreen`
+rebuilt from the placeholder into the 018 profile tab: client-name header
+card (fallback `profileMemberLabel` when name unknown after restore),
+locale-aware service-history feed with rebook per entry (Material date +
+time pickers, `rebookingId` per-card loader, 409 → `bookingConflictMessage`,
+success `StatusView` → My Bookings). `melos verify` exit 0,
+**241 tests** (core 101, client_app 122, design_system 14, 1×4),
+**172 ARB keys** (EN+AR parity).
+
 **Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, 17, 18 / Discovery
-(CL-09), Stitch 017 (CL-10). `IN_PROGRESS`: 09, 12 (both consumed).
-`PENDING`: 13, 14, 15, 19–21.
+(CL-09), Stitch 017 (CL-10), Stitch 018a (CL-11, Service History + Rebook).
+`IN_PROGRESS`: 09, 12 (both consumed). `PENDING`: 13, 14, 15, 19–21.
 
 **Next candidate:**
 
-* `AI Style (018)` / `Stylist Profile (019)` / `Review (020)` — design
+* `AI Style (018)` — 018a (Service History + Rebook) built; 018b (profile
+  header face-scan upload, detected-shape display, `recommended_catalog_item_ids`
+  → catalog cards) remains. `Stylist Profile (019)` / `Review (020)` — design
   exports live in `docs/stitch/exports/` (015–020). 010 profile completion
-  and 015–016 design-system work remain at Track level. Booking creation
-  itself is now interactive end-to-end (chair + services + time).
+  and 015–016 design-system work remain at Track level.
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

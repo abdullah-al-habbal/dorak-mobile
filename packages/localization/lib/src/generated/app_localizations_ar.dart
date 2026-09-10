@@ -530,4 +530,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }
+
+  @override
+  String get historyTitle => 'سجل الخدمات';
+
+  @override
+  String get historyEmptyTitle => 'لا يوجد سجل بعد';
+
+  @override
+  String get historyEmptyMessage => 'ستظهر الخدمات التي حجزتها هنا بعد موعدها.';
+
+  @override
+  String get historyRebookAction => 'إعادة الحجز';
+
+  @override
+  String get historyRebookTitle => 'إعادة الحجز';
+
+  @override
+  String historyRebookMessage(String item) {
+    return 'اختر موعدًا جديدًا لـ$item.';
+  }
+
+  @override
+  String get historyRebookSuccessTitle => 'تم إعادة الحجز';
+
+  @override
+  String get historyRebookSuccessMessage =>
+      'تم حجز موعدك الجديد. ستجده في الحجوزات.';
+
+  @override
+  String get profileMemberLabel => 'عضو';
 }

@@ -36,7 +36,7 @@ child contradicts nothing, the parent still applies.
 | `apps/stylist_app` | [`AGENTS`](./apps/stylist_app/AGENTS.md) · [`CLAUDE`](./apps/stylist_app/CLAUDE.md) | `flutter create` stub |
 | `packages/core` | [`AGENTS`](./packages/core/AGENTS.md) · [`CLAUDE`](./packages/core/CLAUDE.md) | HTTP, config, storage, session, DTOs |
 | `packages/design_system` | [`AGENTS`](./packages/design_system/AGENTS.md) · [`CLAUDE`](./packages/design_system/CLAUDE.md) | tokens, theme, fonts, 14 widgets |
-| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 163 keys, EN + AR |
+| `packages/localization` | [`AGENTS`](./packages/localization/AGENTS.md) · [`CLAUDE`](./packages/localization/CLAUDE.md) | 172 keys, EN + AR |
 | `packages/feature_floor_plan` | [`AGENTS`](./packages/feature_floor_plan/AGENTS.md) · [`CLAUDE`](./packages/feature_floor_plan/CLAUDE.md) | empty stub |
 
 Read the child for the unit you are touching **before** editing it. If you touch
@@ -201,8 +201,8 @@ dart run melos run verify      # all five, in order — the gate
 ```
 
 `verify` must exit 0 before any work is called done. Current baseline
-(re-baselined 2026-09-02): 7 packages analyze clean, taxonomy passes,
-**226 tests pass** (98 core, 110 client_app, 14 design_system, 1 each for
+(re-baselined 2026-09-10): 7 packages analyze clean, taxonomy passes,
+**241 tests pass** (101 core, 122 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -385,14 +385,16 @@ Authentication always outranks the onboarding flag.
 | My Bookings — list/filter/cancel (017a) | `client_app/.../features/booking` (bloc + screen + card over core `Paged`/`BookingDto`) |
 | Branch floor-plan detail + booking creation (017b) | `client_app/.../features/booking` (branch detail bloc/screen + `FloorPlanGrid` over `BranchDetailDto`/`FloorPlanDto`; `createBooking` in core) |
 | Favorites placeholder | `client_app/.../features/profile` |
+| Service History + Rebook (018a) | `client_app/.../features/profile` + core `HistoryRepository` (`getHistory`/`rebookFromHistory` over `ServiceHistoryDto` family) — Profile tab header card, history feed, rebook |
+| Profile tab rebuilt (018a) | `client_app/.../features/profile/profile.screen.dart` |
 
 ### Not built — do not assume these exist
 
-- Profile completion (Stitch 010), AI Style (018), Stylist Profile (019),
-  Review (020). Discovery Feed (016) is **built** per
-  `docs/future-features/discovery-016.md`; My Bookings list/filter/cancel
-  (017a) and branch floor-plan detail + booking creation (017b) are
-  **built**.
+- Profile completion (Stitch 010), 018b AI Style (face analysis + AI
+  recommendations), Stylist Profile (019), Review (020). Discovery Feed (016)
+  is **built** per `docs/future-features/discovery-016.md`; My Bookings
+  list/filter/cancel (017a), branch floor-plan detail + booking creation
+  (017b), and Service History + Rebook (018a) are **built**.
 - **Favorites: no backend route, no client UI.** `rg favorite` in
   `dorak-backend/modules/` is empty. Do not fake a local-only favorite toggle.
 - Authenticated password change (Track 17) **is built** — `PATCH
@@ -528,13 +530,14 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **163 keys, identical sets** (verified 2026-09-02).
+  `app_ar.arb`. **172 keys, identical sets** (verified 2026-09-10).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
   analyzer and taxonomy checker.
-- Two keys take ICU placeholders and generate functions, not getters:
-  `verifySubtitle(String email)`, `verifyResendDisabled(int seconds)`.
+- Three keys take ICU placeholders and generate functions, not getters:
+  `verifySubtitle(String email)`, `verifyResendDisabled(int seconds)`,
+  `historyRebookMessage(String item)`.
 - RTL is automatic from the locale. Use `Align` / `TextAlign.start` /
   `AlignmentDirectional`; never hardcode left/right. For directional icons
   follow the existing idiom:
@@ -544,11 +547,11 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**226 tests pass** (98 in `core`, 110 in `client_app`, 14 in `design_system` —
+**241 tests pass** (101 in `core`, 122 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
-2026-09-02.
+2026-09-10.
 
 | File | Covers |
 |---|---|
@@ -575,6 +578,9 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `core/test/booking_repository_test.dart` | nested parsing, status/page params, cancel route + verb, `createBooking` UTC slot format + 409 |
 | `core/test/branch_repository_test.dart` | `getFloorPlan` parsing (available/occupied chairs) + path |
 | `core/test/explore_repository_test.dart` | branch parsing, `getBranchDetail`, raw payload for cache writes, query params incl. `page` |
+| `core/test/history_repository_test.dart` | `ServiceHistoryDto` nested parse (translations map), history page params, rebook route/verb + UTC slot + BookingDto parse |
+| `client_app/test/history_bloc_test.dart` | history start/fail/load-more append/retry, rebook success (slot + id) + failure + ack reset |
+| `client_app/test/history_flow_test.dart` | profile header + history list, empty state, picker-cancel no-op, rebook success → Bookings + reset |
 
 Rules:
 

@@ -709,5 +709,46 @@
         "type": "int"
       }
     }
+  },
+  "historyTitle": "Service History",
+  "@historyTitle": {
+    "description": "Service history section title on the profile tab"
+  },
+  "historyEmptyTitle": "No history yet",
+  "@historyEmptyTitle": {
+    "description": "Service history empty state title"
+  },
+  "historyEmptyMessage": "Services you've booked will appear here after their appointment.",
+  "@historyEmptyMessage": {
+    "description": "Service history empty state message"
+  },
+  "historyRebookAction": "Book Again",
+  "@historyRebookAction": {
+    "description": "Rebook action on a history entry"
+  },
+  "historyRebookTitle": "Book Again",
+  "@historyRebookTitle": {
+    "description": "Rebook sheet title"
+  },
+  "historyRebookMessage": "Pick a new time for {item}.",
+  "@historyRebookMessage": {
+    "description": "Rebook sheet message naming the service",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "historyRebookSuccessTitle": "Booked Again",
+  "@historyRebookSuccessTitle": {
+    "description": "Rebook success title"
+  },
+  "historyRebookSuccessMessage": "Your new slot is reserved. Find it in Bookings.",
+  "@historyRebookSuccessMessage": {
+    "description": "Rebook success message"
+  },
+  "profileMemberLabel": "Member",
+  "@profileMemberLabel": {
+    "description": "Profile header name fallback when the client name is unknown"
   }
 }

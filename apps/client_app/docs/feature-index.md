@@ -101,6 +101,11 @@
 - Nested `/discover/branch/:branchId` route; "View Details" on result cards; `BranchDetailBloc` built in `app.dart`.
 - `test/branch_detail_bloc_test.dart`; `FakeBranchRepository`, `testFloorPlan`, `testBranchDetail`, fake `createBooking` in fakes.
 
+### Service History & Rebook — Stitch 018a (CL-11a)
+- `lib/src/features/profile/history.{bloc,event,state}.dart` — `HistoryBloc` over `Paged<ServiceHistoryDto>` (start/refresh/load-more/retry) + rebook submit → `rebooked` flag, `HistoryRebookRequested` resets via `HistoryRebookAcknowledged`.
+- `lib/src/features/profile/profile.screen.dart` — rebuilt into the 018 profile tab: client-name header card (fallback `profileMemberLabel`), Change Password entry kept, Service History section (per-entry rebook via Material date + time pickers, per-card `rebookingId` loader, 409 → `bookingConflictMessage`, success `StatusView` → My Bookings), RefreshIndicator + scroll load-more + retry + first-load/empty/error states.
+- `test/history_bloc_test.dart` (8 cases) + `test/history_flow_test.dart`; `FakeHistoryRepository`, `testServiceHistory`/`testHistoryPage`, `fakeHistoryBloc`, `buildRouter` `history` param in fakes.
+
 ### Empty Scaffolds (no files yet)
 - `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
@@ -130,6 +135,6 @@
 | CL-17 | Authenticated password change | ✅ Complete | Track 17 |
 | CL-10a | My Bookings (list/filter/cancel) | ✅ Complete | Stitch 017a |
 | CL-10b | Branch Floor Plan & Booking creation | ✅ Complete | Stitch 017b |
-| CL-11 | Personalised Profile & AI Style | ⏳ Not started | Stitch 018 |
+| CL-11 | Personalised Profile & AI Style (018a Service History + Rebook; 018b face analysis + AI recs pending) | ✅ 018a / ⏳ 018b | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |
 | CL-13 | Review & Rating | ⏳ Not started | Stitch 020 |

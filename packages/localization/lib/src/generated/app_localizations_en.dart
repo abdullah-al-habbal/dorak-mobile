@@ -533,4 +533,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String discoverCompatibilityBadge(int percent) {
     return '$percent%';
   }
+
+  @override
+  String get historyTitle => 'Service History';
+
+  @override
+  String get historyEmptyTitle => 'No history yet';
+
+  @override
+  String get historyEmptyMessage =>
+      'Services you\'ve booked will appear here after their appointment.';
+
+  @override
+  String get historyRebookAction => 'Book Again';
+
+  @override
+  String get historyRebookTitle => 'Book Again';
+
+  @override
+  String historyRebookMessage(String item) {
+    return 'Pick a new time for $item.';
+  }
+
+  @override
+  String get historyRebookSuccessTitle => 'Booked Again';
+
+  @override
+  String get historyRebookSuccessMessage =>
+      'Your new slot is reserved. Find it in Bookings.';
+
+  @override
+  String get profileMemberLabel => 'Member';
 }

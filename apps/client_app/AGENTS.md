@@ -29,7 +29,8 @@ lib/src/features/
   discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
   booking/                        booking.{bloc,event,state}.dart + screen + card (017a list/cancel)
                                   branch_detail.{bloc,event,state}.dart + screen + FloorPlanGrid widget (017b detail/create)
-  profile/                        password entry button only
+  profile/                        profile.screen.dart (018a: header card + change-password entry + Service History)
+                                  history.{bloc,event,state}.dart (018a: paged feed + rebook)
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
 ```
@@ -157,11 +158,20 @@ Bookings tab; `BranchDetailBloc` + `BranchDetailScreen` + `FloorPlanGrid`
 (chair/services/time selection, `createBooking`, 409 conflict → message,
 success → My Bookings) on `/discover/branch/:branchId`.
 
-**Not built:** profile completion (010),
-AI style (018), stylist profile (019), review (020), logout UI, per-route
+**Built:** service history + rebook (018a) — `HistoryBloc` over
+`Paged<ServiceHistoryDto>` (start/refresh/load-more/retry + rebook submit →
+`rebooked` flag, ack reset); `ProfileScreen` rebuilt into the 018 profile tab:
+client-name header card (fallback `profileMemberLabel` when the name is unknown
+after a token-login restore), Change Password entry kept, localized Service
+History feed with per-entry rebook (Material date + time pickers, per-card
+`rebookingId` loader, 409 → `bookingConflictMessage`, success `StatusView` →
+My Bookings).
+
+**Not built:** profile completion (010), 018b AI style (face analysis + AI
+recommendations), stylist profile (019), review (020), logout UI, per-route
 guards, deep links, locale persistence.
 
-`features/{profile}` and `core/{di,theme}` are empty directories.
+`core/{di,theme}` are empty directories.
 
 ## 7. Decisions that are not in the code
 
@@ -201,8 +211,14 @@ guards, deep links, locale persistence.
 | 409 mapping lives in the screen, not the bloc | The bloc stores the raw `ApiException` in `submitError`; `_submitMessage` maps `statusCode == 409` → `bookingConflictMessage`, 422 `errors` → field copy, `NetworkException` → `errorNetwork`. Keeps a pure core exception in state. |
 | Time picked with Material date + time pickers | Design has no custom time selector (Track 15); `showDatePicker` + `showTimePicker` give localised pickers for free. Slot stored as local `DateTime`, wire-formatted to UTC by core. |
 | `buildRouter` takes `bookings` + `branchDetail` fakes | Matched-param seams keep constructors honest; defaults per feature keep unrelated router tests untouched. |
+| History rebook success renders a `StatusView`, navigation via `onViewBookings` callback | Bloc never navigates; the screen surface + callback (`router.go(AppRoutes.bookings)`) keeps routing in the router wiring. |
+| Rebook error mapping lives in the screen, not the bloc | Same rule as booking submit: bloc stores the raw `ApiException` in `rebookError`; the screen maps 409 → `bookingConflictMessage`, `NetworkException` → `errorNetwork`, else `errorGeneric`. |
+| History item name resolved from the translations map | `catalog_item.name[localeCode] ?? ['en'] ?? ''` — object keys are locale codes, value is the localized display name. |
+| Profile header name falls back to `profileMemberLabel` | `RefreshTokenAction` returns only `{token}` — no profile data survives a restore, so a restored logged-in user has no known name. Avatar initial falls back to `'?'`. |
+| Rebook slot formatted like `createBooking` | UTC `yyyy-MM-dd HH:mm:ss`, shared convention with 017b booking creation. |
+| Rebook pickers are Material date + time pickers | Same precedent as 017b — no custom time selector (Track 15). |
 
-## 8. Tests — 110, in `test/`
+## 8. Tests — 122, in `test/`
 
 | File | Covers |
 |---|---|
@@ -215,13 +231,15 @@ guards, deep links, locale persistence.
 | `password_recovery_flow_test.dart` | 011→014 route walk; unregistered email still advances; rejected code routes back to 012; 014 drops the stack |
 | `onboarding_config_bloc_test.dart` | config load, retry after failure, locale refetch |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery` + `bookings` + `branchDetail`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository` (+ `testBranchDetail`), `FakeBranchRepository` (+ `testFloorPlan`), `FakeBookingRepository` (cancel + `createBooking`), `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`/`fakeBookingBloc()`/`fakeBranchDetailBloc()`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery` + `bookings` + `branchDetail` + `history`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository` (+ `testBranchDetail`), `FakeBranchRepository` (+ `testFloorPlan`), `FakeBookingRepository` (cancel + `createBooking`), `FakeHistoryRepository` (+ `testServiceHistory`/`testHistoryPage`), `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`/`fakeBookingBloc()`/`fakeBranchDetailBloc()`/`fakeHistoryBloc()`, `unauthorized()`, `offline()` |
 | `discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
 | `change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
 | `change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
 | `booking_bloc_test.dart` | start/filter/cancel/load-more/retry over `Paged<BookingDto>` |
 | `booking_flow_test.dart` | tab list, past filter, confirm-cancel reload, dialog dismiss, retry-after-offline |
 | `branch_detail_bloc_test.dart` | detail + plan parallel load, plan-failure tolerance, chair/services/time selection, submit guard, 409 conflict, submit no-op without chair |
+| `history_bloc_test.dart` | history start/fail/load-more append/retry, rebook success (slot + id) + failure + ack reset |
+| `history_flow_test.dart` | profile header + history list, empty state, picker-cancel no-op, rebook success → Bookings + reset |
 
 Conventions:
 

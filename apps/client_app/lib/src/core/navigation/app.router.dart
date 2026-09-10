@@ -35,6 +35,7 @@ import 'package:client_app/src/features/onboarding/discovery.screen.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/welcome.screen.dart';
 import 'package:client_app/src/features/profile/favorites.screen.dart';
+import 'package:client_app/src/features/profile/history.bloc.dart';
 import 'package:client_app/src/features/profile/profile.screen.dart';
 import 'package:client_app/src/features/splash/splash.screen.dart';
 
@@ -48,6 +49,7 @@ class AppRouter {
   final BranchDetailBloc branchDetail;
   final ChangePasswordBloc passwordChange;
   final DiscoveryBloc discovery;
+  final HistoryBloc history;
   final VoidCallback switchLocale;
   final ApiClient apiClient;
 
@@ -66,6 +68,7 @@ class AppRouter {
     required this.branchDetail,
     required this.passwordChange,
     required this.discovery,
+    required this.history,
     required this.switchLocale,
     required this.apiClient,
   }) {
@@ -349,8 +352,11 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.profile,
                 builder: (context, state) => ProfileScreen(
+                  history: history,
+                  clientName: session.state.client?.name,
                   onChangePassword: () =>
                       router.push<void>(AppRoutes.profilePassword),
+                  onViewBookings: () => router.go(AppRoutes.bookings),
                 ),
                 routes: [
                   GoRoute(

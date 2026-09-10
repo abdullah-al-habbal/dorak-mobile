@@ -214,8 +214,39 @@ placeholders).**
 - [x] L7: `dart run melos run verify` — **exit 0, 226 tests** (core 98,
       client_app 110, design_system 14, 1×4).
 
-**Next: AI Style (018) / Stylist Profile (019) / Review (020) —
-see `docs/index.md` §6.**
+**Next: AI Style (018) — 018a below; 018b (face analysis + AI
+recommendations) follows. 019/020 after.**
+
+## Phase M — Stitch 018a / Service History + Rebook (CL-11) ✅ 2026-09-10
+
+- [x] M1: Recon — `GET /client/history` (auth:client, paged, per_page ≤ 50,
+      nested barber/branch/catalogItem({name translations})/media), `POST
+      /client/history/{history}/rebook` (`{time_slot}` `after:now`, 201 →
+      BookingResource-shaped `{id, time_slot, status, barber_id}`).
+- [x] M2: Core — `HistoryEndpoints` + `HistoryRepository`/
+      `DioHistoryRepository` (`getHistory` paged, `rebookFromHistory` slot
+      `yyyy-MM-dd HH:mm:ss` UTC); DTOs `ServiceHistoryDto` +
+      `HistoryBarberDto`/`HistoryBranchDto`/`HistoryCatalogItemDto`/
+      `HistoryMediaDto` (codegen); barrel exports.
+- [x] M3: ARB — 8 `history*` keys + `profileMemberLabel` EN+AR
+      (`historyRebookMessage` item placeholder) — **172 keys, parity
+      verified**.
+- [x] M4: `HistoryBloc` + event/state (profile feature) — start/refresh/
+      load-more/retry over `Paged<ServiceHistoryDto>`, rebook submit →
+      `rebooked` flag + `HistoryRebookAcknowledged` reset.
+- [x] M5: `ProfileScreen` rebuilt — client-name header card, Change Password
+      entry kept, Service History feed (locale-aware item name, rebook via
+      Material date + time pickers, per-card `rebookingId` loader, 409 →
+      `bookingConflictMessage`, success `StatusView` → My Bookings); DorakApp
+      DI + `buildRouter` `history` fakes.
+- [x] M6: Tests — 3 core repo tests, 8 bloc tests, 4 flow tests (header +
+      list, empty, picker-cancel no-op, rebook success → Bookings + reset).
+      Client_app 122 tests.
+- [x] M7: `dart run melos run verify` — **exit 0, 241 tests** (core 101,
+      client_app 122, design_system 14, 1×4), 172 ARB.
+
+**Next: AI Style (018b) — profile header + face scan + AI recommendations;
+Stylist Profile (019) / Review (020) — see `docs/index.md` §6.**
 
 ## Track 10 completion record
 
@@ -226,8 +257,9 @@ see `docs/index.md` §6.**
 
 ## Not built — do not assume these exist
 
-Stitch 010 (Profile Completion), 018 AI Style, 019 Stylist Profile, 020 Review.
-016 Discovery and 017 Booking are built.
+Stitch 010 (Profile Completion), 018b AI Style (face analysis + AI
+recommendations), 019 Stylist Profile, 020 Review.
+016 Discovery, 017 Booking, and 018a Service History are built.
 `business_app`/`stylist_app` are skeletons.
 Design-system inputs/cards/chips/dialogs/app bars (Track 15) — only the 14
 widgets in `AGENTS.md` §10 exist.
