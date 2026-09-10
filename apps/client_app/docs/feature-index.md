@@ -113,6 +113,12 @@
 - `lib/src/features/profile/profile.screen.dart` — avatar header (tap to upload, in-flight loader, fallback initial + camera badge), Face Analysis card (empty / pending / result with shape + confidence + photo / error-with-retry), Curated For You section (item name `[localeCode] ?? ['en']`, price range, style period).
 - `test/face_analysis_bloc_test.dart` (9 cases) + `test/avatar_bloc_test.dart` (2) + `test/face_analysis_flow_test.dart` (4); `FakeFaceProfileRepository`, `FakeProfileRepository`, `FakeServiceCatalogRepository`, `FakePhotoPicker`, `testFaceAnalysis`/`testCatalogItem`/`testCatalogPage`, `fakeFaceAnalysisBloc`/`fakeAvatarBloc`, `buildRouter` params in fakes.
 
+### Stylist Profile — Stitch 019 (CL-12)
+- `lib/src/features/stylist/stylist_profile.{bloc,event,state}.dart` — `StylistProfileBloc` over core `ExploreRepository.getBarberDetail` + `CurrencyRepository.getCurrencies` (parallel detail + currencies load, currency failure tolerated, retry).
+- `lib/src/features/stylist/stylist_profile.screen.dart` — avatar header, stats row mapping `rank`/`compatibility_score` onto `discoverRankBadge`/`discoverCompatibilityBadge` localizations, services list with price/currency/duration/at-home flag.
+- Branch-detail barbers → tappable rows navigating to `/discover/barber/:barberId`.
+- `test/stylist_profile_bloc_test.dart` + `test/stylist_profile_flow_test.dart`.
+
 ### Empty Scaffolds (no files yet)
 - `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
@@ -143,5 +149,5 @@
 | CL-10a | My Bookings (list/filter/cancel) | ✅ Complete | Stitch 017a |
 | CL-10b | Branch Floor Plan & Booking creation | ✅ Complete | Stitch 017b |
 | CL-11 | Personalised Profile & AI Style — 018a Service History + Rebook; 018b Face Analysis + AI recs | ✅ Complete | Stitch 018 |
-| CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |
+| CL-12 | Stylist Profile | ✅ Complete | Stitch 019 |
 | CL-13 | Review & Rating | ⏳ Not started | Stitch 020 |

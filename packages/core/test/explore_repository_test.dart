@@ -157,5 +157,71 @@ void main() {
       expect(detail.barbers.map((barber) => barber.name), ['Karim']);
       expect(detail.services.map((service) => service.price), [80.0]);
     });
+
+    test('getBarberDetail parses profile with services', () async {
+      late RequestOptions captured;
+      final fake = fakeDio(
+        handler: (options) {
+          captured = options;
+          return jsonResponse(
+            options,
+            data: successEnvelope(
+              data: {
+                'id': 'barber-1',
+                'name': 'Karim',
+                'email': 'karim@example.com',
+                'is_freelancer': true,
+                'status': 'approved',
+                'travel_radius': 15.0,
+                'latitude': 24.7136,
+                'longitude': 46.6753,
+                'distance': 2.1,
+                'compatibility_score': 0.88,
+                'rank': 3,
+                'created_at': '2026-01-15T10:00:00.000Z',
+                'services': [
+                  {
+                    'id': 'service-1',
+                    'name': 'Fade',
+                    'description': 'A clean fade.',
+                    'price': 80.0,
+                    'currency_id': 'SAR',
+                    'duration': 45,
+                    'at_home': true,
+                    'active': true,
+                    'created_at': '2026-01-15T10:00:00.000Z',
+                  },
+                ],
+              },
+            ),
+          );
+        },
+      );
+      final repository = DioExploreRepository(clientWith(fake));
+
+      final detail = await repository.getBarberDetail('barber-1');
+
+      expect(captured.path, '/explore/barbers/barber-1');
+      expect(detail.name, 'Karim');
+      expect(detail.email, 'karim@example.com');
+      expect(detail.isFreelancer, isTrue);
+      expect(detail.status, 'approved');
+      expect(detail.travelRadius, 15.0);
+      expect(detail.latitude, 24.7136);
+      expect(detail.longitude, 46.6753);
+      expect(detail.distance, 2.1);
+      expect(detail.compatibilityScore, 0.88);
+      expect(detail.rank, 3);
+      expect(detail.createdAt, isNotNull);
+      final service = detail.services.single;
+      expect(service.id, 'service-1');
+      expect(service.name, 'Fade');
+      expect(service.price, 80.0);
+      expect(service.currencyId, 'SAR');
+      expect(service.duration, 45);
+      expect(service.atHome, isTrue);
+      expect(service.active, isTrue);
+      expect(service.createdAt, isNotNull);
+    });
   });
 }

@@ -19,6 +19,7 @@ import 'package:client_app/src/features/profile/avatar.bloc.dart';
 import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
 import 'package:client_app/src/features/profile/photo_picker.provider.dart';
+import 'package:client_app/src/features/stylist/stylist_profile.bloc.dart';
 
 // todo: read this file, and I think is better to make a fakes folder and then move each block/class into a file for better code.
 Widget routerHarness(AppRouter appRouter) {
@@ -46,8 +47,10 @@ AppRouter buildRouter({
   HistoryBloc? history,
   FaceAnalysisBloc? faceAnalysis,
   AvatarBloc? avatar,
+  StylistProfileBloc? stylistProfile,
   PhotoPicker? photoPicker,
   VoidCallback switchLocale = _noSwitchLocale,
+  void Function(String barberId) onBarberSelected = _noBarberSelected,
 }) {
   return AppRouter(
     session: session,
@@ -64,6 +67,7 @@ AppRouter buildRouter({
     history: history ?? fakeHistoryBloc(),
     faceAnalysis: faceAnalysis ?? fakeFaceAnalysisBloc(),
     avatar: avatar ?? fakeAvatarBloc(),
+    stylistProfile: stylistProfile ?? fakeStylistProfileBloc(),
     photoPicker: photoPicker ?? FakePhotoPicker(),
     switchLocale: switchLocale,
     apiClient: apiClient,
@@ -84,6 +88,7 @@ AppRouter buildRouter({
 }
 
 void _noSwitchLocale() {}
+void _noBarberSelected(String _) {}
 
 ApiClient fakeApiClient() {
   return ApiClient(
@@ -376,11 +381,20 @@ class FakeExploreRepository implements ExploreRepository {
 
   BranchDetailDto detail = testBranchDetail();
 
+  BarberProfileDto barberDetail = testBarberProfile();
+
   @override
   Future<BranchDetailDto> getBranchDetail(String branchId) async {
     final failure = error;
     if (failure != null) throw failure;
     return detail;
+  }
+
+  @override
+  Future<BarberProfileDto> getBarberDetail(String barberId) async {
+    final failure = error;
+    if (failure != null) throw failure;
+    return barberDetail;
   }
 }
 
@@ -860,4 +874,93 @@ FaceAnalysisBloc fakeFaceAnalysisBloc({
 
 AvatarBloc fakeAvatarBloc({FakeProfileRepository? repository}) {
   return AvatarBloc(repository ?? FakeProfileRepository());
+}
+
+BarberProfileDto testBarberProfile({
+  String id = 'barber-1',
+  String name = 'Karim',
+  String email = 'karim@example.com',
+  bool isFreelancer = false,
+  String status = 'active',
+  double? travelRadius,
+  double latitude = 24.7136,
+  double longitude = 46.6753,
+  double? distance,
+  double? compatibilityScore = 0.85,
+  int? rank = 3,
+  DateTime? createdAt,
+  List<BarberServiceDto>? services,
+}) =>
+    BarberProfileDto(
+      id: id,
+      name: name,
+      email: email,
+      isFreelancer: isFreelancer,
+      status: status,
+      travelRadius: travelRadius,
+      latitude: latitude,
+      longitude: longitude,
+      distance: distance,
+      compatibilityScore: compatibilityScore,
+      rank: rank,
+      createdAt: createdAt,
+      services: services ??
+          const [
+            BarberServiceDto(
+              id: 'svc-1',
+              name: 'Fade',
+              description: 'Classic fade cut',
+              price: 80,
+              currencyId: 'curr-1',
+              duration: 30,
+              atHome: false,
+              active: true,
+            ),
+            BarberServiceDto(
+              id: 'svc-2',
+              name: 'Beard Trim',
+              price: 30,
+              currencyId: 'curr-1',
+              duration: 15,
+              atHome: true,
+              active: true,
+            ),
+          ],
+    );
+
+CurrencyDto testCurrency({
+  String id = 'curr-1',
+  String code = 'SAR',
+  String? symbol,
+  bool isDefault = true,
+}) =>
+    CurrencyDto(
+      id: id,
+      code: code,
+      symbol: symbol,
+      isDefault: isDefault,
+    );
+
+class FakeCurrencyRepository implements CurrencyRepository {
+  List<CurrencyDto> currencies = [testCurrency()];
+  Object? error;
+  int calls = 0;
+
+  @override
+  Future<List<CurrencyDto>> getCurrencies() async {
+    calls++;
+    final failure = error;
+    if (failure != null) throw failure;
+    return currencies;
+  }
+}
+
+StylistProfileBloc fakeStylistProfileBloc({
+  FakeExploreRepository? explore,
+  FakeCurrencyRepository? currencies,
+}) {
+  return StylistProfileBloc(
+    explore ?? FakeExploreRepository(),
+    currencies ?? FakeCurrencyRepository(),
+  );
 }

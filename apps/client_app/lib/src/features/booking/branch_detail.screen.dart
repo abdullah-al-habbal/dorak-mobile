@@ -18,12 +18,14 @@ class BranchDetailScreen extends StatefulWidget {
     required this.branchId,
     required this.onLocaleToggle,
     required this.onViewBookings,
+    required this.onBarberSelected,
   });
 
   final BranchDetailBloc bloc;
   final String branchId;
   final VoidCallback onLocaleToggle;
   final VoidCallback onViewBookings;
+  final void Function(String barberId) onBarberSelected;
 
   @override
   State<BranchDetailScreen> createState() => _BranchDetailScreenState();
@@ -83,6 +85,7 @@ class _BranchDetailScreenState extends State<BranchDetailScreen> {
           return _BranchDetailBody(
             bloc: widget.bloc,
             state: state,
+            onBarberSelected: widget.onBarberSelected,
           );
         },
       ),
@@ -94,10 +97,12 @@ class _BranchDetailBody extends StatelessWidget {
   const _BranchDetailBody({
     required this.bloc,
     required this.state,
+    required this.onBarberSelected,
   });
 
   final BranchDetailBloc bloc;
   final BranchDetailState state;
+  final void Function(String barberId) onBarberSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -145,10 +150,15 @@ class _BranchDetailBody extends StatelessWidget {
             style: DorakTypography.titleLg,
           ),
           const SizedBox(height: DorakDimensions.spacingSmall),
-          Text(
-            detail.barbers.map((barber) => barber.name).join(' · '),
-            style: DorakTypography.bodyMd.copyWith(
-              color: colors.onSurfaceVariant,
+          ...detail.barbers.map(
+            (barber) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                child: Text(barber.name.characters.firstOrNull ?? '?'),
+              ),
+              title: Text(barber.name),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => onBarberSelected(barber.id),
             ),
           ),
           const SizedBox(height: DorakDimensions.spacingLarge),

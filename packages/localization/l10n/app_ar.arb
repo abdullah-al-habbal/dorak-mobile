@@ -765,5 +765,50 @@
         "type": "String"
       }
     }
+  },
+  "stylistServicesTitle": "الخدمات",
+  "@stylistServicesTitle": {
+    "description": "Stylist profile services section heading"
+  },
+  "stylistNoServicesMessage": "لا توجد خدمات بعد.",
+  "@stylistNoServicesMessage": {
+    "description": "Shown when a stylist has no services"
+  },
+  "serviceAtHomeLabel": "متاح بالمنزل",
+  "@serviceAtHomeLabel": {
+    "description": "Badge label for services available at home"
+  },
+  "serviceDurationLabel": "{minutes} دقيقة",
+  "@serviceDurationLabel": {
+    "description": "Service duration",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "servicePrice": "{displayPrice} {currency}",
+  "@servicePrice": {
+    "description": "Formatted service price with currency code",
+    "placeholders": {
+      "displayPrice": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stylistStatServicesLabel": "الخدمات",
+  "@stylistStatServicesLabel": {
+    "description": "Stat label for number of services on stylist profile"
+  },
+  "stylistStatRankLabel": "الترتيب",
+  "@stylistStatRankLabel": {
+    "description": "Stat label for stylist rank"
+  },
+  "stylistStatCompatibilityLabel": "التوافق",
+  "@stylistStatCompatibilityLabel": {
+    "description": "Stat label for stylist compatibility score"
   }
 }

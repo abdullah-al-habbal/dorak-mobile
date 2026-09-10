@@ -41,6 +41,8 @@ import 'package:client_app/src/features/profile/history.bloc.dart';
 import 'package:client_app/src/features/profile/photo_picker.provider.dart';
 import 'package:client_app/src/features/profile/profile.screen.dart';
 import 'package:client_app/src/features/splash/splash.screen.dart';
+import 'package:client_app/src/features/stylist/stylist_profile.bloc.dart';
+import 'package:client_app/src/features/stylist/stylist_profile.screen.dart';
 
 class AppRouter {
   final SessionBloc session;
@@ -55,6 +57,7 @@ class AppRouter {
   final HistoryBloc history;
   final FaceAnalysisBloc faceAnalysis;
   final AvatarBloc avatar;
+  final StylistProfileBloc stylistProfile;
   final PhotoPicker photoPicker;
   final VoidCallback switchLocale;
   final ApiClient apiClient;
@@ -77,6 +80,7 @@ class AppRouter {
     required this.history,
     required this.faceAnalysis,
     required this.avatar,
+    required this.stylistProfile,
     required this.photoPicker,
     required this.switchLocale,
     required this.apiClient,
@@ -328,6 +332,17 @@ class AppRouter {
                           state.pathParameters['branchId'] ?? '',
                       onLocaleToggle: switchLocale,
                       onViewBookings: () => router.go(AppRoutes.bookings),
+                      onBarberSelected: (barberId) =>
+                          router.push<void>(AppRoutes.barberDetail(barberId)),
+                    ),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.discoverBarberSegment,
+                    builder: (context, state) => StylistProfileScreen(
+                      bloc: stylistProfile,
+                      barberId:
+                          state.pathParameters['barberId'] ?? '',
+                      onLocaleToggle: switchLocale,
                     ),
                   ),
                 ],

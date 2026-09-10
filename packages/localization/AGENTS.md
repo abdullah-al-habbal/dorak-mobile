@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 192 keys
+## 3. The 200 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -134,7 +134,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 ## 4. Parameterised keys
 
-Eight, and they generate **methods**, not getters:
+Ten, and they generate **methods**, not getters:
 
 ```dart
 String verifySubtitle(String email);        // "…code we sent to {email}"
@@ -145,6 +145,8 @@ String discoverCompatibilityBadge(int percent); // "{percent}%"
 String branchChairsCount(int count);        // "{count} chairs"
 String historyRebookMessage(String item);   // "Rebook {item}?"
 String curatedPriceRange(num min, num max, String currency); // "{min}–{max} {currency}"
+String serviceDurationLabel(int minutes);   // "{minutes} min"
+String servicePrice(String displayPrice, String currency); // "{displayPrice} {currency}"
 ```
 
 ARB form:

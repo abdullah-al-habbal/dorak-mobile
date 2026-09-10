@@ -112,6 +112,9 @@
 ### Face Analysis & AI Style — Stitch 018b (CL-11) ✅ Complete
 - Core: `FaceProfileRepository` (`POST /client/face-profile` multipart upload, `GET /client/face-profile/recommendations`), `ProfileRepository` (`PATCH /client/profile`, `POST /client/avatar`, `PATCH /client/preferences/universe`), `ServiceCatalogRepository` (`GET /service-catalog/items` paged); DTOs `FacePhotoDto`/`FaceAnalysisResultDto`/`AvatarDto`/`UniversePreferenceDto`/`CatalogPriceRangeDto`/`CatalogItemDto` (+`ClientDto.preferredUniverse`), codegen. App: `FaceAnalysisBloc` (upload → pending → re-check; curated items resolved by paging the catalog) + `AvatarBloc` over the `PhotoPicker` seam; `ProfileScreen` avatar header, Face Analysis card (empty/pending/result/error) and Curated For You section.
 
+### Stylist Profile — Stitch 019 (CL-12) ✅ Complete
+- Core: `ExploreRepository.getBarberDetail` (`GET /explore/barbers/{barber}`, returns `{...BarberResource, services}`), `CurrencyRepository` (`GET /currencies` public); DTOs `BarberProfileDto`/`BarberServiceDto`/`CurrencyDto` (codegen). App: `StylistProfileBloc` (parallel detail + currencies, currency failure tolerated, retry), `StylistProfileScreen` (avatar header, stats row, services list with price/currency/duration/at-home), branch-detail barbers → tappable rows, route `/discover/barber/:barberId`.
+
 ### Empty Scaffolds (not implemented)
 - `features/profile/` — directories only, no files.
 
@@ -154,7 +157,7 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 017b | Branch Floor Plan & Booking creation | CL-10 | ✅ Complete |
 | 018a | Service History & Rebook | CL-11 | ✅ Complete |
 | 018b | Face Analysis & AI Style (face analysis + AI recs) | CL-11 | ✅ Complete |
-| 019 | Stylist Profile | CL-12 | ⏳ Pending |
+| 019 | Stylist Profile | CL-12 | ✅ Complete |
 | 020 | Review & Rating | CL-13 | ⏳ Pending |
 
 > Note: `015_design.md` is a standalone design doc (not a screen export).
@@ -186,7 +189,7 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |
 
 ### Not Started
-- Profile completion (Stitch 010), Stylist Profile (019), Review & Rating (020). Discovery Feed (016), Booking — list/cancel (017a) + floor-plan detail/creation (017b) — Service History + Rebook (018a) — and Face Analysis & AI Style (018b) are **built**.
+- Profile completion (Stitch 010), Review & Rating (020). Stylist Profile (019) is **built**.
 - `business_app` and `stylist_app` features — both apps are skeletons.
 
 ### Backend routes for unbuilt features
@@ -197,7 +200,7 @@ Recorded so nobody re-derives them from the Stitch HTML or invents a route.
 |---|---|---|
 | Discovery Feed (016) | `GET /explore/branches` | **There is no `/client/discovery-feed`.** Requires `latitude`, `longitude`, `radius`, `universe`; accepts `per_page` (max 100), `catalog_item_ids[]`, `available_now`, `price_range{min,max}`, `rating_min`, `face_shape_compatible`. `clientId` is nullable — **guest-accessible**. Location permission is a prerequisite. |
 | Discovery preferences | `GET`/`PATCH /client/discovery-preferences` | A separate preferences resource, **not** the feed |
-| Stylist Profile (019) | `GET /explore/barbers`, `GET /explore/barbers/{barber}` | |
+| Stylist Profile (019) | `GET /explore/barbers`, `GET /explore/barbers/{barber}`, `GET /currencies` (public) | `{barber}` returns `{...BarberResource, services}` |
 | Branch detail (017) | `GET /explore/branches/{branch}`, `GET /branches/{branch}/floor-plan`, `GET /branches/{branch}/chairs` | |
 | Review & Rating (020) | `GET /branches/{branch}/reviews` | |
 

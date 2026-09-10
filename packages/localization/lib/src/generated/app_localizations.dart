@@ -1249,6 +1249,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{min}–{max} {currency}'**
   String curatedPriceRange(num min, num max, String currency);
+
+  /// Stylist profile services section heading
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get stylistServicesTitle;
+
+  /// Shown when a stylist has no services
+  ///
+  /// In en, this message translates to:
+  /// **'No services listed yet.'**
+  String get stylistNoServicesMessage;
+
+  /// Badge label for services available at home
+  ///
+  /// In en, this message translates to:
+  /// **'At-Home Available'**
+  String get serviceAtHomeLabel;
+
+  /// Service duration
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String serviceDurationLabel(int minutes);
+
+  /// Formatted service price with currency code
+  ///
+  /// In en, this message translates to:
+  /// **'{displayPrice} {currency}'**
+  String servicePrice(String displayPrice, String currency);
+
+  /// Stat label for number of services on stylist profile
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get stylistStatServicesLabel;
+
+  /// Stat label for stylist rank
+  ///
+  /// In en, this message translates to:
+  /// **'Rank'**
+  String get stylistStatRankLabel;
+
+  /// Stat label for stylist compatibility score
+  ///
+  /// In en, this message translates to:
+  /// **'Compatibility'**
+  String get stylistStatCompatibilityLabel;
 }
 
 class _AppLocalizationsDelegate

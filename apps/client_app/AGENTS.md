@@ -34,6 +34,7 @@ lib/src/features/
                                   face_analysis.{bloc,event,state}.dart (018b: upload → pending → re-check, curated via catalog paging)
                                   avatar.{bloc,event,state}.dart (018b: upload → avatarUrl)
                                   photo_picker.provider.dart + image_picker_photo_picker.provider.dart (018b: PhotoPicker seam + image_picker impl)
+  stylist/                         stylist_profile.{bloc,event,state}.dart + screen (019: profile from branch-detail barbers entry, `/discover/barber/:barberId`)
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
 ```
@@ -181,7 +182,14 @@ resolved by paging the catalog, catalog failure tolerated) + `AvatarBloc`
 Curated For You section (item name `[localeCode] ?? ['en'] ?? ''`, price
 range, style period).
 
-**Not built:** profile completion (010), stylist profile (019), review (020),
+**Built:** stylist profile (019) — `StylistProfileBloc` (parallel detail +
+currencies via public `GET /currencies`, currency failure tolerated, retry),
+`StylistProfileScreen` (avatar header, stats row mapping `rank`/`compatibility_score`
+onto `discoverRankBadge`/`discoverCompatibilityBadge`, services list with
+price/currency/duration/at-home), branch-detail barbers → tappable rows,
+route `/discover/barber/:barberId`.
+
+**Not built:** profile completion (010), review (020),
 logout UI, per-route guards, deep links, locale persistence.
 
 `core/{di,theme}` are empty directories.
@@ -238,8 +246,11 @@ logout UI, per-route guards, deep links, locale persistence.
 | Curated card price + style period share one `Text` (`join('\n')`) | Same idiom as the history meta lines; keeps a single tappable surface and no new card layout. |
 | Face shape labels come from `faceShape*` ARB keys via a private `_shapeLabel` switch | Seven enum values (`oval|round|square|heart|diamond|oblong|triangle`) map to localized strings; unknown values fall through as the raw string. |
 | `FacePhotoDto.isPrimary` defaults false | The `face_profile` embed inside a recommendation omits `is_primary` — a required wire field would 400 the parse. Confirm left default, matching the upload default. |
+| Price formatted client-side with `NumberFormat.decimalPattern(localeCode)` | ARB `servicePrice` takes the pre-formatted string + currency code; the bloc formats the number, the screen passes it to the localization |
+| Currencies fetched via public `GET /currencies` | Mapped by id→code in the screen; failure tolerated — prices render without a currency suffix |
+| `buildRouter` fakes `stylistProfile` + `onBarberSelected` | Defaulted per feature so unrelated router tests stay untouched |
 
-## 8. Tests — 137, in `test/`
+## 8. Tests — 145, in `test/`
 
 | File | Covers |
 |---|---|
@@ -252,7 +263,7 @@ logout UI, per-route guards, deep links, locale persistence.
 | `password_recovery_flow_test.dart` | 011→014 route walk; unregistered email still advances; rejected code routes back to 012; 014 drops the stack |
 | `onboarding_config_bloc_test.dart` | config load, retry after failure, locale refetch |
 | `session_expired_test.dart` | 401 mid-session → session-expired signal → auth redirect |
-| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery` + `bookings` + `branchDetail` + `history`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository` (+ `testBranchDetail`), `FakeBranchRepository` (+ `testFloorPlan`), `FakeBookingRepository` (cancel + `createBooking`), `FakeHistoryRepository` (+ `testServiceHistory`/`testHistoryPage`), `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`/`fakeBookingBloc()`/`fakeBranchDetailBloc()`/`fakeHistoryBloc()`, `unauthorized()`, `offline()` |
+| `helpers/fakes.dart` | `routerHarness()`, `buildRouter()` (takes `session` + `auth` + `passwordChange` + `discovery` + `bookings` + `branchDetail` + `history` + `stylistProfile` + `onBarberSelected`), `sessionPair()` (builds a matched `AuthBloc`+`SessionBloc` **plus the app-layer coordinator forward**), `InMemoryTokenStorage`, `InMemoryAppPreferences`, `FakeAuthRepository`, `FakeOnboardingConfigRepository`, `FakeExploreRepository` (+ `testBranchDetail` + `testBarberProfile` + `getBarberDetail`), `FakeCurrencyRepository` (+ `testCurrency`), `FakeBranchRepository` (+ `testFloorPlan`), `FakeBookingRepository` (cancel + `createBooking`), `FakeHistoryRepository` (+ `testServiceHistory`/`testHistoryPage`), `FakeLocationProvider`, `FakeFeedCache`, `testPosition`/`testBranch`/`testBranchPage`, `fakeDiscoveryBloc()`/`fakeBookingBloc()`/`fakeBranchDetailBloc()`/`fakeHistoryBloc()`/`fakeStylistProfileBloc`, `unauthorized()`, `offline()` |
 | `discovery_bloc_test.dart` | location gating, cache fresh/stale/offline, universe/filter reload + evict, load-more append + failure, refresh, retry |
 | `change_password_bloc_test.dart` | submit success + payload, 422 wrong-current, transport failure |
 | `change_password_flow_test.dart` | profile entry → success → Done pop, mismatch blocks, server field error |
@@ -264,6 +275,8 @@ logout UI, per-route guards, deep links, locale persistence.
 | `face_analysis_bloc_test.dart` | start empty/curated/failed, catalog-failure tolerance, scan → pending, upload failure, check-again load / stay-pending / retry |
 | `avatar_bloc_test.dart` | upload publishes the returned url, upload failure keeps the previous avatar + error |
 | `face_analysis_flow_test.dart` | empty card + scan action, scan → pending → analysis result + curated card, picker-cancel no-op, avatar upload |
+| `stylist_profile_bloc_test.dart` | detail + currencies parallel load, currency failure tolerated, retry |
+| `stylist_profile_flow_test.dart` | avatar header, stats row, services list, branch-detail barbers → tappable rows |
 
 Conventions:
 

@@ -628,4 +628,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String curatedPriceRange(num min, num max, String currency) {
     return '$min–$max $currency';
   }
+
+  @override
+  String get stylistServicesTitle => 'Services';
+
+  @override
+  String get stylistNoServicesMessage => 'No services listed yet.';
+
+  @override
+  String get serviceAtHomeLabel => 'At-Home Available';
+
+  @override
+  String serviceDurationLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String servicePrice(String displayPrice, String currency) {
+    return '$displayPrice $currency';
+  }
+
+  @override
+  String get stylistStatServicesLabel => 'Services';
+
+  @override
+  String get stylistStatRankLabel => 'Rank';
+
+  @override
+  String get stylistStatCompatibilityLabel => 'Compatibility';
 }

@@ -32,6 +32,8 @@ abstract class ExploreRepository {
   });
 
   Future<BranchDetailDto> getBranchDetail(String branchId);
+
+  Future<BarberProfileDto> getBarberDetail(String barberId);
 }
 
 class DioExploreRepository implements ExploreRepository {
@@ -157,6 +159,14 @@ class DioExploreRepository implements ExploreRepository {
     return _apiClient.get<BranchDetailDto>(
       ExploreEndpoints.branchDetail.replaceFirst('{branch}', branchId),
       parser: (json) => BranchDetailDto.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Future<BarberProfileDto> getBarberDetail(String barberId) {
+    return _apiClient.get<BarberProfileDto>(
+      ExploreEndpoints.barberDetail.replaceFirst('{barber}', barberId),
+      parser: (json) => BarberProfileDto.fromJson(json as Map<String, dynamic>),
     );
   }
 }

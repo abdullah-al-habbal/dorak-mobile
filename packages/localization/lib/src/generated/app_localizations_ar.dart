@@ -624,4 +624,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String curatedPriceRange(num min, num max, String currency) {
     return '$min–$max $currency';
   }
+
+  @override
+  String get stylistServicesTitle => 'الخدمات';
+
+  @override
+  String get stylistNoServicesMessage => 'لا توجد خدمات بعد.';
+
+  @override
+  String get serviceAtHomeLabel => 'متاح بالمنزل';
+
+  @override
+  String serviceDurationLabel(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String servicePrice(String displayPrice, String currency) {
+    return '$displayPrice $currency';
+  }
+
+  @override
+  String get stylistStatServicesLabel => 'الخدمات';
+
+  @override
+  String get stylistStatRankLabel => 'الترتيب';
+
+  @override
+  String get stylistStatCompatibilityLabel => 'التوافق';
 }

@@ -22,6 +22,7 @@ import 'package:client_app/src/features/profile/avatar.bloc.dart';
 import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
 import 'package:client_app/src/features/profile/image_picker_photo_picker.provider.dart';
+import 'package:client_app/src/features/stylist/stylist_profile.bloc.dart';
 
 class DorakApp extends StatefulWidget {
   final AppPreferences preferences;
@@ -54,6 +55,7 @@ class _DorakAppState extends State<DorakApp> {
   late final HistoryBloc _historyBloc;
   late final FaceAnalysisBloc _faceAnalysisBloc;
   late final AvatarBloc _avatarBloc;
+  late final StylistProfileBloc _stylistProfileBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
   late final LocaleBloc _localeBloc;
   late final AppRouter _router;
@@ -96,6 +98,10 @@ class _DorakAppState extends State<DorakApp> {
       DioServiceCatalogRepository(_apiClient),
     );
     _avatarBloc = AvatarBloc(DioProfileRepository(_apiClient));
+    _stylistProfileBloc = StylistProfileBloc(
+      DioExploreRepository(_apiClient),
+      DioCurrencyRepository(_apiClient),
+    );
 
     unawaited(_sessionBloc.ready);
 
@@ -135,6 +141,7 @@ class _DorakAppState extends State<DorakApp> {
       history: _historyBloc,
       faceAnalysis: _faceAnalysisBloc,
       avatar: _avatarBloc,
+      stylistProfile: _stylistProfileBloc,
       photoPicker: const ImagePickerPhotoPicker(),
       switchLocale: _switchLocale,
       apiClient: _apiClient,
@@ -158,6 +165,7 @@ class _DorakAppState extends State<DorakApp> {
     _historyBloc.close();
     _faceAnalysisBloc.close();
     _avatarBloc.close();
+    _stylistProfileBloc.close();
     _onboardingConfigBloc.close();
     _localeBloc.close();
     _apiClient.dispose();

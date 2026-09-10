@@ -924,23 +924,18 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Stitch 018 / Personalised Profile & AI Style — 018b
-Face Analysis + AI Style DONE 2026-09-10.** Core:
-`FaceProfileEndpoints` (`POST /client/face-profile` multipart upload, `GET
-/client/face-profile/recommendations`), `ProfileEndpoints` (avatar /
-universe / profile update), `ServiceCatalogEndpoints`
-(`GET /service-catalog/items` paged), DTOs `FacePhotoDto` /
-`FaceAnalysisResultDto` / `AvatarDto` / `UniversePreferenceDto` /
-`CatalogPriceRangeDto` / `CatalogItemDto` (+ `ClientDto.preferredUniverse`)
-behind `FaceProfileRepository` / `ProfileRepository` /
-`ServiceCatalogRepository` (codegen). App: `FaceAnalysisBloc`
-(upload → pending → re-check; `recommended_catalog_item_ids` resolved by
-paging the catalog, catalog failure tolerated) + `AvatarBloc` over a
-`PhotoPicker` seam (`ImagePickerPhotoPicker`), `ProfileScreen` tipped with
-an avatar header (tap to upload, fallback initial), a Face Analysis card
-(empty / pending / result-with-shape+confidence / error) and a Curated For
-You section. `melos verify` exit 0, **266 tests** (core 110, client_app
-137, design_system 14, 1×4), **192 ARB keys** (EN+AR parity).
+**Current Track:** **Stitch 019 / Stylist Profile DONE 2026-09-10.** Core:
+`ExploreRepository.getBarberDetail` (`GET /explore/barbers/{barber}`,
+returns `{...BarberResource, services}`), `CurrencyRepository`
+(`GET /currencies` public), DTOs `BarberProfileDto` / `BarberServiceDto` /
+`CurrencyDto` (codegen). App: `StylistProfileBloc` (parallel detail +
+currencies, currency failure tolerated, retry), `StylistProfileScreen`
+(avatar header, stats row mapping `rank`/`compatibility_score` onto
+`discoverRankBadge`/`discoverCompatibilityBadge`, services list with
+price/currency/duration/at-home), branch-detail barbers → tappable rows,
+route `/discover/barber/:barberId`. `melos verify` exit 0, **277 tests**
+(core 114, client_app 145, design_system 14, 1×4), **200 ARB keys**
+(EN+AR parity).
 
 **Just completed — Stitch 018a / Service History + Rebook (CL-11)
 (2026-09-10).** `HistoryEndpoints` +
@@ -1038,16 +1033,14 @@ success `StatusView` → My Bookings). `melos verify` exit 0,
 **172 ARB keys** (EN+AR parity).
 
 **Track statuses.** `DONE`: 00–05, 06, 07, 08, 10, 11, 16, 17, 18 / Discovery
-(CL-09), Stitch 017 (CL-10), Stitch 018a (CL-11, Service History + Rebook).
-`IN_PROGRESS`: 09, 12 (both consumed). `PENDING`: 13, 14, 15, 19–21.
+(CL-09), Stitch 017 (CL-10), Stitch 018a–018b (CL-11), Stitch 019 (CL-12,
+Stylist Profile).
+`IN_PROGRESS`: 09, 12 (both consumed). `PENDING`: 13, 14, 15, 20, 21.
 
 **Next candidate:**
 
-* `AI Style (018)` — 018a (Service History + Rebook) built; 018b (profile
-  header face-scan upload, detected-shape display, `recommended_catalog_item_ids`
-  → catalog cards) remains. `Stylist Profile (019)` / `Review (020)` — design
-  exports live in `docs/stitch/exports/` (015–020). 010 profile completion
-  and 015–016 design-system work remain at Track level.
+* `Review (020)` — design export lives in `docs/stitch/exports/` (020).
+  010 profile completion and 015–016 design-system work remain at Track level.
 
 Architecture deviations are recorded as
 [ADR 0001](./architecture/decisions/0001-bloc-in-core.md),

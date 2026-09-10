@@ -202,7 +202,7 @@ dart run melos run verify      # all five, in order — the gate
 
 `verify` must exit 0 before any work is called done. Current baseline
 (re-baselined 2026-09-10): 7 packages analyze clean, taxonomy passes,
-**266 tests pass** (110 core, 137 client_app, 14 design_system, 1 each for
+**277 tests pass** (114 core, 145 client_app, 14 design_system, 1 each for
 business_app, stylist_app, localization, feature_floor_plan).
 
 After editing an ARB file run `generate`. After editing a DTO run `build`.
@@ -388,10 +388,11 @@ Authentication always outranks the onboarding flag.
 | Service History + Rebook (018a) | `client_app/.../features/profile` + core `HistoryRepository` (`getHistory`/`rebookFromHistory` over `ServiceHistoryDto` family) — Profile tab header card, history feed, rebook |
 | Face Analysis + AI Style (018b) | `client_app/.../features/profile` (`FaceAnalysisBloc` + `AvatarBloc` over `PhotoPicker` seam) + core `FaceProfileRepository`/`ProfileRepository`/`ServiceCatalogRepository` over `FacePhotoDto`/`FaceAnalysisResultDto`/`AvatarDto`/`CatalogItemDto` — avatar header, face card, Curated For You |
 | Profile tab rebuilt (018a–018b) | `client_app/.../features/profile/profile.screen.dart` |
+| Stylist Profile (019) | `client_app/.../features/stylist` (bloc + screen) + core `ExploreRepository`/`CurrencyRepository` (`getBarberDetail`/`getCurrencies`, `BarberProfileDto`/`BarberServiceDto`/`CurrencyDto`) — profile from branch-detail barbers entry, `/discover/barber/:barberId` |
 
 ### Not built — do not assume these exist
 
-- Profile completion (Stitch 010), Stylist Profile (019), Review (020).
+- Profile completion (Stitch 010), Review (020).
   Discovery Feed (016) is **built** per `docs/future-features/discovery-016.md`;
   My Bookings list/filter/cancel (017a), branch floor-plan detail + booking
   creation (017b), Service History + Rebook (018a), and Face Analysis + AI
@@ -434,6 +435,8 @@ Client routes are under `/client`.
 | Verify | `POST /client/email/verify` | `auth:client`, `{code}`, `size:6`. 422 on wrong code. 5 wrong attempts invalidate the code (forces a resend) |
 | Logout | `POST /client/logout` | `auth:client`. 200 with **no `data` key** |
 | Change password | `PATCH /client/password` | `auth:client`. `{current_password, password, password_confirmation}` (`confirmed` rule). 422 field errors are real copy. Success message is an untranslated key — never render it |
+| Barber detail | `GET /explore/barbers/{barber}` | Public. Returns `{...BarberResource, services}` — services nested inside the barber resource |
+| Currencies | `GET /currencies` | Public. Returns currency list |
 
 Also declared and unused: `forgot-password`, `reset-password`,
 `social/{provider}`.
@@ -531,15 +534,16 @@ error / offline / retry / session states). Otherwise keep it in
 ## 11. Localization
 
 - Source of truth: `packages/localization/l10n/app_en.arb` (template) +
-  `app_ar.arb`. **192 keys, identical sets** (verified 2026-09-10).
+  `app_ar.arb`. **200 keys, identical sets** (verified 2026-09-10).
 - camelCase, feature-prefixed (`loginTitle`, `verifyResend`,
   `signUpPasswordHint`). Reuse existing keys before adding new ones.
 - Generated output `lib/src/generated/` is committed and excluded from the
   analyzer and taxonomy checker.
-- Four keys take ICU placeholders and generate functions, not getters:
+- Six keys take ICU placeholders and generate functions, not getters:
   `verifySubtitle(String email)`, `verifyResendDisabled(int seconds)`,
   `historyRebookMessage(String item)`,
-  `curatedPriceRange(num min, num max, String currency)`.
+  `curatedPriceRange(num min, num max, String currency)`,
+  `serviceDurationLabel(int minutes)`, `servicePrice(String displayPrice, String currency)`.
 - RTL is automatic from the locale. Use `Align` / `TextAlign.start` /
   `AlignmentDirectional`; never hardcode left/right. For directional icons
   follow the existing idiom:
@@ -549,7 +553,7 @@ error / offline / retry / session states). Otherwise keep it in
 
 ## 12. Testing conventions
 
-**266 tests pass** (110 in `core`, 137 in `client_app`, 14 in `design_system` —
+**277 tests pass** (114 in `core`, 145 in `client_app`, 14 in `design_system` —
 the Track 12 state-component suite plus the `locale_switcher` tests — plus 1
 smoke test each in `business_app`, `stylist_app`, `localization`,
 `feature_floor_plan`). Re-baselined via `dart run melos run verify`
@@ -579,7 +583,7 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `client_app/test/branch_detail_bloc_test.dart` | detail + plan parallel load, plan-failure tolerance, chair/services/time selection, submit guard, 409 conflict |
 | `core/test/booking_repository_test.dart` | nested parsing, status/page params, cancel route + verb, `createBooking` UTC slot format + 409 |
 | `core/test/branch_repository_test.dart` | `getFloorPlan` parsing (available/occupied chairs) + path |
-| `core/test/explore_repository_test.dart` | branch parsing, `getBranchDetail`, raw payload for cache writes, query params incl. `page` |
+| `core/test/explore_repository_test.dart` | branch parsing, `getBranchDetail`, `getBarberDetail` (barber + services parse), raw payload for cache writes, query params incl. `page` |
 | `core/test/history_repository_test.dart` | `ServiceHistoryDto` nested parse (translations map), history page params, rebook route/verb + UTC slot + BookingDto parse |
 | `core/test/face_profile_repository_test.dart` | upload multipart FormData fields + `is_primary`, recommendations parse (latest-first, nullable rec ids, `face_profile` embed) |
 | `core/test/profile_repository_test.dart` | `updateProfile` PATCH partial payload + `preferred_universe`, uploadAvatar multipart, updatePreferredUniverse, catalog parse (price_range + face_shapes, missing price_range tolerated) |
@@ -588,6 +592,10 @@ smoke test each in `business_app`, `stylist_app`, `localization`,
 | `client_app/test/face_analysis_bloc_test.dart` | start empty/curated/failed, catalog-failure tolerance, scan → pending, upload failure, check-again load/stay-pending/retry |
 | `client_app/test/avatar_bloc_test.dart` | upload publishes url, upload failure keeps previous avatar + error |
 | `client_app/test/face_analysis_flow_test.dart` | empty card + scan action, scan → pending → result, picker-cancel no-op, avatar upload |
+| `core/test/currency_repository_test.dart` | currency parse |
+| `core/test/explore_repository_test.dart` | branch parsing, `getBranchDetail`, `getBarberDetail` (barber + services parse), raw payload for cache writes, query params incl. `page` |
+| `client_app/test/stylist_profile_bloc_test.dart` | detail + currencies parallel load, currency failure tolerated, retry |
+| `client_app/test/stylist_profile_flow_test.dart` | avatar header, stats row, services list, branch-detail barbers → tappable rows |
 
 Rules:
 

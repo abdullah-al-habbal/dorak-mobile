@@ -26,8 +26,11 @@ class AppRoutes {
   static const String profilePassword = '/profile/password';
 
   static const String branchDetailSegment = 'branch/:branchId';
+  static const String discoverBarberSegment = 'barber/:barberId';
 
   static String branchDetail(String branchId) => '$discover/branch/$branchId';
+  static String barberDetail(String barberId) =>
+      '$discover/barber/$barberId';
 
   // Legacy home route (kept for onboarding/guest redirects)
   static const String home = '/home';
