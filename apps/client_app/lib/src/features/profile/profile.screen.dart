@@ -6,20 +6,33 @@ import 'package:localization/localization.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 
+import 'package:client_app/src/features/profile/avatar.bloc.dart';
+import 'package:client_app/src/features/profile/avatar.event.dart';
+import 'package:client_app/src/features/profile/avatar.state.dart';
+import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
+import 'package:client_app/src/features/profile/face_analysis.event.dart';
+import 'package:client_app/src/features/profile/face_analysis.state.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
 import 'package:client_app/src/features/profile/history.event.dart';
 import 'package:client_app/src/features/profile/history.state.dart';
+import 'package:client_app/src/features/profile/photo_picker.provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
     required this.history,
+    required this.faceAnalysis,
+    required this.avatar,
+    required this.photoPicker,
     required this.clientName,
     required this.onChangePassword,
     required this.onViewBookings,
   });
 
   final HistoryBloc history;
+  final FaceAnalysisBloc faceAnalysis;
+  final AvatarBloc avatar;
+  final PhotoPicker photoPicker;
   final String? clientName;
   final VoidCallback onChangePassword;
   final VoidCallback onViewBookings;
@@ -33,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     widget.history.add(const HistoryStarted());
+    widget.faceAnalysis.add(const FaceAnalysisStarted());
   }
 
   @override
@@ -65,6 +79,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: AppLocalizations.of(context)!.changePasswordTitle,
                       onPressed: widget.onChangePassword,
                     ),
+                    ..._faceAnalysisSection(context),
+                    ..._curatedSection(context),
                     const SizedBox(height: DorakDimensions.spacingLarge),
                     Text(
                       AppLocalizations.of(context)!.historyTitle,
@@ -111,11 +127,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: colors.primaryContainer,
-            foregroundColor: colors.onPrimaryContainer,
-            child: Text(initial, style: DorakTypography.titleLg),
+          BlocBuilder<AvatarBloc, AvatarState>(
+            bloc: widget.avatar,
+            builder: (context, avatarState) {
+              return InkWell(
+                onTap: () => _pickAndUploadAvatar(context),
+                customBorder: const CircleBorder(),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _avatarImage(context, avatarState.avatarUrl, initial),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: DorakDimensions.spacingLarge,
+                        height: DorakDimensions.spacingLarge,
+                        decoration: BoxDecoration(
+                          color: colors.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: colors.outline),
+                        ),
+                        child: avatarState.isUploading
+                            ? const Center(child: AppLoader.inline())
+                            : Icon(
+                                Icons.camera_alt_outlined,
+                                size: 14,
+                                color: colors.primary,
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(width: DorakDimensions.spacingMedium),
           Expanded(
@@ -129,6 +174,101 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  Widget _avatarImage(BuildContext context, String? avatarUrl, String initial) {
+    final colors = DorakColors.of(context);
+    final fallback = ColoredBox(
+      color: colors.primaryContainer,
+      child: Center(
+        child: Text(
+          initial,
+          style: DorakTypography.titleLg.copyWith(
+            color: colors.onPrimaryContainer,
+          ),
+        ),
+      ),
+    );
+    return ClipOval(
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: avatarUrl == null
+            ? fallback
+            : Image.network(
+                avatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => fallback,
+              ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadAvatar(BuildContext context) async {
+    final path = await widget.photoPicker.pickPhoto();
+    if (path == null) return;
+    widget.avatar.add(AvatarPhotoChanged(path));
+  }
+
+  List<Widget> _faceAnalysisSection(BuildContext context) {
+    return [
+      BlocBuilder<FaceAnalysisBloc, FaceAnalysisState>(
+        bloc: widget.faceAnalysis,
+        builder: (context, state) => _FaceCard(
+          state: state,
+          onScan: () => _pickAndScanFace(context),
+          onCheckAgain: () => widget.faceAnalysis.add(
+            const FaceAnalysisCheckedAgain(),
+          ),
+        ),
+      ),
+      const SizedBox(height: DorakDimensions.spacingLarge),
+    ];
+  }
+
+  List<Widget> _curatedSection(BuildContext context) {
+    return [
+      BlocBuilder<FaceAnalysisBloc, FaceAnalysisState>(
+        bloc: widget.faceAnalysis,
+        builder: (context, state) {
+          final l10n = AppLocalizations.of(context)!;
+          final colors = DorakColors.of(context);
+          if (state.status != FaceAnalysisStatus.ready) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.curatedForYouTitle, style: DorakTypography.titleLg),
+              const SizedBox(height: DorakDimensions.spacingSmall),
+              if (state.curated.isEmpty)
+                Text(
+                  l10n.curatedEmptyMessage,
+                  style: DorakTypography.bodyMd.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                )
+              else
+                ...state.curated.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: DorakDimensions.spacingMedium,
+                    ),
+                    child: _CuratedCard(item: item),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+      const SizedBox(height: DorakDimensions.spacingLarge),
+    ];
+  }
+
+  Future<void> _pickAndScanFace(BuildContext context) async {
+    final path = await widget.photoPicker.pickPhoto();
+    if (path == null) return;
+    widget.faceAnalysis.add(FaceAnalysisPhotoScanned(path));
   }
 
   List<Widget> _historySection(BuildContext context, HistoryState state) {
@@ -263,6 +403,228 @@ class _ProfileScreenState extends State<ProfileScreen> {
       HistoryRebookRequested(
         item.id,
         DateTime(date.year, date.month, date.day, time.hour, time.minute),
+      ),
+    );
+  }
+}
+
+String _shapeLabel(AppLocalizations l10n, String shape) {
+  switch (shape) {
+    case 'oval':
+      return l10n.faceShapeOval;
+    case 'round':
+      return l10n.faceShapeRound;
+    case 'square':
+      return l10n.faceShapeSquare;
+    case 'heart':
+      return l10n.faceShapeHeart;
+    case 'diamond':
+      return l10n.faceShapeDiamond;
+    case 'oblong':
+      return l10n.faceShapeOblong;
+    case 'triangle':
+      return l10n.faceShapeTriangle;
+  }
+  return shape;
+}
+
+class _FaceCard extends StatelessWidget {
+  const _FaceCard({
+    required this.state,
+    required this.onScan,
+    required this.onCheckAgain,
+  });
+
+  final FaceAnalysisState state;
+  final VoidCallback onScan;
+  final VoidCallback onCheckAgain;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = DorakColors.of(context);
+    final Widget content = switch (state.status) {
+      FaceAnalysisStatus.initial ||
+      FaceAnalysisStatus.loading ||
+      FaceAnalysisStatus.uploading =>
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: DorakDimensions.spacingLarge),
+          child: Center(child: AppLoader.inline()),
+        ),
+      FaceAnalysisStatus.failed => _errorContent(context, l10n),
+      FaceAnalysisStatus.ready => _readyContent(context, l10n),
+    };
+    return Container(
+      padding: const EdgeInsets.all(DorakDimensions.spacingMedium),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: DorakDimensions.radiusMd,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.faceAnalysisTitle, style: DorakTypography.titleLg),
+          const SizedBox(height: DorakDimensions.spacingMedium),
+          content,
+        ],
+      ),
+    );
+  }
+
+  Widget _errorContent(BuildContext context, AppLocalizations l10n) {
+    final message = state.error is NetworkException
+        ? l10n.errorNetwork
+        : l10n.errorGeneric;
+    return StatusView(
+      icon: Icons.error_outline,
+      title: l10n.errorTitleGeneric,
+      message: message,
+      actionLabel: l10n.actionRetry,
+      onAction: onCheckAgain,
+    );
+  }
+
+  Widget _readyContent(BuildContext context, AppLocalizations l10n) {
+    final latest = state.latest;
+    if (latest == null) {
+      if (state.awaitingAnalysis) return _pendingContent(context, l10n);
+      return _emptyContent(context, l10n);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _facePhoto(context, latest.faceProfile?.imageUrl),
+            const SizedBox(width: DorakDimensions.spacingMedium),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${l10n.faceAnalysisDetectedShape}: '
+                    '${_shapeLabel(l10n, latest.detectedFaceShape)}',
+                    style: DorakTypography.bodyMd,
+                  ),
+                  const SizedBox(height: DorakDimensions.spacingSmall / 2),
+                  Text(
+                    '${l10n.faceAnalysisConfidence}: '
+                    '${(latest.confidenceScore * 100).round()}%',
+                    style: DorakTypography.bodyMd.copyWith(
+                      color: DorakColors.of(context).onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: DorakDimensions.spacingMedium),
+        SecondaryButton(label: l10n.faceScanAction, onPressed: onScan),
+      ],
+    );
+  }
+
+  Widget _pendingContent(BuildContext context, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (state.uploadedPhotoUrl != null) ...[
+          _facePhoto(context, state.uploadedPhotoUrl),
+          const SizedBox(height: DorakDimensions.spacingMedium),
+        ],
+        Text(l10n.faceAnalysisPendingTitle, style: DorakTypography.titleLg),
+        const SizedBox(height: DorakDimensions.spacingSmall / 2),
+        Text(
+          l10n.faceAnalysisPendingMessage,
+          style: DorakTypography.bodyMd.copyWith(
+            color: DorakColors.of(context).onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: DorakDimensions.spacingMedium),
+        SecondaryButton(label: l10n.actionCheckAgain, onPressed: onCheckAgain),
+      ],
+    );
+  }
+
+  Widget _emptyContent(BuildContext context, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.faceAnalysisEmptyTitle, style: DorakTypography.titleLg),
+        const SizedBox(height: DorakDimensions.spacingSmall / 2),
+        Text(
+          l10n.faceAnalysisEmptyMessage,
+          style: DorakTypography.bodyMd.copyWith(
+            color: DorakColors.of(context).onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: DorakDimensions.spacingMedium),
+        SecondaryButton(label: l10n.faceScanAction, onPressed: onScan),
+      ],
+    );
+  }
+
+  Widget _facePhoto(BuildContext context, String? url) {
+    final colors = DorakColors.of(context);
+    final placeholder = Container(
+      color: colors.surfaceContainerHighest,
+      child: Icon(Icons.face_outlined, color: colors.onSurfaceVariant),
+    );
+    return ClipRRect(
+      borderRadius: DorakDimensions.radiusSm,
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: url == null
+            ? placeholder
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => placeholder,
+              ),
+      ),
+    );
+  }
+}
+
+class _CuratedCard extends StatelessWidget {
+  const _CuratedCard({required this.item});
+
+  final CatalogItemDto item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = DorakColors.of(context);
+    final localeCode = Localizations.localeOf(context).languageCode;
+    final name = item.name[localeCode] ?? item.name['en'] ?? '';
+    final price = item.priceRange;
+    final lines = <String>[
+      if (price?.min != null && price?.max != null)
+        l10n.curatedPriceRange(price!.min!, price.max!, price.currency ?? ''),
+      if (item.stylePeriod != null) item.stylePeriod!,
+    ];
+    return Container(
+      padding: const EdgeInsets.all(DorakDimensions.spacingMedium),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: DorakDimensions.radiusMd,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: DorakTypography.titleLg),
+          if (lines.isNotEmpty) ...[
+            const SizedBox(height: DorakDimensions.spacingSmall / 2),
+            Text(
+              lines.join('\n'),
+              style: DorakTypography.bodyMd.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

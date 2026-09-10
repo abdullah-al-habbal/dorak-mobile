@@ -214,8 +214,7 @@ placeholders).**
 - [x] L7: `dart run melos run verify` — **exit 0, 226 tests** (core 98,
       client_app 110, design_system 14, 1×4).
 
-**Next: AI Style (018) — 018a below; 018b (face analysis + AI
-recommendations) follows. 019/020 after.**
+**Next: Stylist Profile (019) / Review (020) — see `docs/index.md` §6.**
 
 ## Phase M — Stitch 018a / Service History + Rebook (CL-11) ✅ 2026-09-10
 
@@ -248,6 +247,49 @@ recommendations) follows. 019/020 after.**
 **Next: AI Style (018b) — profile header + face scan + AI recommendations;
 Stylist Profile (019) / Review (020) — see `docs/index.md` §6.**
 
+## Phase N — Stitch 018b / Face Analysis + AI Style (CL-11) ✅ 2026-09-10
+
+- [x] N1: Recon — `POST /client/face-profile` (multipart `photo` +
+      `is_primary`, 201 → `{id, image_url, is_primary, uploaded_at}`);
+      upload does **not** trigger analysis (`AnalyzeFacePhotoJob` is only
+      dispatched by the unwired `RequestFaceAnalysisHandler`) → client needs
+      pending + re-check UX. `GET /client/face-profile/recommendations`
+      (latest-`computed_at` first; `detected_face_shape`,
+      `confidence_score`, `recommended_catalog_item_ids?`, nested
+      `face_profile`). `PATCH /client/profile` (+`preferred_universe`),
+      `POST /client/avatar`, `PATCH /client/preferences/universe`.
+      `GET /service-catalog/items` (shared, paged, no ids/face_shape filter)
+      → resolve recommendations by paging.
+- [x] N2: Core — `FaceProfileEndpoints`/`ProfileEndpoints`/
+      `ServiceCatalogEndpoints`; DTOs `FacePhotoDto` (isPrimary default
+      false — server embed omits it), `FaceAnalysisResultDto`,
+      `AvatarDto`, `UniversePreferenceDto`, `CatalogPriceRangeDto`,
+      `CatalogItemDto` (+`ClientDto.preferredUniverse`, codegen);
+      `FaceProfileRepository`/`ProfileRepository`/
+      `ServiceCatalogRepository`; barrel exports.
+- [x] N3: ARB — 20 keys (`avatarUpdateAction`, `faceAnalysis*` 5,
+      `actionCheckAgain`, `faceShape*` 7, `curatedForYouTitle`,
+      `curatedEmptyMessage`, `curatedPriceRange` placeholder) EN+AR —
+      **192 keys, parity verified**.
+- [x] N4: App blocs — `FaceAnalysisBloc` (start → load recs; scan →
+      upload → pending; re-check; curated resolved by paging catalog
+      per_page 100, cap 5 pages, catalog failure tolerated) +
+      `AvatarBloc` (upload → `avatarUrl`); `PhotoPicker` seam +
+      `ImagePickerPhotoPicker` (`image_picker` dep).
+- [x] N5: `ProfileScreen` — avatar header (tap upload, fallback initial,
+      camera badge, in-flight loader), Face Analysis card (empty / pending /
+      result shape+confidence+photo / error-with-retry), Curated For You
+      section (name `[localeCode] ?? ['en']`, price range, style period);
+      `DorakApp` DI + router wiring + `buildRouter` fakes.
+- [x] N6: Tests — 9 core repo tests (multipart fields, upload flag,
+      recommendations parse/latest-first/rev-id-tolerant, profile patch
+      partial payload, avatar multipart, catalog parse + missing
+      price_range), 11 app bloc tests (face start/scan/check-again + avatar),
+      4 flow tests (empty card, scan → pending → result, cancel no-op,
+      avatar upload). Client_app 137 tests.
+- [x] N7: `dart run melos run verify` — **exit 0, 266 tests** (core 110,
+      client_app 137, design_system 14, 1×4), 192 ARB.
+
 ## Track 10 completion record
 
 - No source, test, or ARB change this pass — lifecycle code + 5 tests already
@@ -255,11 +297,13 @@ Stylist Profile (019) / Review (020) — see `docs/index.md` §6.**
 - `docs/runtime/` previously a never-existing directory per `AGENTS.md` §1; now
   holds its first content file. Update that note → done in this commit.
 
+**Next: Stylist Profile (019) / Review (020); App Store prep.**
+
 ## Not built — do not assume these exist
 
-Stitch 010 (Profile Completion), 018b AI Style (face analysis + AI
-recommendations), 019 Stylist Profile, 020 Review.
-016 Discovery, 017 Booking, and 018a Service History are built.
+Stitch 010 (Profile Completion), 019 Stylist Profile, 020 Review.
+016 Discovery, 017 Booking, `018a` Service History + `018b` Face Analysis /
+AI Style are built.
 `business_app`/`stylist_app` are skeletons.
 Design-system inputs/cards/chips/dialogs/app bars (Track 15) — only the 14
 widgets in `AGENTS.md` §10 exist.

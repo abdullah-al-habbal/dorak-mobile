@@ -750,5 +750,96 @@
   "profileMemberLabel": "Member",
   "@profileMemberLabel": {
     "description": "Profile header name fallback when the client name is unknown"
+  },
+  "avatarUpdateAction": "Change Photo",
+  "@avatarUpdateAction": {
+    "description": "Avatar upload affordance on the profile header"
+  },
+  "faceAnalysisTitle": "Face Analysis",
+  "@faceAnalysisTitle": {
+    "description": "Face analysis module title"
+  },
+  "faceAnalysisDetectedShape": "Detected Shape",
+  "@faceAnalysisDetectedShape": {
+    "description": "Detected face shape label"
+  },
+  "faceAnalysisConfidence": "Confidence",
+  "@faceAnalysisConfidence": {
+    "description": "Analysis confidence label"
+  },
+  "faceScanAction": "Scan my face",
+  "@faceScanAction": {
+    "description": "Face photo upload action"
+  },
+  "faceAnalysisPendingTitle": "Analysis in progress",
+  "@faceAnalysisPendingTitle": {
+    "description": "Pending analysis title"
+  },
+  "faceAnalysisPendingMessage": "We are analyzing your face. Check again in a moment.",
+  "@faceAnalysisPendingMessage": {
+    "description": "Pending analysis message"
+  },
+  "faceAnalysisEmptyTitle": "No analysis yet",
+  "@faceAnalysisEmptyTitle": {
+    "description": "Empty analysis state title"
+  },
+  "faceAnalysisEmptyMessage": "Upload a photo to discover the styles that suit you.",
+  "@faceAnalysisEmptyMessage": {
+    "description": "Empty analysis state message"
+  },
+  "actionCheckAgain": "Check again",
+  "@actionCheckAgain": {
+    "description": "Re-polls a pending face analysis"
+  },
+  "faceShapeOval": "Oval",
+  "@faceShapeOval": {
+    "description": "Detected face shape: oval"
+  },
+  "faceShapeRound": "Round",
+  "@faceShapeRound": {
+    "description": "Detected face shape: round"
+  },
+  "faceShapeSquare": "Square",
+  "@faceShapeSquare": {
+    "description": "Detected face shape: square"
+  },
+  "faceShapeHeart": "Heart",
+  "@faceShapeHeart": {
+    "description": "Detected face shape: heart"
+  },
+  "faceShapeDiamond": "Diamond",
+  "@faceShapeDiamond": {
+    "description": "Detected face shape: diamond"
+  },
+  "faceShapeOblong": "Oblong",
+  "@faceShapeOblong": {
+    "description": "Detected face shape: oblong"
+  },
+  "faceShapeTriangle": "Triangle",
+  "@faceShapeTriangle": {
+    "description": "Detected face shape: triangle"
+  },
+  "curatedForYouTitle": "Curated For You",
+  "@curatedForYouTitle": {
+    "description": "AI style recommendations title"
+  },
+  "curatedEmptyMessage": "No matching styles yet.",
+  "@curatedEmptyMessage": {
+    "description": "Empty recommendations message"
+  },
+  "curatedPriceRange": "{min}–{max} {currency}",
+  "@curatedPriceRange": {
+    "description": "Catalog item price range",
+    "placeholders": {
+      "min": {
+        "type": "num"
+      },
+      "max": {
+        "type": "num"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -29,8 +29,11 @@ lib/src/features/
   discovery/                      discovery.{bloc,event,state}.dart + filter entity + screen + 2 widgets (016 feed)
   booking/                        booking.{bloc,event,state}.dart + screen + card (017a list/cancel)
                                   branch_detail.{bloc,event,state}.dart + screen + FloorPlanGrid widget (017b detail/create)
-  profile/                        profile.screen.dart (018a: header card + change-password entry + Service History)
+  profile/                        profile.screen.dart (018a: header card + change-password entry + Service History; 018b: avatar header + Face Analysis card + Curated For You)
                                   history.{bloc,event,state}.dart (018a: paged feed + rebook)
+                                  face_analysis.{bloc,event,state}.dart (018b: upload → pending → re-check, curated via catalog paging)
+                                  avatar.{bloc,event,state}.dart (018b: upload → avatarUrl)
+                                  photo_picker.provider.dart + image_picker_photo_picker.provider.dart (018b: PhotoPicker seam + image_picker impl)
 lib/src/core/di/ theme/           empty
 assets/images/                    noise_overlay.png, onboarding_hero.jpg
 ```
@@ -167,9 +170,19 @@ History feed with per-entry rebook (Material date + time pickers, per-card
 `rebookingId` loader, 409 → `bookingConflictMessage`, success `StatusView` →
 My Bookings).
 
-**Not built:** profile completion (010), 018b AI style (face analysis + AI
-recommendations), stylist profile (019), review (020), logout UI, per-route
-guards, deep links, locale persistence.
+**Built:** face analysis + AI style (018b) — `FaceAnalysisBloc` (start loads
+recommendations; scan uploads the photo and lands on a pending state because
+the backend job runs async; Check again re-polls; `recommended_catalog_item_ids`
+resolved by paging the catalog, catalog failure tolerated) + `AvatarBloc`
+(upload → `avatarUrl`) over a `PhotoPicker` seam (`ImagePickerPhotoPicker`,
+`image_picker` hidden behind it). `ProfileScreen` gained an avatar header
+(tap to upload, in-flight loader, fallback initial), a Face Analysis card
+(empty / pending / result shape+confidence+photo / error-with-retry) and a
+Curated For You section (item name `[localeCode] ?? ['en'] ?? ''`, price
+range, style period).
+
+**Not built:** profile completion (010), stylist profile (019), review (020),
+logout UI, per-route guards, deep links, locale persistence.
 
 `core/{di,theme}` are empty directories.
 
@@ -217,8 +230,16 @@ guards, deep links, locale persistence.
 | Profile header name falls back to `profileMemberLabel` | `RefreshTokenAction` returns only `{token}` — no profile data survives a restore, so a restored logged-in user has no known name. Avatar initial falls back to `'?'`. |
 | Rebook slot formatted like `createBooking` | UTC `yyyy-MM-dd HH:mm:ss`, shared convention with 017b booking creation. |
 | Rebook pickers are Material date + time pickers | Same precedent as 017b — no custom time selector (Track 15). |
+| `image_picker` is a runtime dep behind a `PhotoPicker` seam | The scan + avatar uploads live behind the app-local abstract `PhotoPicker`; `ImagePickerPhotoPicker` is the only consumer of the platform plugin, so widget tests inject `FakePhotoPicker` and never hit the gallery. |
+| Avatar camera badge uploads by tapping the avatar (or badge) | The whole `InkWell` circle is the target — a 56 px hit area instead of a 24 px one. While uploading the badge swaps to `AppLoader.inline()`. |
+| Avatar fallback initial + `Image.network` `errorBuilder` | A stored `avatar_url` can 400 outside the test binder; the initial renders instead of a broken image. |
+| Pending analysis is `awaitingAnalysis`, not a separate screen | The backend dispatches `AnalyzeFacePhotoJob` async (never on upload), so `recommendations` stays empty right after a scan. `FaceAnalysisState.awaitingAnalysis` turns the ready-empty state into a pending card with a "Check again" poll; a second empty poll keeps it pending until a result exists. |
+| `recommended_catalog_item_ids` resolved by paging the catalog | `/service-catalog/items` has no ids filter and no face-shape filter — the bloc pages `per_page: 100` up to 5 pages; a catalog failure is tolerated (`curated` stays empty) so the analysis card still renders. |
+| Curated card price + style period share one `Text` (`join('\n')`) | Same idiom as the history meta lines; keeps a single tappable surface and no new card layout. |
+| Face shape labels come from `faceShape*` ARB keys via a private `_shapeLabel` switch | Seven enum values (`oval|round|square|heart|diamond|oblong|triangle`) map to localized strings; unknown values fall through as the raw string. |
+| `FacePhotoDto.isPrimary` defaults false | The `face_profile` embed inside a recommendation omits `is_primary` — a required wire field would 400 the parse. Confirm left default, matching the upload default. |
 
-## 8. Tests — 122, in `test/`
+## 8. Tests — 137, in `test/`
 
 | File | Covers |
 |---|---|
@@ -240,6 +261,9 @@ guards, deep links, locale persistence.
 | `branch_detail_bloc_test.dart` | detail + plan parallel load, plan-failure tolerance, chair/services/time selection, submit guard, 409 conflict, submit no-op without chair |
 | `history_bloc_test.dart` | history start/fail/load-more append/retry, rebook success (slot + id) + failure + ack reset |
 | `history_flow_test.dart` | profile header + history list, empty state, picker-cancel no-op, rebook success → Bookings + reset |
+| `face_analysis_bloc_test.dart` | start empty/curated/failed, catalog-failure tolerance, scan → pending, upload failure, check-again load / stay-pending / retry |
+| `avatar_bloc_test.dart` | upload publishes the returned url, upload failure keeps the previous avatar + error |
+| `face_analysis_flow_test.dart` | empty card + scan action, scan → pending → analysis result + curated card, picker-cancel no-op, avatar upload |
 
 Conventions:
 

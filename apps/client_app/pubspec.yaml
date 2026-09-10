@@ -46,6 +46,9 @@ dependencies:
   equatable: ^2.0.7
   # Locale-aware date formatting on booking cards (same pin as localization).
   intl: ^0.20.0
+  # Native photo picking for the 018b profile (avatar + face scan), hidden
+  # behind the app-local PhotoPicker seam so tests never touch the platform.
+  image_picker: ^1.2.0
   # The single application router. Owns the route tree, redirects and guards.
   # Deliberately NOT in packages/core — core must not depend on Flutter routing.
   go_router: ^17.2.1

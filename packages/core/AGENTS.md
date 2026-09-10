@@ -22,11 +22,11 @@ lib/src/
     paginated_data.dto.dart              PaginatedData<T>
     pagination_meta.dto.dart             PaginationMeta
     network.barrel.dart
-    dto/                                 auth_response · client · onboarding_config · booking* · branch_detail · floor_plan · floor_chair · token_response · service_history · history_barber · history_branch · history_catalog_item · history_media
+    dto/                                 auth_response · client · onboarding_config · booking* · branch_detail · floor_plan · floor_chair · token_response · service_history · history_barber · history_branch · history_catalog_item · history_media · face_photo · face_analysis_result · avatar · universe_preference · catalog_price_range · catalog_item
     endpoints/                           app · auth · booking · branch · explore · history (+ endpoints.barrel.dart, orphaned)
     exceptions/                          api · network · validation
     interceptors/                        auth · locale · logging · retry
-    repositories/                        auth · onboarding_config · explore · booking · branch · history
+    repositories/                        auth · onboarding_config · explore · booking · branch · history · face_profile · profile · service_catalog
   session/
     auth_status.entity.dart              AuthStatus enum
     auth.bloc.dart                       AuthBloc — login / register / verify / resend
@@ -141,6 +141,24 @@ barber/branch/catalogItem/media) and `rebookFromHistory` (slot
 `ServiceHistoryDto` + nested `HistoryBarberDto`/`HistoryBranchDto`/
 `HistoryCatalogItemDto` (`name` is a locale→text translations map; resolve
 `[localeCode] ?? ['en'] ?? ''`)/`HistoryMediaDto`.
+
+`FaceProfileRepository` / `DioFaceProfileRepository` — 018b:
+`uploadFacePhoto(filePath, {isPrimary = false})` posts multipart `photo` +
+`is_primary` to `POST /client/face-profile`; `getRecommendations()` reads
+`GET /client/face-profile/recommendations` (latest-`computed_at` first,
+nullable `recommended_catalog_item_ids`, nested `face_profile`). NB: upload
+does **not** trigger analysis server-side — the client shows a pending state
+and re-polls.
+
+`ProfileRepository` / `DioProfileRepository` — 018b: `updateProfile`
+(`PATCH /client/profile`, null-aware map entries `'name': ?name`), 
+`uploadAvatar(filePath)` (multipart `avatar`, ≤ 2048 kB → `{avatar_url}`),
+`updatePreferredUniverse` (`PATCH /client/preferences/universe`).
+
+`ServiceCatalogRepository` / `DioServiceCatalogRepository` — 018b:
+`getCatalogItems({page, perPage})` over `GET /service-catalog/items`
+(shared/public, paged; no ids/face-shape filter — resolve `CatalogItemDto`s
+by paging).
 
 `AuthEndpoints` declares 10 routes; the repository covers 8.
 `changePassword` and `socialLogin(provider)` have constants but **no method**.
@@ -274,7 +292,7 @@ declare `shared_preferences` themselves.
 
 ## 9. Tests
 
-`packages/core/test/` — 101 tests.
+`packages/core/test/` — 110 tests.
 
 | File | Covers |
 |---|---|
@@ -283,6 +301,8 @@ declare `shared_preferences` themselves.
 | `branch_repository_test.dart` | `getFloorPlan` parsing (available/occupied chairs + barber) + path |
 | `booking_repository_test.dart` | nested parsing, status/page params, cancel route + verb, `createBooking` UTC slot format + 409 conflict |
 | `history_repository_test.dart` | `ServiceHistoryDto` nested parse (translations map), history page params, rebook route/verb + UTC slot + BookingDto parse |
+| `face_profile_repository_test.dart` | upload multipart FormData fields (`FormData.files` is `List<MapEntry<String, MultipartFile>>`) + `is_primary`, recommendations parse (latest-first, nullable rec ids, `face_profile` embed) |
+| `profile_repository_test.dart` | `updateProfile` PATCH partial payload (`'name': ?name`) + `preferred_universe`, uploadAvatar multipart, updatePreferredUniverse, catalog parse (price_range + face_shapes, missing price_range tolerated) |
 | `retry_interceptor_test.dart` | retry on 5xx, give-up, POST not retried |
 | `auth_repository_test.dart` | request bodies incl. `password_confirmation`, no-`data` responses, `PATCH /client/password` + 422 field errors, 401/422 mapping |
 | `auth_bloc_test.dart` | login/register/verify success + failure, resend swallow, `AuthSignalAcknowledged` |

@@ -107,7 +107,10 @@
 - `BranchRepository.getFloorPlan` + `ExploreRepository.getBranchDetail` + `BookingRepository.createBooking` in core; `BranchDetailBloc` + `BranchDetailScreen` + `FloorPlanGrid` (chair/services/time selection, 409 conflict, success → My Bookings) on `/discover/branch/:branchId`.
 
 ### Service History & Rebook — Stitch 018a (CL-11) ✅ Complete
-- `HistoryRepository` + `ServiceHistoryDto` family (barber/branch/catalog-item/media) in core; `HistoryBloc` over `Paged<ServiceHistoryDto>` + rebook; `ProfileScreen` rebuilt as the 018 profile tab (name header card, Service History feed, rebook via Material pickers, 409 conflict, success → My Bookings). 018b (face analysis + AI recommendations) remains.
+- `HistoryRepository` + `ServiceHistoryDto` family (barber/branch/catalog-item/media) in core; `HistoryBloc` over `Paged<ServiceHistoryDto>` + rebook; `ProfileScreen` rebuilt as the 018 profile tab (name header card, Service History feed, rebook via Material pickers, 409 conflict, success → My Bookings).
+
+### Face Analysis & AI Style — Stitch 018b (CL-11) ✅ Complete
+- Core: `FaceProfileRepository` (`POST /client/face-profile` multipart upload, `GET /client/face-profile/recommendations`), `ProfileRepository` (`PATCH /client/profile`, `POST /client/avatar`, `PATCH /client/preferences/universe`), `ServiceCatalogRepository` (`GET /service-catalog/items` paged); DTOs `FacePhotoDto`/`FaceAnalysisResultDto`/`AvatarDto`/`UniversePreferenceDto`/`CatalogPriceRangeDto`/`CatalogItemDto` (+`ClientDto.preferredUniverse`), codegen. App: `FaceAnalysisBloc` (upload → pending → re-check; curated items resolved by paging the catalog) + `AvatarBloc` over the `PhotoPicker` seam; `ProfileScreen` avatar header, Face Analysis card (empty/pending/result/error) and Curated For You section.
 
 ### Empty Scaffolds (not implemented)
 - `features/profile/` — directories only, no files.
@@ -150,7 +153,7 @@ Each export is flagged ✅ **Migrated** (implemented in Flutter, verified by `fl
 | 017a | My Bookings (list/filter/cancel) | CL-10 | ✅ Complete |
 | 017b | Branch Floor Plan & Booking creation | CL-10 | ✅ Complete |
 | 018a | Service History & Rebook | CL-11 | ✅ Complete |
-| 018b | Personalised Profile & AI Style (face analysis + AI recs) | CL-11 | ⏳ Pending |
+| 018b | Face Analysis & AI Style (face analysis + AI recs) | CL-11 | ✅ Complete |
 | 019 | Stylist Profile | CL-12 | ⏳ Pending |
 | 020 | Review & Rating | CL-13 | ⏳ Pending |
 
@@ -183,7 +186,7 @@ All Flutter features built, verified, and passing the gate (`melos run verify`: 
 | FE-17 | Auth screens: entry / login / sign-up / verify | client_app | ✅ Complete | Stitch 006–009 |
 
 ### Not Started
-- Profile completion (Stitch 010), Personalised Profile & AI Style (018b — face analysis + AI recs), Stylist Profile (019), Review & Rating (020). Discovery Feed (016), Booking — list/cancel (017a) + floor-plan detail/creation (017b) — and Service History + Rebook (018a) are **built**.
+- Profile completion (Stitch 010), Stylist Profile (019), Review & Rating (020). Discovery Feed (016), Booking — list/cancel (017a) + floor-plan detail/creation (017b) — Service History + Rebook (018a) — and Face Analysis & AI Style (018b) are **built**.
 - `business_app` and `stylist_app` features — both apps are skeletons.
 
 ### Backend routes for unbuilt features

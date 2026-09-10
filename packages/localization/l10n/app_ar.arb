@@ -674,5 +674,96 @@
   "profileMemberLabel": "عضو",
   "@profileMemberLabel": {
     "description": "Profile header name fallback when the client name is unknown"
+  },
+  "avatarUpdateAction": "تغيير الصورة",
+  "@avatarUpdateAction": {
+    "description": "Avatar upload affordance on the profile header"
+  },
+  "faceAnalysisTitle": "تحليل الوجه",
+  "@faceAnalysisTitle": {
+    "description": "Face analysis module title"
+  },
+  "faceAnalysisDetectedShape": "شكل الوجه المكتشف",
+  "@faceAnalysisDetectedShape": {
+    "description": "Detected face shape label"
+  },
+  "faceAnalysisConfidence": "درجة الثقة",
+  "@faceAnalysisConfidence": {
+    "description": "Analysis confidence label"
+  },
+  "faceScanAction": "امسح وجهي",
+  "@faceScanAction": {
+    "description": "Face photo upload action"
+  },
+  "faceAnalysisPendingTitle": "التحليل قيد التنفيذ",
+  "@faceAnalysisPendingTitle": {
+    "description": "Pending analysis title"
+  },
+  "faceAnalysisPendingMessage": "نحن نحلل وجهك. تحقق مجددًا بعد قليل.",
+  "@faceAnalysisPendingMessage": {
+    "description": "Pending analysis message"
+  },
+  "faceAnalysisEmptyTitle": "لا يوجد تحليل بعد",
+  "@faceAnalysisEmptyTitle": {
+    "description": "Empty analysis state title"
+  },
+  "faceAnalysisEmptyMessage": "ارفع صورة لاكتشاف التسريحات التي تناسبك.",
+  "@faceAnalysisEmptyMessage": {
+    "description": "Empty analysis state message"
+  },
+  "actionCheckAgain": "تحقق مجددًا",
+  "@actionCheckAgain": {
+    "description": "Re-polls a pending face analysis"
+  },
+  "faceShapeOval": "بيضاوي",
+  "@faceShapeOval": {
+    "description": "Detected face shape: oval"
+  },
+  "faceShapeRound": "دائري",
+  "@faceShapeRound": {
+    "description": "Detected face shape: round"
+  },
+  "faceShapeSquare": "مربع",
+  "@faceShapeSquare": {
+    "description": "Detected face shape: square"
+  },
+  "faceShapeHeart": "قلب",
+  "@faceShapeHeart": {
+    "description": "Detected face shape: heart"
+  },
+  "faceShapeDiamond": "ماسي",
+  "@faceShapeDiamond": {
+    "description": "Detected face shape: diamond"
+  },
+  "faceShapeOblong": "مستطيل",
+  "@faceShapeOblong": {
+    "description": "Detected face shape: oblong"
+  },
+  "faceShapeTriangle": "مثلث",
+  "@faceShapeTriangle": {
+    "description": "Detected face shape: triangle"
+  },
+  "curatedForYouTitle": "مختار لك",
+  "@curatedForYouTitle": {
+    "description": "AI style recommendations title"
+  },
+  "curatedEmptyMessage": "لا توجد تسريحات مناسبة بعد.",
+  "@curatedEmptyMessage": {
+    "description": "Empty recommendations message"
+  },
+  "curatedPriceRange": "{min}–{max} {currency}",
+  "@curatedPriceRange": {
+    "description": "Catalog item price range",
+    "placeholders": {
+      "min": {
+        "type": "num"
+      },
+      "max": {
+        "type": "num"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

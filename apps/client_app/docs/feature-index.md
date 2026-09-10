@@ -106,6 +106,13 @@
 - `lib/src/features/profile/profile.screen.dart` — rebuilt into the 018 profile tab: client-name header card (fallback `profileMemberLabel`), Change Password entry kept, Service History section (per-entry rebook via Material date + time pickers, per-card `rebookingId` loader, 409 → `bookingConflictMessage`, success `StatusView` → My Bookings), RefreshIndicator + scroll load-more + retry + first-load/empty/error states.
 - `test/history_bloc_test.dart` (8 cases) + `test/history_flow_test.dart`; `FakeHistoryRepository`, `testServiceHistory`/`testHistoryPage`, `fakeHistoryBloc`, `buildRouter` `history` param in fakes.
 
+### Face Analysis & AI Style — Stitch 018b (CL-11b)
+- `lib/src/features/profile/face_analysis.{bloc,event,state}.dart` — `FaceAnalysisBloc` over core `FaceProfileRepository` + `ServiceCatalogRepository`: start loads recommendations, scan uploads the photo and lands on a pending state (`recommendations` returned empty because the backend job runs async), Check again re-polls, and `recommended_catalog_item_ids` are resolved into `CatalogItemDto`s by paging the catalog (per_page 100, cap 5 pages, catalog failure tolerated).
+- `lib/src/features/profile/avatar.{bloc,event,state}.dart` — `AvatarBloc` over core `ProfileRepository.uploadAvatar` → `avatarUrl`.
+- `lib/src/features/profile/{photo_picker,image_picker_photo_picker}.provider.dart` — `PhotoPicker` seam + `ImagePickerPhotoPicker` (`image_picker` dep, hidden so tests never hit the platform).
+- `lib/src/features/profile/profile.screen.dart` — avatar header (tap to upload, in-flight loader, fallback initial + camera badge), Face Analysis card (empty / pending / result with shape + confidence + photo / error-with-retry), Curated For You section (item name `[localeCode] ?? ['en']`, price range, style period).
+- `test/face_analysis_bloc_test.dart` (9 cases) + `test/avatar_bloc_test.dart` (2) + `test/face_analysis_flow_test.dart` (4); `FakeFaceProfileRepository`, `FakeProfileRepository`, `FakeServiceCatalogRepository`, `FakePhotoPicker`, `testFaceAnalysis`/`testCatalogItem`/`testCatalogPage`, `fakeFaceAnalysisBloc`/`fakeAvatarBloc`, `buildRouter` params in fakes.
+
 ### Empty Scaffolds (no files yet)
 - `lib/src/features/profile/` (password entry button only)
 - `lib/src/core/{di,theme}/`
@@ -135,6 +142,6 @@
 | CL-17 | Authenticated password change | ✅ Complete | Track 17 |
 | CL-10a | My Bookings (list/filter/cancel) | ✅ Complete | Stitch 017a |
 | CL-10b | Branch Floor Plan & Booking creation | ✅ Complete | Stitch 017b |
-| CL-11 | Personalised Profile & AI Style (018a Service History + Rebook; 018b face analysis + AI recs pending) | ✅ 018a / ⏳ 018b | Stitch 018 |
+| CL-11 | Personalised Profile & AI Style — 018a Service History + Rebook; 018b Face Analysis + AI recs | ✅ Complete | Stitch 018 |
 | CL-12 | Stylist Profile | ⏳ Not started | Stitch 019 |
 | CL-13 | Review & Rating | ⏳ Not started | Stitch 020 |

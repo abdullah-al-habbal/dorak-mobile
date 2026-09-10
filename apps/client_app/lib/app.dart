@@ -18,7 +18,10 @@ import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.event.dart';
+import 'package:client_app/src/features/profile/avatar.bloc.dart';
+import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
+import 'package:client_app/src/features/profile/image_picker_photo_picker.provider.dart';
 
 class DorakApp extends StatefulWidget {
   final AppPreferences preferences;
@@ -49,6 +52,8 @@ class _DorakAppState extends State<DorakApp> {
   late final ChangePasswordBloc _passwordChangeBloc;
   late final DiscoveryBloc _discoveryBloc;
   late final HistoryBloc _historyBloc;
+  late final FaceAnalysisBloc _faceAnalysisBloc;
+  late final AvatarBloc _avatarBloc;
   late final OnboardingConfigBloc _onboardingConfigBloc;
   late final LocaleBloc _localeBloc;
   late final AppRouter _router;
@@ -86,6 +91,11 @@ class _DorakAppState extends State<DorakApp> {
       cache: widget.feedCache,
     );
     _historyBloc = HistoryBloc(DioHistoryRepository(_apiClient));
+    _faceAnalysisBloc = FaceAnalysisBloc(
+      DioFaceProfileRepository(_apiClient),
+      DioServiceCatalogRepository(_apiClient),
+    );
+    _avatarBloc = AvatarBloc(DioProfileRepository(_apiClient));
 
     unawaited(_sessionBloc.ready);
 
@@ -123,6 +133,9 @@ class _DorakAppState extends State<DorakApp> {
       passwordChange: _passwordChangeBloc,
       discovery: _discoveryBloc,
       history: _historyBloc,
+      faceAnalysis: _faceAnalysisBloc,
+      avatar: _avatarBloc,
+      photoPicker: const ImagePickerPhotoPicker(),
       switchLocale: _switchLocale,
       apiClient: _apiClient,
     );
@@ -143,6 +156,8 @@ class _DorakAppState extends State<DorakApp> {
     _passwordChangeBloc.close();
     _discoveryBloc.close();
     _historyBloc.close();
+    _faceAnalysisBloc.close();
+    _avatarBloc.close();
     _onboardingConfigBloc.close();
     _localeBloc.close();
     _apiClient.dispose();

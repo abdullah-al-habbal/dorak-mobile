@@ -15,7 +15,10 @@ import 'package:client_app/src/features/booking/booking.bloc.dart';
 import 'package:client_app/src/features/booking/branch_detail.bloc.dart';
 import 'package:client_app/src/features/discovery/discovery.bloc.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
+import 'package:client_app/src/features/profile/avatar.bloc.dart';
+import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
+import 'package:client_app/src/features/profile/photo_picker.provider.dart';
 
 // todo: read this file, and I think is better to make a fakes folder and then move each block/class into a file for better code.
 Widget routerHarness(AppRouter appRouter) {
@@ -41,6 +44,9 @@ AppRouter buildRouter({
   ChangePasswordBloc? passwordChange,
   DiscoveryBloc? discovery,
   HistoryBloc? history,
+  FaceAnalysisBloc? faceAnalysis,
+  AvatarBloc? avatar,
+  PhotoPicker? photoPicker,
   VoidCallback switchLocale = _noSwitchLocale,
 }) {
   return AppRouter(
@@ -56,6 +62,9 @@ AppRouter buildRouter({
         ChangePasswordBloc(recoveryRepository ?? FakeAuthRepository()),
     discovery: discovery ?? fakeDiscoveryBloc(),
     history: history ?? fakeHistoryBloc(),
+    faceAnalysis: faceAnalysis ?? fakeFaceAnalysisBloc(),
+    avatar: avatar ?? fakeAvatarBloc(),
+    photoPicker: photoPicker ?? FakePhotoPicker(),
     switchLocale: switchLocale,
     apiClient: apiClient,
   );
@@ -674,3 +683,181 @@ NetworkException offline() => const NetworkException(
       retryable: true,
       message: 'Connection refused',
     );
+
+FacePhotoDto testFacePhoto({String id = 'photo-1'}) => FacePhotoDto(
+      id: id,
+      imageUrl: 'https://cdn.example.com/face-$id.jpg',
+      isPrimary: false,
+      uploadedAt: DateTime.utc(2026, 9, 10, 12),
+    );
+
+FaceAnalysisResultDto testFaceAnalysis({
+  String id = 'analysis-1',
+  String shape = 'oval',
+  double confidence = 0.9,
+  List<String>? recommendedIds = const ['catalog-1'],
+  String? photoUrl = 'https://cdn.example.com/face-photo-1.jpg',
+}) =>
+    FaceAnalysisResultDto(
+      id: id,
+      faceProfileId: 'photo-1',
+      detectedFaceShape: shape,
+      confidenceScore: confidence,
+      recommendedCatalogItemIds: recommendedIds,
+      computedAt: DateTime.utc(2026, 9, 10, 11),
+      faceProfile: photoUrl == null
+          ? null
+          : FacePhotoDto(
+              id: 'photo-1',
+              imageUrl: photoUrl,
+              isPrimary: false,
+              uploadedAt: DateTime.utc(2026, 9, 10, 12),
+            ),
+      createdAt: DateTime.utc(2026, 9, 10, 13),
+    );
+
+CatalogItemDto testCatalogItem({
+  String id = 'catalog-1',
+  String name = 'Classic Fade',
+  num min = 50,
+  num max = 90,
+  String currency = 'SAR',
+  String? stylePeriod = 'Modern',
+}) =>
+    CatalogItemDto(
+      id: id,
+      name: {'en': name},
+      priceRange:
+          CatalogPriceRangeDto(min: min, max: max, currency: currency),
+      faceShapes: const ['oval'],
+      stylePeriod: stylePeriod,
+    );
+
+PaginatedData<CatalogItemDto> testCatalogPage({
+  List<CatalogItemDto>? items,
+}) {
+  final data = items ?? [testCatalogItem()];
+  return PaginatedData(
+    data: data,
+    meta: PaginationMeta(
+      total: data.length,
+      count: data.length,
+      perPage: 100,
+      currentPage: 1,
+      totalPages: 1,
+    ),
+  );
+}
+
+class FakePhotoPicker implements PhotoPicker {
+  String? path;
+  int pickCalls = 0;
+
+  @override
+  Future<String?> pickPhoto() async {
+    pickCalls++;
+    return path;
+  }
+}
+
+class FakeFaceProfileRepository implements FaceProfileRepository {
+  List<FaceAnalysisResultDto> recommendations = const [];
+  Object? uploadError;
+  Object? recommendationsError;
+
+  int uploadCalls = 0;
+  int recommendationsCalls = 0;
+  String? lastUploadedPath;
+  bool? lastIsPrimary;
+
+  @override
+  Future<FacePhotoDto> uploadFacePhoto(
+    String filePath, {
+    bool isPrimary = false,
+  }) async {
+    uploadCalls++;
+    lastUploadedPath = filePath;
+    lastIsPrimary = isPrimary;
+    final failure = uploadError;
+    if (failure != null) throw failure;
+    return testFacePhoto();
+  }
+
+  @override
+  Future<List<FaceAnalysisResultDto>> getRecommendations() async {
+    recommendationsCalls++;
+    final failure = recommendationsError;
+    if (failure != null) throw failure;
+    return recommendations;
+  }
+}
+
+class FakeProfileRepository implements ProfileRepository {
+  String avatarUrl = 'https://cdn.example.com/avatar.jpg';
+  Object? uploadError;
+  int avatarUploadCalls = 0;
+  String? lastAvatarPath;
+
+  @override
+  Future<AvatarDto> uploadAvatar(String filePath) async {
+    avatarUploadCalls++;
+    lastAvatarPath = filePath;
+    final failure = uploadError;
+    if (failure != null) throw failure;
+    return AvatarDto(avatarUrl: avatarUrl);
+  }
+
+  @override
+  Future<ClientDto> updateProfile({
+    String? name,
+    String? email,
+    String? phone,
+  }) async {
+    return const ClientDto(
+      id: 'uuid-1',
+      name: 'Sara',
+      email: 'sara@example.com',
+    );
+  }
+
+  @override
+  Future<UniversePreferenceDto> updatePreferredUniverse(
+    String universe,
+  ) async {
+    return UniversePreferenceDto(preferredUniverse: universe);
+  }
+}
+
+class FakeServiceCatalogRepository implements ServiceCatalogRepository {
+  PaginatedData<CatalogItemDto> page = testCatalogPage();
+  Object? error;
+
+  int calls = 0;
+  int lastPage = 1;
+
+  @override
+  Future<PaginatedData<CatalogItemDto>> getCatalogItems({
+    int page = 1,
+    int perPage = 100,
+  }) async {
+    calls++;
+    lastPage = page;
+    final failure = error;
+    if (failure != null) throw failure;
+    return this.page;
+  }
+}
+
+FaceAnalysisBloc fakeFaceAnalysisBloc({
+  FakeFaceProfileRepository? face,
+  FakeServiceCatalogRepository? catalog,
+}) {
+  return FaceAnalysisBloc(
+    face ?? FakeFaceProfileRepository(),
+    catalog ?? FakeServiceCatalogRepository(),
+  );
+}
+
+AvatarBloc fakeAvatarBloc({FakeProfileRepository? repository}) {
+  return AvatarBloc(repository ?? FakeProfileRepository());
+}

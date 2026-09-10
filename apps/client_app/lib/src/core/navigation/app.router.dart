@@ -34,8 +34,11 @@ import 'package:client_app/src/features/onboarding/booking.screen.dart';
 import 'package:client_app/src/features/onboarding/discovery.screen.dart';
 import 'package:client_app/src/features/onboarding/onboarding_config.bloc.dart';
 import 'package:client_app/src/features/onboarding/welcome.screen.dart';
+import 'package:client_app/src/features/profile/avatar.bloc.dart';
+import 'package:client_app/src/features/profile/face_analysis.bloc.dart';
 import 'package:client_app/src/features/profile/favorites.screen.dart';
 import 'package:client_app/src/features/profile/history.bloc.dart';
+import 'package:client_app/src/features/profile/photo_picker.provider.dart';
 import 'package:client_app/src/features/profile/profile.screen.dart';
 import 'package:client_app/src/features/splash/splash.screen.dart';
 
@@ -50,6 +53,9 @@ class AppRouter {
   final ChangePasswordBloc passwordChange;
   final DiscoveryBloc discovery;
   final HistoryBloc history;
+  final FaceAnalysisBloc faceAnalysis;
+  final AvatarBloc avatar;
+  final PhotoPicker photoPicker;
   final VoidCallback switchLocale;
   final ApiClient apiClient;
 
@@ -69,6 +75,9 @@ class AppRouter {
     required this.passwordChange,
     required this.discovery,
     required this.history,
+    required this.faceAnalysis,
+    required this.avatar,
+    required this.photoPicker,
     required this.switchLocale,
     required this.apiClient,
   }) {
@@ -353,6 +362,9 @@ class AppRouter {
                 path: AppRoutes.profile,
                 builder: (context, state) => ProfileScreen(
                   history: history,
+                  faceAnalysis: faceAnalysis,
+                  avatar: avatar,
+                  photoPicker: photoPicker,
                   clientName: session.state.client?.name,
                   onChangePassword: () =>
                       router.push<void>(AppRoutes.profilePassword),

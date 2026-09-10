@@ -560,4 +560,68 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileMemberLabel => 'عضو';
+
+  @override
+  String get avatarUpdateAction => 'تغيير الصورة';
+
+  @override
+  String get faceAnalysisTitle => 'تحليل الوجه';
+
+  @override
+  String get faceAnalysisDetectedShape => 'شكل الوجه المكتشف';
+
+  @override
+  String get faceAnalysisConfidence => 'درجة الثقة';
+
+  @override
+  String get faceScanAction => 'امسح وجهي';
+
+  @override
+  String get faceAnalysisPendingTitle => 'التحليل قيد التنفيذ';
+
+  @override
+  String get faceAnalysisPendingMessage =>
+      'نحن نحلل وجهك. تحقق مجددًا بعد قليل.';
+
+  @override
+  String get faceAnalysisEmptyTitle => 'لا يوجد تحليل بعد';
+
+  @override
+  String get faceAnalysisEmptyMessage =>
+      'ارفع صورة لاكتشاف التسريحات التي تناسبك.';
+
+  @override
+  String get actionCheckAgain => 'تحقق مجددًا';
+
+  @override
+  String get faceShapeOval => 'بيضاوي';
+
+  @override
+  String get faceShapeRound => 'دائري';
+
+  @override
+  String get faceShapeSquare => 'مربع';
+
+  @override
+  String get faceShapeHeart => 'قلب';
+
+  @override
+  String get faceShapeDiamond => 'ماسي';
+
+  @override
+  String get faceShapeOblong => 'مستطيل';
+
+  @override
+  String get faceShapeTriangle => 'مثلث';
+
+  @override
+  String get curatedForYouTitle => 'مختار لك';
+
+  @override
+  String get curatedEmptyMessage => 'لا توجد تسريحات مناسبة بعد.';
+
+  @override
+  String curatedPriceRange(num min, num max, String currency) {
+    return '$min–$max $currency';
+  }
 }

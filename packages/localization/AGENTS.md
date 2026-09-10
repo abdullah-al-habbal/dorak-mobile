@@ -48,7 +48,7 @@ supportedLocales: AppLocalizations.supportedLocales,
 
 `business_app` and `stylist_app` do **not** depend on this package yet.
 
-## 3. The 172 keys
+## 3. The 192 keys
 
 **Common** — `splashTitle` `skip` `cancel` `next` `previous` `back` `homeTitle`
 
@@ -122,9 +122,19 @@ supportedLocales: AppLocalizations.supportedLocales,
 `historyRebookMessage` `historyRebookSuccessTitle`
 `historyRebookSuccessMessage` `profileMemberLabel`
 
+**Face Analysis + AI Style (018b)** — `profileAvatarFallbackInitial`
+`profileUploadingAvatar` `faceAnalysisTitle` `faceAnalysisSubtitle`
+`faceAnalysisScanAction` `faceAnalysisCheckAgainAction`
+`faceAnalysisNoPhotoMessage` `faceAnalysisNoPhotoAction` `faceAnalysisPendingTitle`
+`faceAnalysisPendingMessage` `faceAnalysisDetectedShapeLabel` `faceShapeOval`
+`faceShapeRound` `faceShapeSquare` `faceShapeHeart` `faceShapeDiamond`
+`faceShapeOblong` `faceShapeTriangle` `faceAnalysisUploadError`
+`faceAnalysisResultsError` `curatedForYouTitle` `curatedForYouSubtitle`
+`curatedPriceRange`
+
 ## 4. Parameterised keys
 
-Seven, and they generate **methods**, not getters:
+Eight, and they generate **methods**, not getters:
 
 ```dart
 String verifySubtitle(String email);        // "…code we sent to {email}"
@@ -134,6 +144,7 @@ String discoverRankBadge(int rank);         // "#{rank}"
 String discoverCompatibilityBadge(int percent); // "{percent}%"
 String branchChairsCount(int count);        // "{count} chairs"
 String historyRebookMessage(String item);   // "Rebook {item}?"
+String curatedPriceRange(num min, num max, String currency); // "{min}–{max} {currency}"
 ```
 
 ARB form:

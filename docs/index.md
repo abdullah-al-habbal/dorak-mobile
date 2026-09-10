@@ -924,8 +924,26 @@ Verify:
 
 # 6. Current Execution Point
 
-**Current Track:** **Stitch 018 / Personalised Profile & AI Style — 018a
-Service History + Rebook DONE 2026-09-10.** `HistoryEndpoints` +
+**Current Track:** **Stitch 018 / Personalised Profile & AI Style — 018b
+Face Analysis + AI Style DONE 2026-09-10.** Core:
+`FaceProfileEndpoints` (`POST /client/face-profile` multipart upload, `GET
+/client/face-profile/recommendations`), `ProfileEndpoints` (avatar /
+universe / profile update), `ServiceCatalogEndpoints`
+(`GET /service-catalog/items` paged), DTOs `FacePhotoDto` /
+`FaceAnalysisResultDto` / `AvatarDto` / `UniversePreferenceDto` /
+`CatalogPriceRangeDto` / `CatalogItemDto` (+ `ClientDto.preferredUniverse`)
+behind `FaceProfileRepository` / `ProfileRepository` /
+`ServiceCatalogRepository` (codegen). App: `FaceAnalysisBloc`
+(upload → pending → re-check; `recommended_catalog_item_ids` resolved by
+paging the catalog, catalog failure tolerated) + `AvatarBloc` over a
+`PhotoPicker` seam (`ImagePickerPhotoPicker`), `ProfileScreen` tipped with
+an avatar header (tap to upload, fallback initial), a Face Analysis card
+(empty / pending / result-with-shape+confidence / error) and a Curated For
+You section. `melos verify` exit 0, **266 tests** (core 110, client_app
+137, design_system 14, 1×4), **192 ARB keys** (EN+AR parity).
+
+**Just completed — Stitch 018a / Service History + Rebook (CL-11)
+(2026-09-10).** `HistoryEndpoints` +
 `HistoryRepository`/`DioHistoryRepository` (`GET /client/history` paged,
 `POST /client/history/{history}/rebook` with UTC `yyyy-MM-dd HH:mm:ss`
 slot) + `ServiceHistoryDto` with nested `HistoryBarberDto` /
@@ -936,8 +954,7 @@ slot) + `ServiceHistoryDto` with nested `HistoryBarberDto` /
 Change Password entry, Service History section, per-entry rebook via Material
 date + time pickers, 409 → conflict message, success `StatusView` → My
 Bookings). `melos verify` exit 0, **241 tests** (core 101, client_app 122,
-design_system 14, 1×4), **172 ARB keys** (EN+AR parity). 018b (face
-analysis + AI recommendations) not started.
+design_system 14, 1×4), **172 ARB keys** (EN+AR parity).
 
 **Just completed — Track 11 Navigation (2026-09-02).** Four-tab
 `StatefulShellRoute.indexedStack` with bottom `NavigationBar`:

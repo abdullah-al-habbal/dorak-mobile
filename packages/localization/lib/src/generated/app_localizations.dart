@@ -1129,6 +1129,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Member'**
   String get profileMemberLabel;
+
+  /// Avatar upload affordance on the profile header
+  ///
+  /// In en, this message translates to:
+  /// **'Change Photo'**
+  String get avatarUpdateAction;
+
+  /// Face analysis module title
+  ///
+  /// In en, this message translates to:
+  /// **'Face Analysis'**
+  String get faceAnalysisTitle;
+
+  /// Detected face shape label
+  ///
+  /// In en, this message translates to:
+  /// **'Detected Shape'**
+  String get faceAnalysisDetectedShape;
+
+  /// Analysis confidence label
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get faceAnalysisConfidence;
+
+  /// Face photo upload action
+  ///
+  /// In en, this message translates to:
+  /// **'Scan my face'**
+  String get faceScanAction;
+
+  /// Pending analysis title
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis in progress'**
+  String get faceAnalysisPendingTitle;
+
+  /// Pending analysis message
+  ///
+  /// In en, this message translates to:
+  /// **'We are analyzing your face. Check again in a moment.'**
+  String get faceAnalysisPendingMessage;
+
+  /// Empty analysis state title
+  ///
+  /// In en, this message translates to:
+  /// **'No analysis yet'**
+  String get faceAnalysisEmptyTitle;
+
+  /// Empty analysis state message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload a photo to discover the styles that suit you.'**
+  String get faceAnalysisEmptyMessage;
+
+  /// Re-polls a pending face analysis
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get actionCheckAgain;
+
+  /// Detected face shape: oval
+  ///
+  /// In en, this message translates to:
+  /// **'Oval'**
+  String get faceShapeOval;
+
+  /// Detected face shape: round
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get faceShapeRound;
+
+  /// Detected face shape: square
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get faceShapeSquare;
+
+  /// Detected face shape: heart
+  ///
+  /// In en, this message translates to:
+  /// **'Heart'**
+  String get faceShapeHeart;
+
+  /// Detected face shape: diamond
+  ///
+  /// In en, this message translates to:
+  /// **'Diamond'**
+  String get faceShapeDiamond;
+
+  /// Detected face shape: oblong
+  ///
+  /// In en, this message translates to:
+  /// **'Oblong'**
+  String get faceShapeOblong;
+
+  /// Detected face shape: triangle
+  ///
+  /// In en, this message translates to:
+  /// **'Triangle'**
+  String get faceShapeTriangle;
+
+  /// AI style recommendations title
+  ///
+  /// In en, this message translates to:
+  /// **'Curated For You'**
+  String get curatedForYouTitle;
+
+  /// Empty recommendations message
+  ///
+  /// In en, this message translates to:
+  /// **'No matching styles yet.'**
+  String get curatedEmptyMessage;
+
+  /// Catalog item price range
+  ///
+  /// In en, this message translates to:
+  /// **'{min}–{max} {currency}'**
+  String curatedPriceRange(num min, num max, String currency);
 }
 
 class _AppLocalizationsDelegate
